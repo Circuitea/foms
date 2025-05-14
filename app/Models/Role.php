@@ -9,6 +9,8 @@ class Role extends Model
 {
     public $timestamps = false;
 
+    protected $fillable = ['name'];
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(Personnel::class, 'personnel_role');
