@@ -1,18 +1,20 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
+import ApplicationLogo from '@/components/ApplicationLogo';
 import { PropsWithChildren } from 'react';
 
 export default function Guest({ children }: PropsWithChildren) {
     return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0 dark:bg-gray-900">
-            <div>
-                <Link href="/">
-                    <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" />
-                </Link>
-            </div>
+        <div className={`bg-[url("/img/guest_bg.jpg")]` + ' bg-cover bg-center'}>
+            <div className='flex flex-col min-h-screen pt-4 items-center sm:justify-center sm:pt-0 bg-white/50'>
+                <div className='flex items-stretch  '>
+                    <div className='mt-6 flex flex-col justify-center items-center bg-white sm:rounded-tl-lg sm:rounded-bl-lg min-h-full px-10'>
+                        <ApplicationLogo className="h-28 w-28 mb-2" />
+                        <p className='text-center font-bold'>City Disaster Risk Reduction and Management Office</p>
+                    </div>
 
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg dark:bg-gray-800">
-                {children}
+                    <div className="mt-6 w-full overflow-hidden bg-auth text-auth-foreground px-6 py-24 sm:max-w-md sm:rounded-tr-lg sm:rounded-br-lg">
+                        {children}
+                    </div>
+                </div>
             </div>
         </div>
     );

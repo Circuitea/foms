@@ -1,8 +1,10 @@
-import InputError from '@/Components/InputError';
+import InputError from '@/components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 export default function ForgotPassword({ status }: { status?: string }) {
@@ -20,10 +22,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
         <GuestLayout>
             <Head title="Forgot Password" />
 
-            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                Forgot your password? No problem. Just let us know your email
-                address and we will email you a password reset link that will
-                allow you to choose a new one.
+            <div className="mb-4 text-sm">
+                Enter your email address and we will send you instructions to reset your password.
             </div>
 
             {status && (
@@ -33,22 +33,31 @@ export default function ForgotPassword({ status }: { status?: string }) {
             )}
 
             <form onSubmit={submit}>
-                <TextInput
-                    id="email"
-                    type="email"
-                    name="email"
+                <Input
+                    id='email'
+                    type='email'
+                    name='email'
                     value={data.email}
-                    className="mt-1 block w-full"
-                    isFocused={true}
+                    className='mt-1 block w-full bg-background text-foreground'
                     onChange={(e) => setData('email', e.target.value)}
                 />
 
                 <InputError message={errors.email} className="mt-2" />
 
                 <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    {/* <PrimaryButton className="ms-4" disabled={processing}>
                         Email Password Reset Link
-                    </PrimaryButton>
+                    </PrimaryButton> */}
+
+                    <Button className='ms-4' variant='secondary' disabled={processing} asChild>
+                        <Link href={route('login')}>
+                            Cancel
+                        </Link>
+                    </Button>
+
+                    <Button className='ms-4 bg-auth-primary text-auth-primary-foreground' disabled={processing}>
+                        Email Password Reset Link
+                    </Button>
                 </div>
             </form>
         </GuestLayout>
