@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 57 100% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
@@ -29,10 +29,6 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --auth: 231 56% 24%;
-    --auth-foreground: 0 0% 98%;
-    --auth-primary: 0 100% 76%;
-    --auth-primary-foreground: 0 0% 98%;
     --sidebar-background: 231 56% 24%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 240 5.9% 10%;
@@ -41,6 +37,12 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --auth: 231 56% 24%;
+    --auth-foreground: 0 0% 98%;
+    --auth-primary: 0 100% 76%;
+    --auth-primary-foreground: 0 0% 98%;
+    --header: 231 56% 24%;
+    --header-foreground: 0 0% 98%;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -79,6 +81,8 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --header: 231 56% 24%;
+    --header-foreground: 0 0% 98%;
   }
 }
 
@@ -95,5 +99,7 @@
   --color-auth: var(--auth);
   --color-auth-foreground: var(--auth-foreground);
   --color-auth-primary: var(--auth-primary);
-  --color-auth-primary-foreground: var(--auth-primary-foreground)
+  --color-auth-primary-foreground: var(--auth-primary-foreground);
+  --color-header: var(--header);
+  --color-header-foreground: var(--header-foreground)
 }
