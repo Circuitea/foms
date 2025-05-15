@@ -1,7 +1,10 @@
-import InputError from '@/Components/InputError';
+import InputError from '@/components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -34,15 +37,13 @@ export default function ResetPassword({
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
+                    <Label htmlFor='email'>Email</Label>
+                    <Input
+                        id='email'
+                        type='email'
+                        name='email'
                         value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
+                        className='mt-1 block w-full bg-background text-foreground'
                         onChange={(e) => setData('email', e.target.value)}
                     />
 
@@ -50,33 +51,26 @@ export default function ResetPassword({
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
+                    <Label htmlFor='password'>Password</Label>
+                    <Input
+                        id='password'
+                        type='password'
+                        name='password'
                         value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        isFocused={true}
+                        className='mt-1 block w-full bg-background text-foreground'
                         onChange={(e) => setData('password', e.target.value)}
                     />
-
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
+                    <Label htmlFor="password_confirmation">Confirm Password</Label>
 
-                    <TextInput
+                    <Input
                         type="password"
                         name="password_confirmation"
                         value={data.password_confirmation}
-                        className="mt-1 block w-full"
+                        className="mt-1 block w-full bg-background text-foreground"
                         autoComplete="new-password"
                         onChange={(e) =>
                             setData('password_confirmation', e.target.value)
@@ -90,9 +84,9 @@ export default function ResetPassword({
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <Button className="ms-4 bg-auth-primary text-auth-primary-foreground" disabled={processing}>
                         Reset Password
-                    </PrimaryButton>
+                    </Button>
                 </div>
             </form>
         </GuestLayout>
