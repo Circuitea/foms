@@ -21,7 +21,7 @@ const navItems = [
     },
     {
         title: 'Personnel',
-        url: '#',
+        url: '/personnel',
         icon: UserPen,
     },
     {

@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,6 +17,12 @@ use Inertia\Inertia;
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::prefix('personnel')->middleware(['auth', 'verified'])->group(function () {
+    Route::get('', [PersonnelController::class, 'list']);
+    Route::get('new', [PersonnelController::class, 'new']);
+    Route::post('new', [PersonnelController::class, 'create']);
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
