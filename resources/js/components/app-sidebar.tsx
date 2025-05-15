@@ -1,6 +1,6 @@
 import { Bell, ClipboardCheck, FolderOpen, LayoutDashboard, LogOut, Phone, Settings, UserPen } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "./ui/sidebar";
-import { Link, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
 const navItems = [
@@ -88,7 +88,7 @@ export function AppSidebar() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <SidebarMenuButton>
+                        <SidebarMenuButton onClick={() => router.post(route('logout'))}>
                             <LogOut />
                             <span>Logout</span>
                         </SidebarMenuButton>
