@@ -82,7 +82,7 @@ export default function Login({
                             onCheckedChange={(isChecked) => setData('remember', (isChecked || false) as false)}
                         />
                         <span className="ms-2 text-sm">
-                            Remember me
+                            Remember me?
                         </span>
                     </Label>
                 </div>
