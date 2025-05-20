@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import GuestLayout from "@/Layouts/GuestLayout"
 import { Head, Link, useForm } from "@inertiajs/react"
+import { route } from "laravel-vite-plugin/inertia-helpers"
 import type { FormEventHandler } from "react"
 
 export default function Login({
@@ -36,8 +37,8 @@ export default function Login({
 
       <div className="space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
-          <p className="text-sm text-muted-foreground mt-2">Enter your credentials to access your account</p>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Welcome back</h1>
+          <p className="text-sm text-white/70 mt-2">Enter your credentials to access your account</p>
         </div>
 
         {status && (
@@ -48,7 +49,7 @@ export default function Login({
 
         <form onSubmit={submit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-base">
+            <Label htmlFor="email" className="text-base text-white">
               Email
             </Label>
             <Input
@@ -56,7 +57,7 @@ export default function Login({
               type="email"
               name="email"
               value={data.email}
-              className="h-11 bg-white/50 border-input/60 focus-visible:ring-auth-primary"
+              className="h-11 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus-visible:ring-white/50"
               autoComplete="email"
               placeholder="name@example.com"
               onChange={(e) => setData("email", e.target.value)}
@@ -66,13 +67,13 @@ export default function Login({
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-base">
+              <Label htmlFor="password" className="text-base text-white">
                 Password
               </Label>
               {canResetPassword && (
                 <Link
                   href={route("password.request")}
-                  className="text-xs font-medium text-auth-primary hover:text-auth-primary/80 transition-colors"
+                  className="text-xs font-medium text-white/80 hover:text-white transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -83,7 +84,7 @@ export default function Login({
               type="password"
               name="password"
               value={data.password}
-              className="h-11 bg-white/50 border-input/60 focus-visible:ring-auth-primary"
+              className="h-11 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus-visible:ring-white/50"
               autoComplete="current-password"
               placeholder="••••••••"
               onChange={(e) => setData("password", e.target.value)}
@@ -96,16 +97,16 @@ export default function Login({
               id="remember"
               name="remember"
               checked={data.remember}
-              className="border-input/60 data-[state=checked]:bg-auth-primary data-[state=checked]:border-auth-primary"
+              className="border-white/30 data-[state=checked]:bg-white data-[state=checked]:border-white"
               onCheckedChange={(isChecked) => setData("remember", (isChecked || false) as false)}
             />
-            <Label htmlFor="remember" className="text-sm font-normal">
+            <Label htmlFor="remember" className="text-sm font-normal text-white">
               Remember me
             </Label>
           </div>
 
           <Button
-            className="w-full h-11 bg-auth-primary hover:bg-auth-primary/90 text-auth-primary-foreground font-semibold"
+            className="w-full h-11 bg-white hover:bg-white/90 text-[#1B2560] font-semibold mt-6"
             disabled={processing}
           >
             {processing ? "Signing in..." : "Sign in"}

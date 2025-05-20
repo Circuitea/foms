@@ -6,7 +6,7 @@ export default function InputError({
   ...props
 }: HTMLAttributes<HTMLParagraphElement> & { message?: string }) {
   return message ? (
-    <p {...props} className={"text-sm font-medium text-red-600 dark:text-red-400 flex items-center " + className}>
+    <p {...props} className={"text-sm font-medium text-red-300 flex items-center " + className}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 20 20"

@@ -16,6 +16,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         auth: "bg-auth-primary text-auth-primary-foreground shadow-md hover:bg-auth-primary/90 transition-all duration-200",
+        white: "bg-white text-[#1B2560] shadow-md hover:bg-white/90 transition-all duration-200",
       },
       size: {
         default: "h-9 px-4 py-2",
