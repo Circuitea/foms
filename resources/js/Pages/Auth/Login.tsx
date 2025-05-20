@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import GuestLayout from "@/Layouts/GuestLayout"
 import { Head, Link, useForm } from "@inertiajs/react"
-import { route } from "laravel-vite-plugin/inertia-helpers"
 import type { FormEventHandler } from "react"
 
 export default function Login({
@@ -106,7 +105,7 @@ export default function Login({
           </div>
 
           <Button
-            className="w-full h-11 bg-white hover:bg-white/90 text-[#1B2560] font-semibold mt-6"
+            className="w-full h-11 bg-[#FF8484] hover:bg-[#e57676] text-white font-semibold mt-6"
             disabled={processing}
           >
             {processing ? "Signing in..." : "Sign in"}

@@ -9,16 +9,14 @@ export default function Guest({ children }: PropsWithChildren) {
           <div className="flex-1 flex flex-col justify-center items-center bg-white p-8 md:p-10">
             <ApplicationLogo className="h-28 w-28 mb-4" />
             <h2 className="text-xl font-bold text-center mb-1">City Disaster Risk Reduction</h2>
-            <p className="text-center text-muted-foreground">and Management Office</p>
+            <p className="text-xl font-bold text-center mb-1">and Management Office</p>
           </div>
 
           <div className="flex-1 w-full relative overflow-hidden bg-gradient-to-br from-[#1B2560] to-[#2d3a8a] text-auth-foreground px-6 py-10 sm:px-10">
             {/* Decorative shapes */}
             <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/5 -translate-y-1/2 translate-x-1/2"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white/5 translate-y-1/3 -translate-x-1/3"></div>
-            <div className="absolute top-1/4 left-1/4 w-16 h-16 rounded-md rotate-45 bg-white/5"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-24 h-24 rounded-md rotate-12 bg-white/5"></div>
-
+ 
             {/* Content with relative positioning to appear above the shapes */}
             <div className="relative z-10">{children}</div>
           </div>
