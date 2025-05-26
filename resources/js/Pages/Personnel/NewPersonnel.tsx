@@ -28,13 +28,6 @@ const departments = [
   "Administration",
   "IT Department",
   "Logistic",
-  "Human Resources",
-  "Finance",
-  "Operations",
-  "Security",
-  "Maintenance",
-  "Planning",
-  "Communications",
 ]
 
 export default function NewPersonnel() {
