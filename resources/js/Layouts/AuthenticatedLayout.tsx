@@ -9,7 +9,7 @@ export default function Authenticated({
         <SidebarProvider>
             <AppSidebar />
             <main className='w-full'>
-                <div className='bg-header text-header-foreground w-full flex justify-center p-4 text-2xl font-extrabold'>
+                <div className='bg-header text-header-foreground w-full flex justify-center p-8 text-4xl font-black'>
                     <p>CITY DISASTER RISK REDUCTION AND MANAGEMENT OFFICE</p>
                 </div>
                 {children}
