@@ -6,34 +6,44 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { Head, Link, useForm } from "@inertiajs/react"
-import {
-  ArrowLeft,
-  User,
-  Mail,
-  Phone,
-  Lock,
-  Save,
-  Loader2,
-  Briefcase,
-  ChevronDown,
-  Check,
-  Building,
-} from "lucide-react"
+import { ArrowLeft, User, Mail, Phone, Lock, Save, Loader2, Briefcase, ChevronDown, Check, Building, AlertCircle, X } from 'lucide-react'
 import type { FormEventHandler } from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const positions = ["IT Staff", "Administrative Staff", "Logistic Staff"]
 
-const departments = [
-  "Administration",
-  "IT Department",
-  "Logistic",
-]
+const departments = ["Administration", "IT Department", "Logistic"]
+
+// Position to Department mapping
+const positionDepartmentMapping: Record<string, string> = {
+  "IT Staff": "IT Department",
+  "Administrative Staff": "Administration",
+  "Logistic Staff": "Logistic",
+}
+
+// Department to positions mapping (for filtering)
+const departmentPositionsMapping: Record<string, string[]> = {
+  "IT Department": ["IT Staff"],
+  Administration: ["Administrative Staff"],
+  Logistic: ["Logistic Staff"],
+}
+
+interface ValidationErrors {
+  [key: string]: string
+}
+
+interface Toast {
+  id: string
+  type: "error" | "success" | "warning"
+  title: string
+  message: string
+}
 
 export default function NewPersonnel() {
   const { data, setData, processing, errors, post, reset } = useForm({
     first_name: "",
     middle_name: "",
+    surname: "",
     surname: "",
     name_extension: "",
     email: "",
@@ -51,51 +61,301 @@ export default function NewPersonnel() {
   const [isDepartmentOpen, setIsDepartmentOpen] = useState(false)
   const [departmentSearch, setDepartmentSearch] = useState("")
 
+  // Validation states
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
+  const [toasts, setToasts] = useState<Toast[]>([])
+
   const filteredPositions = positions.filter((position) =>
     position.toLowerCase().includes(positionSearch.toLowerCase()),
   )
 
-  const filteredDepartments = departments.filter((department) =>
+  // Filter departments based on selected position
+  const getAvailableDepartments = () => {
+    if (data.position && positionDepartmentMapping[data.position]) {
+      // If position is selected and has a mapping, only show the mapped department
+      return [positionDepartmentMapping[data.position]]
+    }
+    // Otherwise show all departments
+    return departments
+  }
+
+  const filteredDepartments = getAvailableDepartments().filter((department) =>
     department.toLowerCase().includes(departmentSearch.toLowerCase()),
   )
+
+  // Toast management
+  const addToast = (type: Toast["type"], title: string, message: string) => {
+    const id = Math.random().toString(36).substr(2, 9)
+    const newToast: Toast = { id, type, title, message }
+    setToasts((prev) => [...prev, newToast])
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      removeToast(id)
+    }, 5000)
+  }
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id))
+  }
+
+  // Validation functions
+  const validateEmail = (email: string): string | null => {
+    if (!email) return "Email address is required"
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) return "Please enter a valid email address"
+    return null
+  }
+
+  const validateMobileNumber = (mobile: string): string | null => {
+    if (!mobile) return "Mobile number is required"
+    if (!/^[0-9]+$/.test(mobile)) return "Mobile number should only contain numbers"
+    if (mobile.length !== 10) return "Please enter exactly 10 digits after +63"
+    return null
+  }
+
+  const validatePassword = (password: string): string | null => {
+    if (!password) return "Password is required"
+    if (password.length < 8) return "Password must be at least 8 characters long"
+    if (!/(?=.*[a-z])/.test(password)) return "Password must contain at least one lowercase letter"
+    if (!/(?=.*[A-Z])/.test(password)) return "Password must contain at least one uppercase letter"
+    if (!/(?=.*\d)/.test(password)) return "Password must contain at least one number"
+    return null
+  }
+
+  const validateName = (name: string, fieldName: string, required = true): string | null => {
+    if (required && !name) return `${fieldName} is required`
+    if (name && !/^[a-zA-Z\s\-.]+$/.test(name))
+      return `${fieldName} should only contain letters, spaces, hyphens, and periods`
+    if (name && name.length > 50) return `${fieldName} should not exceed 50 characters`
+    return null
+  }
+
+  const validateRequired = (value: string, fieldName: string): string | null => {
+    if (!value || value.trim() === "") return `${fieldName} is required`
+    return null
+  }
+
+  // Real-time validation
+  const handleFieldValidation = (field: string, value: string) => {
+    let error: string | null = null
+
+    switch (field) {
+      case "first_name":
+        error = validateName(value, "First name")
+        break
+      case "surname":
+        error = validateName(value, "Surname")
+        break
+      case "middle_name":
+        error = validateName(value, "Middle name", false)
+        break
+      case "name_extension":
+        error = validateName(value, "Name extension", false)
+        break
+      case "email":
+        error = validateEmail(value)
+        break
+      case "mobile_number":
+        error = validateMobileNumber(value)
+        break
+      case "password":
+        error = validatePassword(value)
+        break
+      case "position":
+        error = validateRequired(value, "Position")
+        break
+      case "department":
+        error = validateRequired(value, "Department")
+        break
+    }
+
+    setValidationErrors((prev) => ({
+      ...prev,
+      [field]: error || "",
+    }))
+  }
+
+  // Handle input changes with validation
+  const handleInputChange = (field: string, value: string) => {
+    setData(field as any, value)
+    handleFieldValidation(field, value)
+  }
+
+  const handleMobileNumberChange = (value: string) => {
+    // Only allow numbers
+    const numbersOnly = value.replace(/[^0-9]/g, "")
+    // Limit to 10 digits (after +63)
+    const limitedValue = numbersOnly.slice(0, 10)
+
+    if (value !== numbersOnly) {
+      addToast("error", "Invalid Input", "Mobile number should only contain numbers")
+    }
+
+    handleInputChange("mobile_number", limitedValue)
+  }
 
   const handlePositionSelect = (position: string) => {
     setData("position", position)
     setPositionSearch(position)
     setIsPositionOpen(false)
+    handleFieldValidation("position", position)
+
+    // Auto-set department based on position
+    const mappedDepartment = positionDepartmentMapping[position]
+    if (mappedDepartment) {
+      setData("department", mappedDepartment)
+      setDepartmentSearch(mappedDepartment)
+      handleFieldValidation("department", mappedDepartment)
+
+      // Show success toast
+      addToast(
+        "success",
+        "Department Auto-Selected",
+        `${mappedDepartment} has been automatically selected for ${position}`,
+      )
+    }
   }
 
   const handlePositionInputChange = (value: string) => {
     setPositionSearch(value)
     setData("position", value)
     setIsPositionOpen(true)
+    handleFieldValidation("position", value)
+
+    // If user is typing a custom position, clear the department auto-selection
+    if (!positionDepartmentMapping[value]) {
+      // Only clear if the current department was auto-selected
+      const currentDepartment = data.department
+      if (currentDepartment && Object.values(positionDepartmentMapping).includes(currentDepartment)) {
+        setData("department", "")
+        setDepartmentSearch("")
+      }
+    }
   }
 
   const handleDepartmentSelect = (department: string) => {
     setData("department", department)
     setDepartmentSearch(department)
     setIsDepartmentOpen(false)
+    handleFieldValidation("department", department)
   }
 
   const handleDepartmentInputChange = (value: string) => {
     setDepartmentSearch(value)
     setData("department", value)
     setIsDepartmentOpen(true)
+    handleFieldValidation("department", value)
   }
 
+  // Form submission with validation
   const submit: FormEventHandler = (e) => {
     e.preventDefault()
 
+    // Validate all fields
+    const allErrors: ValidationErrors = {}
+
+    allErrors.first_name = validateName(data.first_name, "First name") || ""
+    allErrors.surname = validateName(data.surname, "Surname") || ""
+    allErrors.middle_name = validateName(data.middle_name, "Middle name", false) || ""
+    allErrors.name_extension = validateName(data.name_extension, "Name extension", false) || ""
+    allErrors.email = validateEmail(data.email) || ""
+    allErrors.mobile_number = validateMobileNumber(data.mobile_number) || ""
+    allErrors.password = validatePassword(data.password) || ""
+    allErrors.position = validateRequired(data.position, "Position") || ""
+    allErrors.department = validateRequired(data.department, "Department") || ""
+
+    setValidationErrors(allErrors)
+
+    // Check if there are any errors
+    const hasErrors = Object.values(allErrors).some((error) => error !== "")
+
+    if (hasErrors) {
+      const errorCount = Object.values(allErrors).filter((error) => error !== "").length
+      addToast(
+        "error",
+        "Form Validation Failed",
+        `Please fix ${errorCount} error${errorCount > 1 ? "s" : ""} before submitting`,
+      )
+
+      // Scroll to first error
+      const firstErrorField = Object.keys(allErrors).find((key) => allErrors[key] !== "")
+      if (firstErrorField) {
+        const element = document.getElementById(firstErrorField)
+        element?.scrollIntoView({ behavior: "smooth", block: "center" })
+        element?.focus()
+      }
+      return
+    }
+
+    // If no validation errors, proceed with submission
     post("/personnel/new", {
+      onSuccess: () => {
+        addToast("success", "Success!", "Personnel has been created successfully")
+      },
+      onError: (errors) => {
+        addToast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
+      },
       onFinish: () => {
         reset("password")
       },
     })
   }
 
+  // Initialize validation on mount
+  useEffect(() => {
+    if (data.position) setPositionSearch(data.position)
+    if (data.department) setDepartmentSearch(data.department)
+  }, [])
+
   return (
     <Authenticated>
       <Head title="Add New Personnel" />
+
+      {/* Toast Notifications */}
+      <div className="fixed top-4 right-4 z-50 space-y-2">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden transform transition-all duration-300 ease-in-out ${
+              toast.type === "error"
+                ? "border-l-4 border-red-500"
+                : toast.type === "success"
+                  ? "border-l-4 border-green-500"
+                  : "border-l-4 border-yellow-500"
+            }`}
+          >
+            <div className="p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <AlertCircle
+                    className={`h-5 w-5 ${
+                      toast.type === "error"
+                        ? "text-red-400"
+                        : toast.type === "success"
+                          ? "text-green-400"
+                          : "text-yellow-400"
+                    }`}
+                  />
+                </div>
+                <div className="ml-3 flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">{toast.title}</p>
+                  <p className="mt-1 text-sm text-gray-500">{toast.message}</p>
+                </div>
+                <div className="ml-4 flex-shrink-0 flex">
+                  <button
+                    className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none"
+                    onClick={() => removeToast(toast.id)}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className="px-6 py-6 bg-gray-50 min-h-screen">
         {/* Header Section */}
         <div className="mb-6">
@@ -157,7 +417,7 @@ export default function NewPersonnel() {
                   </div>
                 </div>
 
-                {/* Name Fields - Positioned Lower */}
+                {/* Name Fields */}
                 <div className="lg:col-span-9">
                   <div className="pt-8">
                     <Label className="text-sm font-medium text-gray-700 mb-4 block">Full Name</Label>
@@ -170,10 +430,16 @@ export default function NewPersonnel() {
                           id="surname"
                           name="surname"
                           value={data.surname}
-                          className="w-full"
-                          onChange={(e) => setData("surname", e.target.value)}
+                          className={`w-full ${validationErrors.surname ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => handleInputChange("surname", e.target.value)}
                           placeholder="e.g. Dela Cruz"
                         />
+                        {validationErrors.surname && (
+                          <div className="flex items-center gap-1 text-xs text-red-600">
+                            <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                            <span className="break-words">{validationErrors.surname}</span>
+                          </div>
+                        )}
                         <InputError message={errors.surname} className="text-xs" />
                       </div>
 
@@ -185,10 +451,16 @@ export default function NewPersonnel() {
                           id="first_name"
                           name="first_name"
                           value={data.first_name}
-                          className="w-full"
-                          onChange={(e) => setData("first_name", e.target.value)}
+                          className={`w-full ${validationErrors.first_name ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => handleInputChange("first_name", e.target.value)}
                           placeholder="e.g. Juan"
                         />
+                        {validationErrors.first_name && (
+                          <div className="flex items-center gap-1 text-xs text-red-600">
+                            <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                            <span className="break-words">{validationErrors.first_name}</span>
+                          </div>
+                        )}
                         <InputError message={errors.first_name} className="text-xs" />
                       </div>
 
@@ -200,10 +472,16 @@ export default function NewPersonnel() {
                           id="middle_name"
                           name="middle_name"
                           value={data.middle_name}
-                          className="w-full"
-                          onChange={(e) => setData("middle_name", e.target.value)}
+                          className={`w-full ${validationErrors.middle_name ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => handleInputChange("middle_name", e.target.value)}
                           placeholder="e.g. Reyes"
                         />
+                        {validationErrors.middle_name && (
+                          <div className="flex items-center gap-1 text-xs text-red-600">
+                            <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                            <span className="break-words">{validationErrors.middle_name}</span>
+                          </div>
+                        )}
                         <InputError message={errors.middle_name} className="text-xs" />
                       </div>
 
@@ -215,10 +493,16 @@ export default function NewPersonnel() {
                           id="name_extension"
                           name="name_extension"
                           value={data.name_extension}
-                          className="w-full"
-                          onChange={(e) => setData("name_extension", e.target.value)}
+                          className={`w-full ${validationErrors.name_extension ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => handleInputChange("name_extension", e.target.value)}
                           placeholder="e.g. Jr, Sr, III"
                         />
+                        {validationErrors.name_extension && (
+                          <div className="flex items-center gap-1 text-xs text-red-600">
+                            <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                            <span className="break-words">{validationErrors.name_extension}</span>
+                          </div>
+                        )}
                         <InputError message={errors.name_extension} className="text-xs" />
                       </div>
                     </div>
@@ -230,10 +514,10 @@ export default function NewPersonnel() {
 
           {/* Organization Information Section */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200 bg-blue-50">
+            <div className="px-6 py-4 border-b border-gray-200 bg-green-50">
               <div className="flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-semibold text-gray-900">Organization Details</h3>
+                <Briefcase className="w-5 h-5 text-green-600" />
+                <h3 className="text-lg font-semibold text-gray-900">Organization Information</h3>
               </div>
               <p className="text-sm text-gray-600 mt-1">Employee position and department details</p>
             </div>
@@ -253,10 +537,30 @@ export default function NewPersonnel() {
                       value={positionSearch}
                       onChange={(e) => handlePositionInputChange(e.target.value)}
                       onFocus={() => setIsPositionOpen(true)}
-                      className="w-full pl-10 pr-10"
+                      className={`w-full pl-10 pr-16 ${validationErrors.position ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
                       placeholder="Type to search or select position..."
                       autoComplete="off"
                     />
+
+                    {/* Clear button */}
+                    {positionSearch && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPositionSearch("")
+                          setData("position", "")
+                          setData("department", "")
+                          setDepartmentSearch("")
+                          handleFieldValidation("position", "")
+                          handleFieldValidation("department", "")
+                          setIsPositionOpen(false)
+                        }}
+                        className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       onClick={() => setIsPositionOpen(!isPositionOpen)}
@@ -288,6 +592,12 @@ export default function NewPersonnel() {
                       </div>
                     )}
                   </div>
+                  {validationErrors.position && (
+                    <div className="flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <span className="break-words">{validationErrors.position}</span>
+                    </div>
+                  )}
                   <InputError message={errors.position} className="text-xs" />
                   <p className="text-xs text-gray-500">Start typing to see suggestions or enter a custom position</p>
                 </div>
@@ -305,10 +615,31 @@ export default function NewPersonnel() {
                       value={departmentSearch}
                       onChange={(e) => handleDepartmentInputChange(e.target.value)}
                       onFocus={() => setIsDepartmentOpen(true)}
-                      className="w-full pl-10 pr-10"
-                      placeholder="Type to search or select department..."
+                      className={`w-full pl-10 pr-16 ${validationErrors.department ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                      placeholder={
+                        data.position && positionDepartmentMapping[data.position]
+                          ? `Auto-selected: ${positionDepartmentMapping[data.position]}`
+                          : "Type to search or select department..."
+                      }
                       autoComplete="off"
                     />
+
+                    {/* Clear button */}
+                    {departmentSearch && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDepartmentSearch("")
+                          setData("department", "")
+                          handleFieldValidation("department", "")
+                          setIsDepartmentOpen(false)
+                        }}
+                        className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       onClick={() => setIsDepartmentOpen(!isDepartmentOpen)}
@@ -334,14 +665,26 @@ export default function NewPersonnel() {
                           ))
                         ) : (
                           <div className="px-3 py-2 text-sm text-gray-500">
-                            No departments found. You can type a custom department.
+                            {data.position && positionDepartmentMapping[data.position]
+                              ? `Only ${positionDepartmentMapping[data.position]} is available for ${data.position}`
+                              : "No departments found. You can type a custom department."}
                           </div>
                         )}
                       </div>
                     )}
                   </div>
+                  {validationErrors.department && (
+                    <div className="flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <span className="break-words">{validationErrors.department}</span>
+                    </div>
+                  )}
                   <InputError message={errors.department} className="text-xs" />
-                  <p className="text-xs text-gray-500">Start typing to see suggestions or enter a custom department</p>
+                  <p className="text-xs text-gray-500">
+                    {data.position && positionDepartmentMapping[data.position]
+                      ? `Department automatically selected based on position`
+                      : "Start typing to see suggestions or enter a custom department"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -349,9 +692,9 @@ export default function NewPersonnel() {
 
           {/* Contact Information Section */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200 bg-blue-50">
+            <div className="px-6 py-4 border-b border-gray-200 bg-purple-50">
               <div className="flex items-center gap-2">
-                <Mail className="w-5 h-5 text-blue-600" />
+                <Mail className="w-5 h-5 text-purple-600" />
                 <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
               </div>
               <p className="text-sm text-gray-600 mt-1">Email, phone number and account security</p>
@@ -372,11 +715,17 @@ export default function NewPersonnel() {
                         type="email"
                         name="email"
                         value={data.email}
-                        className="pl-10 w-full"
-                        onChange={(e) => setData("email", e.target.value)}
+                        className={`pl-10 w-full ${validationErrors.email ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                        onChange={(e) => handleInputChange("email", e.target.value)}
                         placeholder="e.g. juan.delacruz@cdrrmo.gov.ph"
                       />
                     </div>
+                    {validationErrors.email && (
+                      <div className="flex items-center gap-1 text-xs text-red-600">
+                        <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                        <span className="break-words">{validationErrors.email}</span>
+                      </div>
+                    )}
                     <InputError message={errors.email} className="text-xs" />
                   </div>
 
@@ -384,19 +733,30 @@ export default function NewPersonnel() {
                     <Label htmlFor="mobile_number" className="text-sm font-medium text-gray-700">
                       Mobile Number <span className="text-red-500">*</span>
                     </Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <div className="flex items-center">
+                      <div className="flex items-center justify-center px-3 py-2 bg-gray-50 border border-gray-300 rounded-l-md text-sm text-gray-700 font-medium min-w-[60px] h-10">
+                        <Phone className="h-4 w-4 mr-2 text-gray-400" />
+                        +63
+                      </div>
                       <Input
                         id="mobile_number"
                         name="mobile_number"
                         value={data.mobile_number}
-                        className="pl-10 w-full"
-                        onChange={(e) => setData("mobile_number", e.target.value)}
-                        placeholder="e.g. 09123456789"
+                        className={`rounded-l-none border-l-0 flex-1 h-10 ${validationErrors.mobile_number ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-gray-300"}`}
+                        onChange={(e) => handleMobileNumberChange(e.target.value)}
+                        placeholder="9123456789"
+                        maxLength={10}
                       />
                     </div>
-                    <InputError message={errors.mobile_number} className="text-xs" />
                   </div>
+                  {validationErrors.mobile_number && (
+                    <div className="flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <span className="break-words">{validationErrors.mobile_number}</span>
+                    </div>
+                  )}
+                  <InputError message={errors.mobile_number} className="text-xs" />
+                  <p className="text-xs text-gray-500">Enter 10 digits after +63 (e.g., +639123456789)</p>
                 </div>
 
                 {/* Account Security */}
@@ -415,25 +775,53 @@ export default function NewPersonnel() {
                         name="password"
                         type="password"
                         value={data.password}
-                        className="pl-10 w-full"
-                        onChange={(e) => setData("password", e.target.value)}
+                        className={`pl-10 w-full ${validationErrors.password ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                        onChange={(e) => handleInputChange("password", e.target.value)}
                         placeholder="Enter a secure password"
                       />
                     </div>
+                    {validationErrors.password && (
+                      <div className="flex items-center gap-1 text-xs text-red-600">
+                        <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                        <span className="break-words">{validationErrors.password}</span>
+                      </div>
+                    )}
                     <InputError message={errors.password} className="text-xs" />
-                    <p className="text-xs text-gray-500">
-                      Password should be at least 8 characters long and include uppercase, lowercase, numbers, and
-                      special characters
-                    </p>
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-4 mt-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Security Guidelines</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Password Requirements</h4>
                     <ul className="text-xs text-gray-600 space-y-1">
-                      <li>• Use a strong, unique password</li>
-                      <li>• Include uppercase and lowercase letters</li>
-                      <li>• Add numbers and special characters</li>
-                      <li>• Minimum 8 characters recommended</li>
+                      <li className={`flex items-center gap-2 ${data.password.length >= 8 ? "text-green-600" : ""}`}>
+                        <div
+                          className={`w-2 h-2 rounded-full ${data.password.length >= 8 ? "bg-green-500" : "bg-gray-300"}`}
+                        ></div>
+                        At least 8 characters
+                      </li>
+                      <li
+                        className={`flex items-center gap-2 ${/(?=.*[a-z])/.test(data.password) ? "text-green-600" : ""}`}
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full ${/(?=.*[a-z])/.test(data.password) ? "bg-green-500" : "bg-gray-300"}`}
+                        ></div>
+                        One lowercase letter
+                      </li>
+                      <li
+                        className={`flex items-center gap-2 ${/(?=.*[A-Z])/.test(data.password) ? "text-green-600" : ""}`}
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full ${/(?=.*[A-Z])/.test(data.password) ? "bg-green-500" : "bg-gray-300"}`}
+                        ></div>
+                        One uppercase letter
+                      </li>
+                      <li
+                        className={`flex items-center gap-2 ${/(?=.*\d)/.test(data.password) ? "text-green-600" : ""}`}
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full ${/(?=.*\d)/.test(data.password) ? "bg-green-500" : "bg-gray-300"}`}
+                        ></div>
+                        One number
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -456,7 +844,7 @@ export default function NewPersonnel() {
                 <Button
                   type="submit"
                   disabled={processing}
-                  className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-6"
+                  className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-6"
                 >
                   {processing ? (
                     <>
