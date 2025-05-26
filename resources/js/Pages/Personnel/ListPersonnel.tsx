@@ -260,7 +260,7 @@ export default function ListPersonnel({ personnel }: PageProps<{ personnel?: Pag
 
               {/* Action Buttons */}
               <div className="flex gap-2 flex-shrink-0">
-                <Button className="bg-red-500 hover:bg-red-600 text-white flex items-center gap-2 px-4 py-2.5" asChild>
+                <Button className="bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 px-4 py-2.5" asChild>
                   <Link href="/personnel/track">
                     <MapPin className="w-4 h-4" />
                     Track Employees
@@ -269,7 +269,7 @@ export default function ListPersonnel({ personnel }: PageProps<{ personnel?: Pag
 
                 <Button
                   asChild
-                  className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-4 py-2.5"
+                  className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5"
                 >
                   <Link href="/personnel/new">
                     <Plus className="w-4 h-4" />
@@ -287,7 +287,7 @@ export default function ListPersonnel({ personnel }: PageProps<{ personnel?: Pag
             <DataTable
               columns={columns}
               data={tableData}
-              className="[&_thead]:bg-gradient-to-r [&_thead]:from-blue-600 [&_thead]:to-blue-700 [&_thead_tr]:border-0 [&_tbody_tr]:border-b [&_tbody_tr]:border-gray-100 [&_tbody_tr:hover]:bg-blue-50/50 [&_tbody_tr]:transition-colors"
+              className="[&_thead]:bg-[#1B2560] [&_thead_tr]:border-0 [&_thead_tr:hover]:bg-[#1B2560] [&_tbody_tr]:border-b [&_tbody_tr]:border-gray-100 [&_tbody_tr:hover]:bg-transparent"
             />
           </div>
         </div>
@@ -320,4 +320,3 @@ function getCurrentTime() {
     hour12: true,
   }).format(date)
 }
-    

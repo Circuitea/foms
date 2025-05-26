@@ -26,10 +26,10 @@ export function DataTable<TData, TValue>({ columns, data, className }: DataTable
 
   return (
     <div className={className}>
-      <Table>
+      <Table className="[&_thead]:bg-[#1B2560]">
         <TableHeader>
           {headerGroups.map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="border-0">
+            <TableRow key={headerGroup.id} className="border-0 hover:bg-[#1B2560]">
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead
@@ -49,7 +49,7 @@ export function DataTable<TData, TValue>({ columns, data, className }: DataTable
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="border-b border-gray-100 hover:bg-blue-50/50 transition-colors"
+                className="border-b border-gray-100 hover:bg-transparent"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="py-4 px-6">
