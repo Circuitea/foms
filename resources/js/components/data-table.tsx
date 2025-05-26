@@ -1,62 +1,76 @@
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+"use client"
+
+import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { Users } from "lucide-react" // Import Users component
+
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[];
-    data: TData[];
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+  className?: string
 }
 
-export function DataTable<TData, TValue>({
-    columns,
-    data
-}: DataTableProps<TData, TValue>) {
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
+export function DataTable<TData, TValue>({ columns, data, className }: DataTableProps<TData, TValue>) {
+  const safeData = Array.isArray(data) ? data : []
+  const safeColumns = Array.isArray(columns) ? columns : []
 
-    return (
-        <div className="rounded-md border">
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead key={header.id}>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                            )}
-                                    </TableHead>
-                                )
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                No results.
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </div>
-    )
+  const table = useReactTable({
+    data: safeData,
+    columns: safeColumns,
+    getCoreRowModel: getCoreRowModel(),
+  })
+
+  const headerGroups = table.getHeaderGroups() || []
+  const rows = table.getRowModel()?.rows || []
+
+  return (
+    <div className={className}>
+      <Table>
+        <TableHeader>
+          {headerGroups.map((headerGroup) => (
+            <TableRow key={headerGroup.id} className="border-0">
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead
+                    key={header.id}
+                    className="text-white font-semibold py-4 px-6 first:rounded-tl-lg last:rounded-tr-lg"
+                  >
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                )
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {rows.length > 0 ? (
+            rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+                className="border-b border-gray-100 hover:bg-blue-50/50 transition-colors"
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id} className="py-4 px-6">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={safeColumns.length} className="h-32 text-center">
+                <div className="flex flex-col items-center justify-center text-gray-500">
+                  <Users className="h-12 w-12 mb-4 text-gray-300" />
+                  <p className="text-lg font-medium">No personnel found</p>
+                  <p className="text-sm">Add your first team member to get started</p>
+                </div>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  )
 }
