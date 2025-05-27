@@ -29,11 +29,6 @@ const navItems = [
         url: '#',
         icon: ClipboardCheck,
     },
-    {
-        title: 'Files',
-        url: '#',
-        icon: FolderOpen,
-    },
 ]
 
 export function AppSidebar() {
