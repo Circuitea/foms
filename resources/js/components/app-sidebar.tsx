@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell, ClipboardCheck, LayoutDashboard, LogOut, Phone, Settings, PenIcon as UserPen } from "lucide-react"
+import { Bell, CheckCheck, ClipboardCheck, LayoutDashboard, LogOut, Phone, Settings, PenIcon as UserPen } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -27,6 +27,11 @@ const navItems = [
     title: "Notification",
     url: "/notifications",
     icon: Bell,
+  },
+  {
+    title: "Tasks",
+    url: "/tasks",
+    icon: CheckCheck,
   },
   {
     title: "Meetings",

@@ -4,6 +4,7 @@ use App\Http\Controllers\MeetingsController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TasksController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -26,6 +27,10 @@ Route::prefix('meetings')-> middleware(['auth', 'verified'])->group(function () 
 Route::prefix('notifications')->middleware(['auth', 'verified'])->group(function() {
     Route::get('/', [NotificationsController::class, 'list']);
     Route::get('/{id}', [NotificationsController::class, 'show']);
+});
+
+Route::prefix('tasks')->middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [TasksController::class, 'new']);
 });
 
 Route::middleware('auth')->group(function () {
