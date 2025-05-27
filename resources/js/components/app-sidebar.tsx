@@ -16,7 +16,7 @@ const navItems = [
     },
     {
         title: 'Meetings',
-        url: '#',
+        url: '/meetings',
         icon: Phone,
     },
     {
