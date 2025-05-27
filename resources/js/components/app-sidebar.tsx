@@ -11,7 +11,7 @@ const navItems = [
     },
     {
         title: 'Notification',
-        url: '#',
+        url: '/notifications',
         icon: Bell,
     },
     {
@@ -26,7 +26,7 @@ const navItems = [
     },
     {
         title: 'Inventory',
-        url: '#',
+        url: '/inventory',
         icon: ClipboardCheck,
     },
 ]
