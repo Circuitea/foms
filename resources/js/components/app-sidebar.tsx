@@ -1,15 +1,6 @@
 "use client"
 
-import {
-  Bell,
-  ClipboardCheck,
-  FolderOpen,
-  LayoutDashboard,
-  LogOut,
-  Phone,
-  Settings,
-  PenIcon as UserPen,
-} from "lucide-react"
+import { Bell, ClipboardCheck, LayoutDashboard, LogOut, Phone, Settings, PenIcon as UserPen } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -27,31 +18,31 @@ import {
 import { Link, router, usePage } from "@inertiajs/react"
 
 const navItems = [
-    {
-        title: 'Dashboard',
-        url: '/dashboard',
-        icon: LayoutDashboard,
-    },
-    {
-        title: 'Notification',
-        url: '/notifications',
-        icon: Bell,
-    },
-    {
-        title: 'Meetings',
-        url: '/meetings',
-        icon: Phone,
-    },
-    {
-        title: 'Personnel',
-        url: '/personnel',
-        icon: UserPen,
-    },
-    {
-        title: 'Inventory',
-        url: '/inventory',
-        icon: ClipboardCheck,
-    },
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Notification",
+    url: "/notifications",
+    icon: Bell,
+  },
+  {
+    title: "Meetings",
+    url: "/meetings",
+    icon: Phone,
+  },
+  {
+    title: "Personnel",
+    url: "/personnel",
+    icon: UserPen,
+  },
+  {
+    title: "Inventory",
+    url: "/inventory",
+    icon: ClipboardCheck,
+  },
 ]
 
 export function AppSidebar() {
@@ -59,21 +50,27 @@ export function AppSidebar() {
   const { open } = useSidebar()
   return (
     <Sidebar collapsible="icon" variant="sidebar">
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="px-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex items-center justify-between">
               <SidebarTrigger className="ml-auto" />
             </div>
-            {/* <div className="flex">
-                            <Avatar className="">
-                                <AvatarFallback className="text-foreground">{`${user.first_name.slice(0, 1)}${user.surname.slice(0,1)}`}</AvatarFallback>
-                            </Avatar>
-                            <div className="pl-2">
-                                <p>{`${user.first_name} ${user.surname}`}</p>
-                                <p className="text-xs">[POSITION]</p>
-                            </div>
-                        </div> */}
+            <div className="flex flex-col items-center space-y-2 py-4 group-data-[collapsible=icon]:hidden">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                <div className="w-28 h-28 rounded-full bg-white flex items-center justify-center">
+                  <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
+                    <svg className="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 24 24"> 
+                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div className="text-center">
+                <p className="text-white font-medium text-lg">Alexis</p>
+                <p className="text-white/70 text-sm">Admin</p>
+              </div>
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
