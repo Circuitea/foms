@@ -49,6 +49,7 @@ class Personnel extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'first_time_login' => 'boolean',
         ];
     }
 
