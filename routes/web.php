@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MeetingsController;
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,11 @@ Route::prefix('meetings')-> middleware(['auth', 'verified'])->group(function () 
     Route::get('/', [MeetingsController::class, 'list']);
     Route::get('/new', [MeetingsController::class, 'new']);
     Route::post('/new', [MeetingsController::class, 'create']);
+});
+
+Route::prefix('notifications')->middleware(['auth', 'verified'])->group(function() {
+    Route::get('/', [NotificationsController::class, 'list']);
+    Route::get('/{id}', [NotificationsController::class, 'show']);
 });
 
 Route::middleware('auth')->group(function () {
