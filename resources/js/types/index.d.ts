@@ -1,3 +1,5 @@
+import { LatLngExpression, LatLngTuple } from "leaflet";
+
 export interface Personnel {
     id: number;
     first_name: string;
@@ -12,6 +14,11 @@ export interface Personnel {
 export interface Role {
     id: number;
     name: string;
+}
+
+export interface PersonnelMarkerDetails {
+    personnel: Personnel,
+    position: LatLngTuple,
 }
 
 export type PageProps<
