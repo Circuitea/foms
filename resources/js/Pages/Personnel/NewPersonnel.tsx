@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
+import toast from "@/components/toast";
 import { Head, Link, useForm } from "@inertiajs/react"
 import { ArrowLeft, User, Mail, Phone, Lock, Save, Loader2, Briefcase, ChevronDown, Check, Building, AlertCircle, X } from 'lucide-react'
 import type { FormEventHandler } from "react"
@@ -43,7 +44,6 @@ export default function NewPersonnel() {
   const { data, setData, processing, errors, post, reset } = useForm({
     first_name: "",
     middle_name: "",
-    surname: "",
     surname: "",
     name_extension: "",
     email: "",
@@ -84,20 +84,20 @@ export default function NewPersonnel() {
   )
 
   // Toast management
-  const addToast = (type: Toast["type"], title: string, message: string) => {
-    const id = Math.random().toString(36).substr(2, 9)
-    const newToast: Toast = { id, type, title, message }
-    setToasts((prev) => [...prev, newToast])
+  // const addToast = (type: Toast["type"], title: string, message: string) => {
+  //   const id = Math.random().toString(36).substr(2, 9)
+  //   const newToast: Toast = { id, type, title, message }
+  //   setToasts((prev) => [...prev, newToast])
 
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      removeToast(id)
-    }, 5000)
-  }
+  //   // Auto remove after 5 seconds
+  //   setTimeout(() => {
+  //     removeToast(id)
+  //   }, 5000)
+  // }
 
-  const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id))
-  }
+  // const removeToast = (id: string) => {
+  //   setToasts((prev) => prev.filter((toast) => toast.id !== id))
+  // }
 
   // Validation functions
   const validateEmail = (email: string): string | null => {
@@ -189,7 +189,7 @@ export default function NewPersonnel() {
     const limitedValue = numbersOnly.slice(0, 10)
 
     if (value !== numbersOnly) {
-      addToast("error", "Invalid Input", "Mobile number should only contain numbers")
+      toast('error', 'Invalid Input', "Mobile number should only contain numbers");
     }
 
     handleInputChange("mobile_number", limitedValue)
@@ -208,12 +208,11 @@ export default function NewPersonnel() {
       setDepartmentSearch(mappedDepartment)
       handleFieldValidation("department", mappedDepartment)
 
-      // Show success toast
-      addToast(
-        "success",
-        "Department Auto-Selected",
+      toast(
+        'success',
+        'Department Auto Selected',
         `${mappedDepartment} has been automatically selected for ${position}`,
-      )
+      );
     }
   }
 
@@ -272,11 +271,12 @@ export default function NewPersonnel() {
 
     if (hasErrors) {
       const errorCount = Object.values(allErrors).filter((error) => error !== "").length
-      addToast(
-        "error",
-        "Form Validation Failed",
-        `Please fix ${errorCount} error${errorCount > 1 ? "s" : ""} before submitting`,
-      )
+      // addToast(
+      //   "error",
+      //   "Form Validation Failed",
+      //   `Please fix ${errorCount} error${errorCount > 1 ? "s" : ""} before submitting`,
+      // )
+      toast('error', 'Form Validation Failed', `Please fix ${errorCount} error${errorCount > 1 ? 's' : ''} before submitting`);
 
       // Scroll to first error
       const firstErrorField = Object.keys(allErrors).find((key) => allErrors[key] !== "")
@@ -291,10 +291,12 @@ export default function NewPersonnel() {
     // If no validation errors, proceed with submission
     post("/personnel/new", {
       onSuccess: () => {
-        addToast("success", "Success!", "Personnel has been created successfully")
+        // addToast("success", "Success!", "Personnel has been created successfully")
+        toast('success', 'Success!', 'Personnel has been created successfully');
       },
       onError: (errors) => {
-        addToast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
+        // addToast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
+        toast('error', 'Submission Failed', 'There was an error creating the personnel. Please try again.');
       },
       onFinish: () => {
         reset("password")
@@ -311,50 +313,6 @@ export default function NewPersonnel() {
   return (
     <Authenticated>
       <Head title="Add New Personnel" />
-
-      {/* Toast Notifications */}
-      <div className="fixed top-4 right-4 z-50 space-y-2">
-        {toasts.map((toast) => (
-          <div
-            key={toast.id}
-            className={`max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden transform transition-all duration-300 ease-in-out ${
-              toast.type === "error"
-                ? "border-l-4 border-red-500"
-                : toast.type === "success"
-                  ? "border-l-4 border-green-500"
-                  : "border-l-4 border-yellow-500"
-            }`}
-          >
-            <div className="p-4">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <AlertCircle
-                    className={`h-5 w-5 ${
-                      toast.type === "error"
-                        ? "text-red-400"
-                        : toast.type === "success"
-                          ? "text-green-400"
-                          : "text-yellow-400"
-                    }`}
-                  />
-                </div>
-                <div className="ml-3 flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900">{toast.title}</p>
-                  <p className="mt-1 text-sm text-gray-500">{toast.message}</p>
-                </div>
-                <div className="ml-4 flex-shrink-0 flex">
-                  <button
-                    className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none"
-                    onClick={() => removeToast(toast.id)}
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
 
       <div className="px-6 py-6 bg-gray-50 min-h-screen">
         {/* Header Section */}

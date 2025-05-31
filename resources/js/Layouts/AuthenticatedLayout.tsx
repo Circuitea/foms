@@ -2,6 +2,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { PropsWithChildren } from 'react';
 import ApplicationLogo from '@/components/ApplicationLogo';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function Authenticated({
     children,
@@ -18,6 +19,10 @@ export default function Authenticated({
                 </div>
                 {children}
             </main>
+            <Toaster
+                position='top-right'
+                richColors={true}
+            />
         </SidebarProvider>
     );
 }
