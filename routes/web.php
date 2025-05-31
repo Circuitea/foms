@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MeetingsController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonnelController;
@@ -27,6 +28,11 @@ Route::prefix('meetings')-> middleware(['auth', 'verified'])->group(function () 
 Route::prefix('notifications')->middleware(['auth', 'verified'])->group(function() {
     Route::get('/', [NotificationsController::class, 'list']);
     Route::get('/{id}', [NotificationsController::class, 'show']);
+});
+
+Route::prefix('inventory')->middleware(['auth', 'verified'])->group(function() {
+    Route::get('/', [InventoryController::class, 'index']);
+    Route::get('/category', [InventoryController::class, 'list']);
 });
 
 Route::prefix('tasks')->middleware(['auth', 'verified'])->group(function () {
