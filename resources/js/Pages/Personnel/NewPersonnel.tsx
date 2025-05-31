@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import toast from "@/components/toast";
-import { Head, Link, useForm } from "@inertiajs/react"
+import { Head, Link } from "@inertiajs/react"
+import { useForm } from 'laravel-precognition-react-inertia';
 import { ArrowLeft, User, Mail, Phone, Lock, Save, Loader2, Briefcase, ChevronDown, Check, Building, AlertCircle, X } from 'lucide-react'
 import type { FormEventHandler } from "react"
 import { useState, useEffect } from "react"
@@ -41,7 +42,7 @@ interface Toast {
 }
 
 export default function NewPersonnel() {
-  const { data, setData, processing, errors, post, reset } = useForm({
+  const { data, setData, processing, errors, submit, reset, validate, invalid, setValidationTimeout } = useForm('post', '/personnel/new', {
     first_name: "",
     middle_name: "",
     surname: "",
@@ -51,7 +52,9 @@ export default function NewPersonnel() {
     position: "",
     department: "",
     password: "",
-  })
+  });
+
+  setValidationTimeout(3000);
 
   // Position dropdown states
   const [isPositionOpen, setIsPositionOpen] = useState(false)
@@ -82,22 +85,6 @@ export default function NewPersonnel() {
   const filteredDepartments = getAvailableDepartments().filter((department) =>
     department.toLowerCase().includes(departmentSearch.toLowerCase()),
   )
-
-  // Toast management
-  // const addToast = (type: Toast["type"], title: string, message: string) => {
-  //   const id = Math.random().toString(36).substr(2, 9)
-  //   const newToast: Toast = { id, type, title, message }
-  //   setToasts((prev) => [...prev, newToast])
-
-  //   // Auto remove after 5 seconds
-  //   setTimeout(() => {
-  //     removeToast(id)
-  //   }, 5000)
-  // }
-
-  // const removeToast = (id: string) => {
-  //   setToasts((prev) => prev.filter((toast) => toast.id !== id))
-  // }
 
   // Validation functions
   const validateEmail = (email: string): string | null => {
@@ -248,48 +235,48 @@ export default function NewPersonnel() {
   }
 
   // Form submission with validation
-  const submit: FormEventHandler = (e) => {
+  const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault()
 
-    // Validate all fields
-    const allErrors: ValidationErrors = {}
+    // // Validate all fields
+    // const allErrors: ValidationErrors = {}
 
-    allErrors.first_name = validateName(data.first_name, "First name") || ""
-    allErrors.surname = validateName(data.surname, "Surname") || ""
-    allErrors.middle_name = validateName(data.middle_name, "Middle name", false) || ""
-    allErrors.name_extension = validateName(data.name_extension, "Name extension", false) || ""
-    allErrors.email = validateEmail(data.email) || ""
-    allErrors.mobile_number = validateMobileNumber(data.mobile_number) || ""
-    allErrors.password = validatePassword(data.password) || ""
-    allErrors.position = validateRequired(data.position, "Position") || ""
-    allErrors.department = validateRequired(data.department, "Department") || ""
+    // allErrors.first_name = validateName(data.first_name, "First name") || ""
+    // allErrors.surname = validateName(data.surname, "Surname") || ""
+    // allErrors.middle_name = validateName(data.middle_name, "Middle name", false) || ""
+    // allErrors.name_extension = validateName(data.name_extension, "Name extension", false) || ""
+    // allErrors.email = validateEmail(data.email) || ""
+    // allErrors.mobile_number = validateMobileNumber(data.mobile_number) || ""
+    // allErrors.password = validatePassword(data.password) || ""
+    // allErrors.position = validateRequired(data.position, "Position") || ""
+    // allErrors.department = validateRequired(data.department, "Department") || ""
 
-    setValidationErrors(allErrors)
+    // setValidationErrors(allErrors)
 
-    // Check if there are any errors
-    const hasErrors = Object.values(allErrors).some((error) => error !== "")
+    // // Check if there are any errors
+    // const hasErrors = Object.values(allErrors).some((error) => error !== "")
 
-    if (hasErrors) {
-      const errorCount = Object.values(allErrors).filter((error) => error !== "").length
-      // addToast(
-      //   "error",
-      //   "Form Validation Failed",
-      //   `Please fix ${errorCount} error${errorCount > 1 ? "s" : ""} before submitting`,
-      // )
-      toast('error', 'Form Validation Failed', `Please fix ${errorCount} error${errorCount > 1 ? 's' : ''} before submitting`);
+    // if (hasErrors) {
+    //   const errorCount = Object.values(allErrors).filter((error) => error !== "").length
+    //   // addToast(
+    //   //   "error",
+    //   //   "Form Validation Failed",
+    //   //   `Please fix ${errorCount} error${errorCount > 1 ? "s" : ""} before submitting`,
+    //   // )
+    //   toast('error', 'Form Validation Failed', `Please fix ${errorCount} error${errorCount > 1 ? 's' : ''} before submitting`);
 
-      // Scroll to first error
-      const firstErrorField = Object.keys(allErrors).find((key) => allErrors[key] !== "")
-      if (firstErrorField) {
-        const element = document.getElementById(firstErrorField)
-        element?.scrollIntoView({ behavior: "smooth", block: "center" })
-        element?.focus()
-      }
-      return
-    }
+    //   // Scroll to first error
+    //   const firstErrorField = Object.keys(allErrors).find((key) => allErrors[key] !== "")
+    //   if (firstErrorField) {
+    //     const element = document.getElementById(firstErrorField)
+    //     element?.scrollIntoView({ behavior: "smooth", block: "center" })
+    //     element?.focus()
+    //   }
+    //   return
+    // }
 
     // If no validation errors, proceed with submission
-    post("/personnel/new", {
+    submit({
       onSuccess: () => {
         // addToast("success", "Success!", "Personnel has been created successfully")
         toast('success', 'Success!', 'Personnel has been created successfully');
@@ -338,7 +325,7 @@ export default function NewPersonnel() {
         </div>
 
         {/* Form Section */}
-        <form onSubmit={submit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Personal Information Section */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 bg-blue-50">
@@ -378,8 +365,9 @@ export default function NewPersonnel() {
                 {/* Name Fields */}
                 <div className="lg:col-span-9">
                   <div className="pt-8">
-                    <Label className="text-sm font-medium text-gray-700 mb-4 block">Full Name</Label>
+                    <p className="text-sm font-medium text-gray-700 mb-4 block">Full Name</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+
                       <div className="space-y-2">
                         <Label htmlFor="surname" className="text-sm font-medium text-gray-700">
                           Surname <span className="text-red-500">*</span>
@@ -388,17 +376,17 @@ export default function NewPersonnel() {
                           id="surname"
                           name="surname"
                           value={data.surname}
-                          className={`w-full ${validationErrors.surname ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                          onChange={(e) => handleInputChange("surname", e.target.value)}
+                          className={`w-full ${invalid('surname') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => setData('surname', e.target.value)}
+                          onBlur={() => validate('surname')}
                           placeholder="e.g. Dela Cruz"
                         />
-                        {validationErrors.surname && (
+                        {invalid('surname') && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                            <span className="break-words">{validationErrors.surname}</span>
+                            <span className="break-words">{errors.surname}</span>
                           </div>
                         )}
-                        <InputError message={errors.surname} className="text-xs" />
                       </div>
 
                       <div className="space-y-2">
@@ -409,17 +397,17 @@ export default function NewPersonnel() {
                           id="first_name"
                           name="first_name"
                           value={data.first_name}
-                          className={`w-full ${validationErrors.first_name ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                          onChange={(e) => handleInputChange("first_name", e.target.value)}
+                          className={`w-full ${invalid('first_name') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => setData("first_name", e.target.value)}
+                          onBlur={() => validate('first_name')}
                           placeholder="e.g. Juan"
                         />
-                        {validationErrors.first_name && (
+                        {invalid('first_name') && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                            <span className="break-words">{validationErrors.first_name}</span>
+                            <span className="break-words">{errors.first_name}</span>
                           </div>
                         )}
-                        <InputError message={errors.first_name} className="text-xs" />
                       </div>
 
                       <div className="space-y-2">
@@ -431,16 +419,16 @@ export default function NewPersonnel() {
                           name="middle_name"
                           value={data.middle_name}
                           className={`w-full ${validationErrors.middle_name ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                          onChange={(e) => handleInputChange("middle_name", e.target.value)}
+                          onChange={(e) => setData("middle_name", e.target.value)}
+                          onBlur={() => validate('middle_name')}
                           placeholder="e.g. Reyes"
                         />
-                        {validationErrors.middle_name && (
+                        {invalid('middle_name') && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                            <span className="break-words">{validationErrors.middle_name}</span>
+                            <span className="break-words">{errors.middle_name}</span>
                           </div>
                         )}
-                        <InputError message={errors.middle_name} className="text-xs" />
                       </div>
 
                       <div className="space-y-2">
@@ -452,17 +440,18 @@ export default function NewPersonnel() {
                           name="name_extension"
                           value={data.name_extension}
                           className={`w-full ${validationErrors.name_extension ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                          onChange={(e) => handleInputChange("name_extension", e.target.value)}
+                          onChange={(e) => setData("name_extension", e.target.value)}
+                          onBlur={() => validate('name_extension')}
                           placeholder="e.g. Jr, Sr, III"
                         />
-                        {validationErrors.name_extension && (
+                        {invalid('name_extension') && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                            <span className="break-words">{validationErrors.name_extension}</span>
+                            <span className="break-words">{errors.name_extension}</span>
                           </div>
                         )}
-                        <InputError message={errors.name_extension} className="text-xs" />
                       </div>
+                      
                     </div>
                   </div>
                 </div>
