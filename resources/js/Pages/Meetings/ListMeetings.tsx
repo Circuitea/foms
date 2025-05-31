@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Bell, MoreVertical, MapPin, Video } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -9,8 +9,32 @@ import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
 import { Link } from "@inertiajs/react"
 
-// Meeting data
-const meetingsData = [
+// Meeting data type
+interface Meeting {
+  id: number
+  priority: "URGENT" | "NORMAL"
+  type: string
+  meetingId: string
+  title: string
+  location: string
+  department: string
+  reportedBy: string
+  assignedTo: string
+  time: string
+  timeAgo: string
+  status: string
+  meetingFormat: "in-person" | "zoom" | "google-meet"
+  meetingDate: string
+  meetingTime: string
+  description: string
+  agenda: string[]
+  meetingLink?: string
+  meetingId_zoom?: string
+  passcode?: string
+}
+
+// Initial meeting data
+const initialMeetingsData: Meeting[] = [
   {
     id: 1,
     priority: "URGENT",
@@ -92,25 +116,191 @@ const meetingsData = [
   },
 ]
 
-export default function ListMeetings() {
-  const [activeTab, setActiveTab] = useState("active")
-  const [selectedMeeting, setSelectedMeeting] = useState<any>(null)
+// Real-time clock hook
+function useRealTimeClock() {
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  const formatDateTime = (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    }
+    return date.toLocaleDateString("en-US", options)
+  }
+
+  return formatDateTime(currentTime)
+}
+
+interface ListMeetingsProps {
+  onCreateMeeting?: () => void
+}
+
+export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}) {
+  const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null)
+  const [meetingsData, setMeetingsData] = useState<Meeting[]>(initialMeetingsData)
+  const currentDateTime = useRealTimeClock()
+
+  // Store scroll position
+  const [scrollPosition, setScrollPosition] = useState(0)
+  const detailsContainerRef = useRef<HTMLDivElement>(null)
 
   const handleMarkAllRead = () => {
     alert("All meetings marked as read!")
   }
 
-  const handleMeetingClick = (meeting: any) => {
+  const handleMeetingClick = (meeting: Meeting) => {
+    // Save current scroll position before showing meeting details
+    setScrollPosition(window.scrollY)
     setSelectedMeeting(meeting)
+
+    // Only reset scroll for the details container
+    if (detailsContainerRef.current) {
+      detailsContainerRef.current.scrollTop = 0
+    }
   }
 
   const handleBackToList = () => {
     setSelectedMeeting(null)
+
+    // Restore previous scroll position with a slight delay to ensure rendering
+    setTimeout(() => {
+      window.scrollTo({ top: scrollPosition })
+    }, 0)
   }
 
   const handleMoreActions = (action: string, meetingId: string) => {
     alert(`${action} for meeting ${meetingId}`)
   }
+
+  // Function to add a new meeting
+  const addNewMeeting = (newMeetingData: any) => {
+    const now = new Date()
+    const timeString = now.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })
+
+    // Generate new meeting ID
+    const newId = Math.max(...meetingsData.map((m) => m.id)) + 1
+    const meetingIdNumber = String(newId).padStart(3, "0")
+
+    // Map form data to meeting format
+    const departmentMap: { [key: string]: string } = {
+      emergency: "Emergency Operations",
+      admin: "Administration",
+      community: "Community Relations",
+      training: "Training & Development",
+      logistics: "Logistics",
+    }
+
+    const typeMap: { [key: string]: string } = {
+      "team-meeting": "Team Meeting",
+      training: "Training Session",
+      planning: "Planning Meeting",
+      briefing: "Emergency Briefing",
+      drill: "Drill Exercise",
+    }
+
+    const newMeeting: Meeting = {
+      id: newId,
+      priority: newMeetingData.priority === "urgent" ? "URGENT" : "NORMAL",
+      type: typeMap[newMeetingData.type] || newMeetingData.type,
+      meetingId: `MTG-2025-${meetingIdNumber}`,
+      title: newMeetingData.title,
+      location: newMeetingData.meetingFormat === "in-person" ? newMeetingData.location : "Virtual Meeting",
+      department: departmentMap[newMeetingData.department] || newMeetingData.department,
+      reportedBy: "Current User", // You can replace this with actual user data
+      assignedTo: "Team Members", // You can replace this with actual assignment logic
+      time: timeString,
+      timeAgo: "Just now",
+      status: "Active",
+      meetingFormat: newMeetingData.meetingFormat,
+      meetingDate: new Date(newMeetingData.date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+      meetingTime: `${newMeetingData.time} - ${
+        newMeetingData.duration
+          ? new Date(
+              new Date(`2000-01-01T${newMeetingData.time}`).getTime() +
+                Number.parseInt(newMeetingData.duration) * 60000,
+            ).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })
+          : "TBD"
+      }`,
+      description: newMeetingData.description,
+      agenda:
+        newMeetingData.agenda && newMeetingData.agenda.length > 0
+          ? newMeetingData.agenda
+          : ["Meeting agenda to be updated"],
+      meetingLink: newMeetingData.meetingLink,
+      meetingId_zoom: newMeetingData.meetingId,
+      passcode: newMeetingData.passcode,
+    }
+
+    // Add the new meeting to the beginning of the list
+    setMeetingsData((prev) => [newMeeting, ...prev])
+
+    // Show success message
+    alert(`Meeting "${newMeeting.title}" created successfully!`)
+  }
+
+  // Expose the addNewMeeting function globally so NewMeeting component can use it
+  useEffect(() => {
+    ;(window as any).addNewMeeting = addNewMeeting
+    return () => {
+      delete (window as any).addNewMeeting
+    }
+  }, [meetingsData])
+
+  // Add this useEffect after the existing useEffect that exposes addNewMeeting
+  useEffect(() => {
+    // Check for new meetings from localStorage when component mounts
+    const checkForNewMeetings = () => {
+      const newMeetingsFromStorage = JSON.parse(localStorage.getItem("newMeetings") || "[]")
+
+      if (newMeetingsFromStorage.length > 0) {
+        // Process each new meeting
+        newMeetingsFromStorage.forEach((newMeetingData: any) => {
+          addNewMeeting(newMeetingData)
+        })
+
+        // Clear the localStorage after processing
+        localStorage.removeItem("newMeetings")
+      }
+    }
+
+    // Check immediately when component mounts
+    checkForNewMeetings()
+
+    // Also check when the page becomes visible (user returns from another tab/page)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        checkForNewMeetings()
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [])
 
   const activeMeetingsCount = meetingsData.filter((m) => m.status !== "Completed").length
 
@@ -118,20 +308,23 @@ export default function ListMeetings() {
   if (selectedMeeting) {
     return (
       <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="bg-[#1B2560] text-white p-4 md:p-6">
+        {/* Header - Sticky */}
+        <div className="sticky top-0 z-50 bg-[#1B2560] text-white p-4 md:p-6 shadow-lg">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center gap-3">
               <Button variant="ghost" className="text-white hover:bg-[#1B2560]/80" onClick={handleBackToList}>
                 ← Back to Meetings
               </Button>
             </div>
-            <div className="text-sm">Meeting Details</div>
+            <div className="text-sm">
+              <div>Meeting Details</div>
+              <div className="text-xs text-gray-300 mt-1">{currentDateTime}</div>
+            </div>
           </div>
         </div>
 
-        {/* Meeting Details */}
-        <div className="container mx-auto px-4 md:px-6 py-6 max-w-4xl">
+        {/* Meeting Details - with ref for scroll control */}
+        <div ref={detailsContainerRef} className="container mx-auto px-4 md:px-6 py-6 max-w-4xl">
           {/* Meeting Header */}
           <div className="bg-[#1B2560] text-white p-4 md:p-6 rounded-lg mb-6">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
@@ -278,45 +471,26 @@ export default function ListMeetings() {
             <h1 className="text-xl font-semibold">Meeting Notifications</h1>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-            <span className="text-sm">Sat, May 31, 2025, 06:43 PM</span>
+            <span className="text-sm font-mono">{currentDateTime}</span>
             <div className="flex items-center gap-2">
               <Button variant="ghost" className="text-white hover:bg-[#1B2560]/80" onClick={handleMarkAllRead}>
                 Mark all as read
               </Button>
               <Button className="bg-white text-[#1B2560] hover:bg-gray-100" asChild>
-                <Link href='/meetings/new'>
-                  New Meeting
-                </Link>
+                <Link href="/meetings/new">New Meeting</Link>
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Single Tab - Active Notifications Only */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex gap-4 md:gap-8 overflow-x-auto">
-            <button
-              className={`py-4 px-2 border-b-2 font-medium whitespace-nowrap ${
-                activeTab === "active"
-                  ? "border-[#1B2560] text-[#1B2560]"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-              onClick={() => setActiveTab("active")}
-            >
+            <div className="py-4 px-2 border-b-2 border-[#1B2560] text-[#1B2560] font-medium whitespace-nowrap">
               Active Notifications ({activeMeetingsCount})
-            </button>
-            <button
-              className={`py-4 px-2 border-b-2 font-medium whitespace-nowrap ${
-                activeTab === "archived"
-                  ? "border-[#1B2560] text-[#1B2560]"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-              onClick={() => setActiveTab("archived")}
-            >
-              Archived (0)
-            </button>
+            </div>
           </div>
         </div>
       </div>
@@ -346,11 +520,16 @@ export default function ListMeetings() {
                     </span>
                     <div className="flex items-center gap-1 text-gray-600">
                       {meeting.meetingFormat === "in-person" ? (
-                        <MapPin className="w-4 h-4" />
+                        <>
+                          <MapPin className="w-4 h-4" />
+                          <span className="text-sm">{meeting.type}</span>
+                        </>
                       ) : (
-                        <Video className="w-4 h-4" />
+                        <>
+                          <Video className="w-4 h-4" />
+                          <span className="text-sm">{meeting.type}</span>
+                        </>
                       )}
-                      <span className="text-sm">{meeting.type}</span>
                     </div>
                     <span className="text-sm text-gray-500">{meeting.meetingId}</span>
                     <span
