@@ -338,3 +338,5 @@ export default function NewMeeting() {
 }
 
 NewMeeting.layout = (e: JSX.Element) => <Authenticated children={e} />
+
+//this and the listmeeting part should be fixed.
