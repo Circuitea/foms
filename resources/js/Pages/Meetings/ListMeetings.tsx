@@ -1,7 +1,9 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect, useRef } from "react"
-import { Bell, MoreVertical, MapPin, Video } from "lucide-react"
+import { Bell, MoreVertical, MapPin, Video, Check, Copy, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -22,7 +24,7 @@ interface Meeting {
   assignedTo: string
   time: string
   timeAgo: string
-  status: string
+  status: "Active" | "Checked" | "Completed"
   meetingFormat: "in-person" | "zoom" | "google-meet"
   meetingDate: string
   meetingTime: string
@@ -116,6 +118,36 @@ const initialMeetingsData: Meeting[] = [
   },
 ]
 
+// Function to load meeting statuses from localStorage
+const loadMeetingStatuses = (): Meeting[] => {
+  try {
+    const savedStatuses = localStorage.getItem("meetingStatuses")
+    if (savedStatuses) {
+      const statusMap = JSON.parse(savedStatuses)
+      return initialMeetingsData.map((meeting) => ({
+        ...meeting,
+        status: statusMap[meeting.id] || meeting.status,
+      }))
+    }
+  } catch (error) {
+    console.error("Error loading meeting statuses:", error)
+  }
+  return initialMeetingsData
+}
+
+// Function to save meeting statuses to localStorage
+const saveMeetingStatuses = (meetings: Meeting[]) => {
+  try {
+    const statusMap: { [key: number]: string } = {}
+    meetings.forEach((meeting) => {
+      statusMap[meeting.id] = meeting.status
+    })
+    localStorage.setItem("meetingStatuses", JSON.stringify(statusMap))
+  } catch (error) {
+    console.error("Error saving meeting statuses:", error)
+  }
+}
+
 // Real-time clock hook
 function useRealTimeClock() {
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -150,8 +182,8 @@ interface ListMeetingsProps {
 }
 
 export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}) {
+  const [meetingsData, setMeetingsData] = useState<Meeting[]>(loadMeetingStatuses())
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null)
-  const [meetingsData, setMeetingsData] = useState<Meeting[]>(initialMeetingsData)
   const currentDateTime = useRealTimeClock()
 
   // Store scroll position
@@ -159,13 +191,36 @@ export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}
   const detailsContainerRef = useRef<HTMLDivElement>(null)
 
   const handleMarkAllRead = () => {
-    alert("All meetings marked as read!")
+    setMeetingsData((prev) => {
+      const newMeetings = prev.map((meeting) => ({
+        ...meeting,
+        status: meeting.status === "Active" ? "Checked" : meeting.status,
+      }))
+      saveMeetingStatuses(newMeetings)
+      return newMeetings
+    })
+    alert("All meetings marked as read")
   }
 
   const handleMeetingClick = (meeting: Meeting) => {
+    // Create updated meeting object if it's currently Active (unread)
+    let updatedMeeting = meeting
+    if (meeting.status === "Active") {
+      updatedMeeting = { ...meeting, status: "Checked" }
+
+      // Update the meetings data state
+      setMeetingsData((prev) => {
+        const newMeetings = prev.map((m) => (m.id === meeting.id ? updatedMeeting : m))
+        saveMeetingStatuses(newMeetings)
+        return newMeetings
+      })
+    }
+
     // Save current scroll position before showing meeting details
     setScrollPosition(window.scrollY)
-    setSelectedMeeting(meeting)
+
+    // Set the selected meeting with the updated status
+    setSelectedMeeting(updatedMeeting)
 
     // Only reset scroll for the details container
     if (detailsContainerRef.current) {
@@ -182,8 +237,58 @@ export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}
     }, 0)
   }
 
-  const handleMoreActions = (action: string, meetingId: string) => {
-    alert(`${action} for meeting ${meetingId}`)
+  // Function to mark a meeting as read
+  const handleMarkAsRead = (meetingId: string, event: React.MouseEvent) => {
+    event.stopPropagation()
+    setMeetingsData((prev) => {
+      const newMeetings = prev.map((meeting) =>
+        meeting.meetingId === meetingId ? { ...meeting, status: "Checked" } : meeting,
+      )
+      saveMeetingStatuses(newMeetings)
+      return newMeetings
+    })
+
+    // Update selectedMeeting if it's the same meeting
+    if (selectedMeeting?.meetingId === meetingId) {
+      setSelectedMeeting((prev) => (prev ? { ...prev, status: "Checked" } : null))
+    }
+
+    alert("Meeting marked as read")
+  }
+
+  // Function to join a meeting
+  const handleJoinMeeting = (meeting: Meeting, event: React.MouseEvent) => {
+    event.stopPropagation()
+
+    if (meeting.meetingFormat === "in-person") {
+      alert(`Location: ${meeting.location}`)
+      return
+    }
+
+    if (meeting.meetingLink) {
+      window.open(meeting.meetingLink, "_blank")
+      alert("Opening meeting link in a new tab")
+    } else {
+      alert("No meeting link available")
+    }
+  }
+
+  // Function to copy meeting link
+  const handleCopyLink = (meeting: Meeting, event: React.MouseEvent) => {
+    event.stopPropagation()
+
+    if (meeting.meetingFormat === "in-person") {
+      navigator.clipboard.writeText(`In-person meeting at ${meeting.location}`)
+      alert("Location information copied to clipboard")
+      return
+    }
+
+    if (meeting.meetingLink) {
+      navigator.clipboard.writeText(meeting.meetingLink)
+      alert("Meeting link copied to clipboard")
+    } else {
+      alert("No meeting link available to copy")
+    }
   }
 
   // Function to add a new meeting
@@ -303,6 +408,7 @@ export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}
   }, [])
 
   const activeMeetingsCount = meetingsData.filter((m) => m.status !== "Completed").length
+  const unreadMeetingsCount = meetingsData.filter((m) => m.status === "Active").length
 
   // Meeting detail view
   if (selectedMeeting) {
@@ -330,7 +436,7 @@ export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span
-                  className={`px-3 py-1 text-xs font-bold text-white rounded ${selectedMeeting.priority === "URGENT" ? "bg-red-600" : "bg-[#1B2560]/95"}`}
+                  className={`px-3 py-1 text-xs font-bold text-white rounded ${selectedMeeting.priority === "URGENT" ? "bg-red-600 animate-pulse" : "bg-[#1B2560]/95"}`}
                 >
                   {selectedMeeting.priority}
                 </span>
@@ -383,7 +489,33 @@ export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}
                     <>
                       <div>
                         <label className="text-sm font-medium text-gray-500">Meeting Link</label>
-                        <p className="text-sm text-blue-600 break-all">{selectedMeeting.meetingLink}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm text-blue-600 break-all">{selectedMeeting.meetingLink}</p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="ml-2"
+                            onClick={() => {
+                              if (selectedMeeting.meetingLink) {
+                                window.open(selectedMeeting.meetingLink, "_blank")
+                              }
+                            }}
+                          >
+                            <ExternalLink className="w-4 h-4 mr-1" /> Join
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (selectedMeeting.meetingLink) {
+                                navigator.clipboard.writeText(selectedMeeting.meetingLink)
+                                alert("Meeting link copied to clipboard")
+                              }
+                            }}
+                          >
+                            <Copy className="w-4 h-4 mr-1" /> Copy
+                          </Button>
+                        </div>
                       </div>
                       {selectedMeeting.meetingId_zoom && (
                         <div>
@@ -463,17 +595,22 @@ export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}
   // Main list view
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-[#1B2560] text-white p-4 md:p-6">
+      {/* Header - Sticky */}
+      <div className="sticky top-0 z-50 bg-[#1B2560] text-white p-4 md:p-6 shadow-lg">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
             <Bell className="w-6 h-6" />
             <h1 className="text-xl font-semibold">Meeting Notifications</h1>
+            {unreadMeetingsCount > 0 && (
+              <span className="bg-red-600 text-white px-2 py-1 rounded-full text-xs font-medium animate-pulse">
+                {unreadMeetingsCount} new
+              </span>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
             <span className="text-sm font-mono">{currentDateTime}</span>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" className="text-white hover:bg-[#1B2560]/80" onClick={handleMarkAllRead}>
+              <Button variant="ghost" className="text-white hover:bg-white/10" onClick={handleMarkAllRead}>
                 Mark all as read
               </Button>
               <Button className="bg-white text-[#1B2560] hover:bg-gray-100" asChild>
@@ -506,14 +643,18 @@ export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}
             <div className="p-4 md:p-6">
               <div className="flex items-start gap-4">
                 {/* Status indicator */}
-                <div className="w-3 h-3 bg-gray-400 rounded-full mt-2 flex-shrink-0"></div>
+                <div
+                  className={`w-3 h-3 rounded-full mt-2 flex-shrink-0 ${
+                    meeting.status === "Active" ? "bg-[#1B2560] animate-pulse" : "bg-gray-400"
+                  }`}
+                ></div>
 
                 <div className="flex-1 min-w-0">
                   {/* Priority and type badges */}
                   <div className="flex flex-wrap items-center gap-2 mb-3">
                     <span
                       className={`px-3 py-1 text-xs font-bold text-white rounded ${
-                        meeting.priority === "URGENT" ? "bg-red-600" : "bg-[#1B2560]"
+                        meeting.priority === "URGENT" ? "bg-red-600 animate-pulse" : "bg-[#1B2560]"
                       }`}
                     >
                       {meeting.priority}
@@ -578,7 +719,13 @@ export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}
                     <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
                       <span>{meeting.time}</span>
                       <span>({meeting.timeAgo})</span>
-                      <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs">{meeting.status}</span>
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${
+                          meeting.status === "Active" ? "bg-[#1B2560] text-white" : "bg-gray-200 text-gray-700"
+                        }`}
+                      >
+                        {meeting.status}
+                      </span>
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -587,17 +734,19 @@ export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleMoreActions("Mark as read", meeting.meetingId)}>
-                          Mark as read
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleMoreActions("Join meeting", meeting.meetingId)}>
+                        {meeting.status === "Active" && (
+                          <DropdownMenuItem onClick={(e) => handleMarkAsRead(meeting.meetingId, e)}>
+                            <Check className="w-4 h-4 mr-2" />
+                            Mark as read
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={(e) => handleJoinMeeting(meeting, e)}>
+                          <ExternalLink className="w-4 h-4 mr-2" />
                           Join meeting
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleMoreActions("Copy link", meeting.meetingId)}>
+                        <DropdownMenuItem onClick={(e) => handleCopyLink(meeting, e)}>
+                          <Copy className="w-4 h-4 mr-2" />
                           Copy link
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleMoreActions("Report", meeting.meetingId)}>
-                          Report
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
