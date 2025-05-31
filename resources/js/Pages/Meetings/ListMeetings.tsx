@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
+import { Link } from "@inertiajs/react"
 
 // Meeting data
 const meetingsData = [
@@ -282,11 +283,10 @@ export default function ListMeetings() {
               <Button variant="ghost" className="text-white hover:bg-[#1B2560]/80" onClick={handleMarkAllRead}>
                 Mark all as read
               </Button>
-              <Button
-                className="bg-white text-[#1B2560] hover:bg-gray-100"
-                onClick={() => alert("Navigate to New Meeting - Replace with your routing logic")}
-              >
-                New Meeting
+              <Button className="bg-white text-[#1B2560] hover:bg-gray-100" asChild>
+                <Link href='/meetings/new'>
+                  New Meeting
+                </Link>
               </Button>
             </div>
           </div>

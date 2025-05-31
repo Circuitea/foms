@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
+import { Link } from "@inertiajs/react"
 
 export default function NewMeeting() {
   const [formData, setFormData] = useState({
@@ -56,9 +57,11 @@ export default function NewMeeting() {
       {/* Header */}
       <div className="bg-white border-b px-4 md:px-6 py-4">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" className="text-gray-600" onClick={handleBack}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Meetings
+          <Button variant="ghost" size="sm" className="text-gray-600" asChild>
+            <Link href='/meetings'>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Meetings
+            </Link>
           </Button>
         </div>
         <div className="mt-2 text-sm text-gray-500">CDRRMO Staff Portal › Meetings › Create New Meeting</div>
