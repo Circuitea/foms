@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Users, MapPin, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react'
+import { Users, Eye, EyeOff, ChevronUp, ChevronDown } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
 import TrackingMap from "./TrackingMap"
@@ -105,11 +105,11 @@ function MapPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       // Trigger window resize event to force map libraries to recalculate
-      window.dispatchEvent(new Event('resize'))
-      
+      window.dispatchEvent(new Event("resize"))
+
       // If you have access to the map instance, you can also call map.invalidateSize() here
       // This is for Leaflet specifically - adjust based on your mapping library
-      if (window.map && typeof window.map.invalidateSize === 'function') {
+      if (window.map && typeof window.map.invalidateSize === "function") {
         window.map.invalidateSize()
       }
     }, 350) // Wait for sidebar animation to complete
@@ -122,6 +122,21 @@ function MapPage() {
       {/* Header - Navy Blue Theme */}
       <div className="bg-[#1B2560] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 text-white hover:text-gray-200 transition-colors duration-200 group"
+          >
+            <svg
+              className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="text-sm font-medium">Back to Dashboard</span>
+          </Link>
+          <div className="w-px h-6 bg-white/20"></div>
           <h1 className="text-2xl font-bold text-white">PERSONNEL TRACKING</h1>
           <Badge className="bg-red-500 hover:bg-red-600 text-white border-0">LIVE</Badge>
         </div>
@@ -173,16 +188,14 @@ function MapPage() {
                   className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-white border-gray-300 hover:bg-gray-50 px-4 py-2 h-12 whitespace-nowrap transform -translate-x-[calc(100%-3rem)] flex items-center justify-center shadow-lg rounded-lg"
                   asChild
                 >
-                  <Link href='/map/report'>
-                    Export Report
-                  </Link>
+                  <Link href="/map/report">Export Report</Link>
                 </Button>
               </div>
             </div>
 
             {/* Legend */}
             {selectedCategory && (
-              <div className="absolute bottom-32 left-4 bg-white rounded-lg shadow-lg p-4 max-w-xs">
+              <div className="absolute bottom-16 left-4 bg-white rounded-lg shadow-lg p-4 max-w-xs">
                 <h3 className="font-medium text-gray-900 mb-2">Legend</h3>
                 <div className="space-y-1 text-sm">
                   <div className="flex items-center gap-2">

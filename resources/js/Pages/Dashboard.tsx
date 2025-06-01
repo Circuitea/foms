@@ -805,7 +805,7 @@ export default function Dashboard() {
                         LIVE
                       </span>
                     </div>
-                    <Link href={route('map')} className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    <Link href="/map" className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                       <Maximize2 className="w-4 h-4" />
                       Full View
                     </Link>
@@ -832,7 +832,7 @@ export default function Dashboard() {
                         <div className="absolute bottom-16 right-8 w-4 h-4 bg-purple-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
                         <div className="absolute top-20 left-1/2 w-4  -4 bg-orange-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
                         <div className="absolute top-1/2 right-1/4 w-4 h-4 bg-pink-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div> */}
-                        <Link href={route('map')}>
+                        <Link href="/map">
                           <MapContainer className='min-h-full h-[16rem] z-0 border-2 border-dashed border-gray-300 rounded-lg' center={[14.6034363, 121.0389469]} zoom={14} scrollWheelZoom={false} dragging={false} zoomControl={false}>
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
