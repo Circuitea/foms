@@ -668,6 +668,7 @@ export default function NewPersonnel() {
             </div>
           </div>
 
+          {/* Account Security */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 bg-red-50">
               <div className="flex items-center gap-2">
