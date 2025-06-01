@@ -726,16 +726,10 @@ export default function Dashboard() {
 
         {/* Dashboard Content */}
         <div className="max-w-7xl mx-auto px-6 py-6">
-          {/* Dashboard Title */}
-          <div className="mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">DASHBOARD</h2>
-              <div className="w-16 h-1 bg-red-500 mt-1"></div>
-            </div>
-          </div>
+
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -788,29 +782,6 @@ export default function Dashboard() {
               <div className="mt-4">
                 <span className="text-red-600 text-sm font-medium">-8.3%</span>
                 <span className="text-gray-600 text-sm ml-1">improvement</span>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Success Rate</p>
-                  <p className="text-2xl font-bold text-gray-900">91.7%</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div className="mt-4">
-                <span className="text-green-600 text-sm font-medium">+5.4%</span>
-                <span className="text-gray-600 text-sm ml-1">from last month</span>
               </div>
             </div>
           </div>
