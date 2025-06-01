@@ -57,4 +57,9 @@ class Personnel extends Authenticatable
     {
         return $this->belongsToMany(Role::class, 'personnel_role');
     }
+
+    public function departments(): BelongsToMany
+    {
+        return $this->belongsToMany(Department::class, 'departments_personnel');
+    }
 }
