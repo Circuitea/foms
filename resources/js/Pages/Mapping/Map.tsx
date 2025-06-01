@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Users, MapPin, Eye, EyeOff, ChevronUp, ChevronDown } from "lucide-react"
+import { Users, MapPin, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react'
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
 import TrackingMap from "./TrackingMap"
@@ -72,6 +72,7 @@ function MapPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [prioritizedUser, setPrioritizedUser] = useState<Personnel | null>(null)
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
+  const mapContainerRef = useRef<HTMLDivElement>(null)
 
   const handleCategoryClick = (category: Category) => {
     if (selectedCategory === category) {
@@ -99,6 +100,22 @@ function MapPage() {
     setSidebarExpanded(!sidebarExpanded)
   }
 
+  // Force map resize when sidebar state changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Trigger window resize event to force map libraries to recalculate
+      window.dispatchEvent(new Event('resize'))
+      
+      // If you have access to the map instance, you can also call map.invalidateSize() here
+      // This is for Leaflet specifically - adjust based on your mapping library
+      if (window.map && typeof window.map.invalidateSize === 'function') {
+        window.map.invalidateSize()
+      }
+    }, 350) // Wait for sidebar animation to complete
+
+    return () => clearTimeout(timer)
+  }, [sidebarExpanded])
+
   return (
     <div className="h-screen w-full bg-gray-50 flex flex-col">
       {/* Header - Navy Blue Theme */}
@@ -113,12 +130,12 @@ function MapPage() {
         {/* Map Area - Flexible Width */}
         <div className="flex-1 min-w-0">
           {/* Map Container */}
-          <div className="w-full h-full bg-gray-100 relative overflow-hidden">
+          <div ref={mapContainerRef} className="w-full h-full bg-gray-100 relative overflow-hidden">
             {/* Map Placeholder - In real implementation, use Leaflet, Google Maps, etc. */}
             <TrackingMap />
 
-            {/* Map Controls - Bottom Right - Floating and Separate */}
-            <div className="absolute bottom-4 right-4 flex flex-col gap-3 items-center">
+            {/* Map Controls - Bottom Right - Floating and Separate - Moved higher */}
+            <div className="absolute bottom-16 right-4 flex flex-col gap-3 items-center">
               {/* Zoom In Button - Floating */}
               <Button
                 variant="outline"
@@ -161,7 +178,7 @@ function MapPage() {
 
             {/* Legend */}
             {selectedCategory && (
-              <div className="absolute bottom-20 left-4 bg-white rounded-lg shadow-lg p-4 max-w-xs">
+              <div className="absolute bottom-32 left-4 bg-white rounded-lg shadow-lg p-4 max-w-xs">
                 <h3 className="font-medium text-gray-900 mb-2">Legend</h3>
                 <div className="space-y-1 text-sm">
                   <div className="flex items-center gap-2">
