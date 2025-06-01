@@ -11,17 +11,17 @@ const personnelMarkers: PersonnelMarkerDetails[] = [
             email: 'charlesaaron.sarmiento@example.com',
             roles: [{id: 1, name: 'IT Staff'}],
         },
-        position: [14.6044363, 121.0299469],
+        position: [14.6074363, 121.0299469],
     },
     {
         personnel: {
             id: 2,
             first_name: 'Victor',
             surname: 'Chipe',
-            email: 'charlesaaron.sarmiento@example.com',
+            email: 'victor.chipe@example.com',
             roles: [{id: 1, name: 'IT Staff'}],
         },
-        position: [14.6032363, 121.0299469],
+        position: [14.6032363, 121.0499469],
     },
 ]
 

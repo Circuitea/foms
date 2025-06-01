@@ -19,7 +19,7 @@ export interface Role {
 export interface PersonnelMarkerDetails {
     personnel: Personnel,
     position: LatLngTuple,
-    recentLocations: {
+    recentLocations?: {
         location: string,
         time: Date,
     }[],

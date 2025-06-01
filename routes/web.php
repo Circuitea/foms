@@ -14,6 +14,10 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/map', function () {
+    return Inertia::render('Mapping/Map');
+})->middleware(['auth', 'verified'])->name('map');
+
 Route::prefix('personnel')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [PersonnelController::class, 'list']);
     Route::get('/new', [PersonnelController::class, 'new']);

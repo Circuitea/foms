@@ -2,9 +2,10 @@
 
 import React from "react"
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
-import { Head } from "@inertiajs/react"
+import { Head, Link } from "@inertiajs/react"
 import { useState, useEffect } from "react"
 import { Users, MapPin, Calendar, Maximize2, AlertTriangle, CheckCircle, X, ChevronLeft, RefreshCw } from "lucide-react"
+import TrackingMap from "./Mapping/TrackingMap"
 
 // Mock data for charts
 const requestOverviewData = [
@@ -799,13 +800,10 @@ export default function Dashboard() {
                         LIVE
                       </span>
                     </div>
-                    <button
-                      onClick={() => setIsMapMaximized(true)}
-                      className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-                    >
+                    <Link href={route('map')} className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                       <Maximize2 className="w-4 h-4" />
-                      Maximize
-                    </button>
+                      Full View
+                    </Link>
                   </div>
                 </div>
 
@@ -813,10 +811,9 @@ export default function Dashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-3">
                       <div
-                        className="relative bg-gradient-to-br from-blue-50 to-green-50 rounded-lg h-64 cursor-pointer hover:shadow-md transition-all border-2 border-dashed border-gray-300"
-                        onClick={() => setIsMapMaximized(true)}
+                        className="relative bg-gradient-to-br from-blue-50 to-green-50 rounded-lg h-64 cursor-pointer hover:shadow-md transition-all"
                       >
-                        <div className="absolute inset-0 flex items-center justify-center">
+                        {/* <div className="absolute inset-0 flex items-center justify-center">
                           <div className="text-center">
                             <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
                             <p className="text-gray-600 font-medium">Interactive Map</p>
@@ -828,8 +825,11 @@ export default function Dashboard() {
                         <div className="absolute top-12 right-12 w-4 h-4 bg-blue-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
                         <div className="absolute bottom-8 left-16 w-4 h-4 bg-green-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
                         <div className="absolute bottom-16 right-8 w-4 h-4 bg-purple-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
-                        <div className="absolute top-20 left-1/2 w-4 h-4 bg-orange-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
-                        <div className="absolute top-1/2 right-1/4 w-4 h-4 bg-pink-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
+                        <div className="absolute top-20 left-1/2 w-4  -4 bg-orange-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
+                        <div className="absolute top-1/2 right-1/4 w-4 h-4 bg-pink-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div> */}
+                        <Link href={route('map')}>
+                          <TrackingMap dragging={false} />
+                        </Link>
                       </div>
                     </div>
 
