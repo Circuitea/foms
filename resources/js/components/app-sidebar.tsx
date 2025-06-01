@@ -72,7 +72,7 @@ export function AppSidebar() {
                 </div>
               </div>
               <div className="text-center">
-                <p className="text-white font-medium text-lg">Alexis</p>
+                <p className="text-white font-medium text-lg">Yuan</p>
                 <p className="text-white/70 text-sm">Admin</p>
               </div>
             </div>
