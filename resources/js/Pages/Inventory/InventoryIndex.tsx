@@ -1645,6 +1645,9 @@ export default function InventoryIndex() {
     setShowAddDeploymentForm(false)
   }
 
+  const [bulkDeploymentSearchTerm, setBulkDeploymentSearchTerm] = useState("")
+  const [bulkMaintenanceSearchTerm, setBulkMaintenanceSearchTerm] = useState("")
+
   const handleBulkDeployment = () => {
     if (!bulkDeploymentData.user || !bulkDeploymentData.purpose || selectedItems.length === 0) {
       alert("Please fill in all required fields and select at least one item")
@@ -1678,6 +1681,7 @@ export default function InventoryIndex() {
       date: new Date().toISOString().split("T")[0],
     })
     setShowBulkDeploymentModal(false)
+    setBulkDeploymentSearchTerm("")
 
     // Show success notification
     showSuccess(
@@ -1729,6 +1733,7 @@ export default function InventoryIndex() {
       date: new Date().toISOString().split("T")[0],
     })
     setShowBulkMaintenanceModal(false)
+    setBulkMaintenanceSearchTerm("")
 
     // Show success notification
     showSuccess(
@@ -2684,9 +2689,29 @@ export default function InventoryIndex() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Select Equipment ({selectedItems.length} selected)
                 </h3>
-                <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-md">
+                <div className="relative mb-3">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search equipment..."
+                    value={bulkDeploymentSearchTerm}
+                    onChange={(e) => setBulkDeploymentSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  />
+                </div>
+                <div className="h-96 overflow-y-auto border border-gray-200 rounded-md">
                   {equipmentList
                     .filter((item) => item.available > 0)
+                    .filter((item) =>
+                      bulkDeploymentSearchTerm
+                        ? item.name.toLowerCase().includes(bulkDeploymentSearchTerm.toLowerCase()) ||
+                          item.description.toLowerCase().includes(bulkDeploymentSearchTerm.toLowerCase()) ||
+                          (item.location &&
+                            item.location.toLowerCase().includes(bulkDeploymentSearchTerm.toLowerCase())) ||
+                          (item.serialNumber &&
+                            item.serialNumber.toLowerCase().includes(bulkDeploymentSearchTerm.toLowerCase()))
+                        : true,
+                    )
                     .map((item) => (
                       <div key={item.id} className="p-3 border-b border-gray-100 hover:bg-gray-50">
                         <label className="flex items-center space-x-3 cursor-pointer">
@@ -2809,9 +2834,29 @@ export default function InventoryIndex() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Select Equipment ({selectedItems.length} selected)
                 </h3>
-                <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-md">
+                <div className="relative mb-3">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search equipment..."
+                    value={bulkMaintenanceSearchTerm}
+                    onChange={(e) => setBulkMaintenanceSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                </div>
+                <div className="h-96 overflow-y-auto border border-gray-200 rounded-md">
                   {equipmentList
                     .filter((item) => item.available > 0)
+                    .filter((item) =>
+                      bulkMaintenanceSearchTerm
+                        ? item.name.toLowerCase().includes(bulkMaintenanceSearchTerm.toLowerCase()) ||
+                          item.description.toLowerCase().includes(bulkMaintenanceSearchTerm.toLowerCase()) ||
+                          (item.location &&
+                            item.location.toLowerCase().includes(bulkMaintenanceSearchTerm.toLowerCase())) ||
+                          (item.serialNumber &&
+                            item.serialNumber.toLowerCase().includes(bulkMaintenanceSearchTerm.toLowerCase()))
+                        : true,
+                    )
                     .map((item) => (
                       <div key={item.id} className="p-3 border-b border-gray-100 hover:bg-gray-50">
                         <label className="flex items-center space-x-3 cursor-pointer">
