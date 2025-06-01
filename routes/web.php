@@ -6,6 +6,7 @@ use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TasksController;
+use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -14,9 +15,9 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::prefix('personnel')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('', [PersonnelController::class, 'list']);
-    Route::get('new', [PersonnelController::class, 'new']);
-    Route::post('new', [PersonnelController::class, 'create']);
+    Route::get('/', [PersonnelController::class, 'list']);
+    Route::get('/new', [PersonnelController::class, 'new']);
+    Route::post('/new', [PersonnelController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
 });
 
 Route::prefix('meetings')-> middleware(['auth', 'verified'])->group(function () {

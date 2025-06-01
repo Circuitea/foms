@@ -10,13 +10,7 @@ export default function Edit({
     status,
 }: PageProps<{ mustVerifyEmail: boolean; status?: string }>) {
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Profile
-                </h2>
-            }
-        >
+        <div>
             <Head title="Profile" />
 
             <div className="py-12">
@@ -38,6 +32,8 @@ export default function Edit({
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </div>
     );
 }
+
+Edit.layout = (e: JSX.Element) => <AuthenticatedLayout children={e} />

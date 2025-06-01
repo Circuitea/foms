@@ -3,11 +3,13 @@ import { Head } from '@inertiajs/react';
 
 export default function Dashboard() {
     return (
-        <AuthenticatedLayout>
+        <div>
             <Head title="Dashboard" />
-            <div className="p-6 text-gray-900 dark:text-gray-100 text-xl">
+            <div className="text-gray-900 dark:text-gray-100 text-xl">
                 Dashboard
             </div>
-        </AuthenticatedLayout>
+        </div>
     );
 }
+
+Dashboard.layout = (e: JSX.Element) => <AuthenticatedLayout children={e} />
