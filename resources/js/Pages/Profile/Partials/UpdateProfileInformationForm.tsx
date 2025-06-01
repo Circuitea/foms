@@ -17,7 +17,6 @@ interface PersonalInformationProps {
     photo?: string
   }
 }
-
 export default function PersonalInformation({
   user = {
     surname: "Dela Cruz",
@@ -51,6 +50,24 @@ export default function PersonalInformation({
 
   return (
     <div>
+      {/* Main Settings Header */}
+      <div className="flex justify-between items-start mb-8 pb-6 border-b border-gray-200">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
+          <p className="text-gray-600 text-lg">Manage your account preferences and personal information</p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm text-gray-500 mb-1">Current Time</p>
+          <p className="text-lg font-semibold text-gray-900">
+            {new Date().toLocaleTimeString("en-US", {
+              hour12: true,
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}
+          </p>
+        </div>
+      </div>
       {/* Header */}
       <div className="mb-8 p-6 bg-blue-50 rounded-lg">
         <div className="flex items-center gap-3 mb-2">
