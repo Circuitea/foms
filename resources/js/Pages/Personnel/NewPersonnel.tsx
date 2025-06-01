@@ -9,7 +9,7 @@ import toast from "@/components/toast";
 import { Head, Link } from "@inertiajs/react"
 import { useForm } from 'laravel-precognition-react-inertia';
 import { ArrowLeft, User, Mail, Phone, Lock, Save, Loader2, Briefcase, ChevronDown, Check, Building, AlertCircle, X } from 'lucide-react'
-import type { FormEventHandler } from "react"
+import type { FormEventHandler, MouseEventHandler } from "react"
 import { useState, useEffect } from "react"
 
 const positions = ["IT Staff", "Administrative Staff", "Logistic Staff"]
@@ -34,15 +34,8 @@ interface ValidationErrors {
   [key: string]: string
 }
 
-interface Toast {
-  id: string
-  type: "error" | "success" | "warning"
-  title: string
-  message: string
-}
-
 export default function NewPersonnel() {
-  const { data, setData, processing, errors, submit, reset, validate, invalid, setValidationTimeout } = useForm('post', '/personnel/new', {
+  const form = useForm('post', '/personnel/new', {
     first_name: "",
     middle_name: "",
     surname: "",
@@ -54,7 +47,21 @@ export default function NewPersonnel() {
     password: "",
   });
 
-  setValidationTimeout(3000);
+  form.setValidationTimeout(3000);
+
+  const generateRandomPassword: MouseEventHandler = (e) => {
+    e.preventDefault();
+
+    let charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    let newPassword = '';
+    let passwordLength = 8;
+
+    for (let i = 0; i < passwordLength; i++) {
+      newPassword += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+
+    form.setData('password', newPassword);
+  }
 
   // Position dropdown states
   const [isPositionOpen, setIsPositionOpen] = useState(false)
@@ -66,7 +73,6 @@ export default function NewPersonnel() {
 
   // Validation states
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
-  const [toasts, setToasts] = useState<Toast[]>([])
 
   const filteredPositions = positions.filter((position) =>
     position.toLowerCase().includes(positionSearch.toLowerCase()),
@@ -74,9 +80,9 @@ export default function NewPersonnel() {
 
   // Filter departments based on selected position
   const getAvailableDepartments = () => {
-    if (data.position && positionDepartmentMapping[data.position]) {
+    if (form.data.position && positionDepartmentMapping[form.data.position]) {
       // If position is selected and has a mapping, only show the mapped department
-      return [positionDepartmentMapping[data.position]]
+      return [positionDepartmentMapping[form.data.position]]
     }
     // Otherwise show all departments
     return departments
@@ -165,7 +171,7 @@ export default function NewPersonnel() {
 
   // Handle input changes with validation
   const handleInputChange = (field: string, value: string) => {
-    setData(field as any, value)
+    form.setData(field as any, value)
     handleFieldValidation(field, value)
   }
 
@@ -183,7 +189,7 @@ export default function NewPersonnel() {
   }
 
   const handlePositionSelect = (position: string) => {
-    setData("position", position)
+    form.setData("position", position)
     setPositionSearch(position)
     setIsPositionOpen(false)
     handleFieldValidation("position", position)
@@ -191,7 +197,7 @@ export default function NewPersonnel() {
     // Auto-set department based on position
     const mappedDepartment = positionDepartmentMapping[position]
     if (mappedDepartment) {
-      setData("department", mappedDepartment)
+      form.setData("department", mappedDepartment)
       setDepartmentSearch(mappedDepartment)
       handleFieldValidation("department", mappedDepartment)
 
@@ -205,23 +211,23 @@ export default function NewPersonnel() {
 
   const handlePositionInputChange = (value: string) => {
     setPositionSearch(value)
-    setData("position", value)
+    form.setData("position", value)
     setIsPositionOpen(true)
     handleFieldValidation("position", value)
 
     // If user is typing a custom position, clear the department auto-selection
     if (!positionDepartmentMapping[value]) {
       // Only clear if the current department was auto-selected
-      const currentDepartment = data.department
+      const currentDepartment = form.data.department
       if (currentDepartment && Object.values(positionDepartmentMapping).includes(currentDepartment)) {
-        setData("department", "")
+        form.setData("department", "")
         setDepartmentSearch("")
       }
     }
   }
 
   const handleDepartmentSelect = (department: string) => {
-    setData("department", department)
+    form.setData("department", department)
     setDepartmentSearch(department)
     setIsDepartmentOpen(false)
     handleFieldValidation("department", department)
@@ -229,54 +235,16 @@ export default function NewPersonnel() {
 
   const handleDepartmentInputChange = (value: string) => {
     setDepartmentSearch(value)
-    setData("department", value)
+    form.setData("department", value)
     setIsDepartmentOpen(true)
     handleFieldValidation("department", value)
   }
 
   // Form submission with validation
-  const handleSubmit: FormEventHandler = (e) => {
+  const submit: FormEventHandler = (e) => {
     e.preventDefault()
 
-    // // Validate all fields
-    // const allErrors: ValidationErrors = {}
-
-    // allErrors.first_name = validateName(data.first_name, "First name") || ""
-    // allErrors.surname = validateName(data.surname, "Surname") || ""
-    // allErrors.middle_name = validateName(data.middle_name, "Middle name", false) || ""
-    // allErrors.name_extension = validateName(data.name_extension, "Name extension", false) || ""
-    // allErrors.email = validateEmail(data.email) || ""
-    // allErrors.mobile_number = validateMobileNumber(data.mobile_number) || ""
-    // allErrors.password = validatePassword(data.password) || ""
-    // allErrors.position = validateRequired(data.position, "Position") || ""
-    // allErrors.department = validateRequired(data.department, "Department") || ""
-
-    // setValidationErrors(allErrors)
-
-    // // Check if there are any errors
-    // const hasErrors = Object.values(allErrors).some((error) => error !== "")
-
-    // if (hasErrors) {
-    //   const errorCount = Object.values(allErrors).filter((error) => error !== "").length
-    //   // addToast(
-    //   //   "error",
-    //   //   "Form Validation Failed",
-    //   //   `Please fix ${errorCount} error${errorCount > 1 ? "s" : ""} before submitting`,
-    //   // )
-    //   toast('error', 'Form Validation Failed', `Please fix ${errorCount} error${errorCount > 1 ? 's' : ''} before submitting`);
-
-    //   // Scroll to first error
-    //   const firstErrorField = Object.keys(allErrors).find((key) => allErrors[key] !== "")
-    //   if (firstErrorField) {
-    //     const element = document.getElementById(firstErrorField)
-    //     element?.scrollIntoView({ behavior: "smooth", block: "center" })
-    //     element?.focus()
-    //   }
-    //   return
-    // }
-
-    // If no validation errors, proceed with submission
-    submit({
+    form.submit({
       onSuccess: () => {
         // addToast("success", "Success!", "Personnel has been created successfully")
         toast('success', 'Success!', 'Personnel has been created successfully');
@@ -286,15 +254,15 @@ export default function NewPersonnel() {
         toast('error', 'Submission Failed', 'There was an error creating the personnel. Please try again.');
       },
       onFinish: () => {
-        reset("password")
+        form.reset("password")
       },
     })
   }
 
   // Initialize validation on mount
   useEffect(() => {
-    if (data.position) setPositionSearch(data.position)
-    if (data.department) setDepartmentSearch(data.department)
+    if (form.data.position) setPositionSearch(form.data.position)
+    if (form.data.department) setDepartmentSearch(form.data.department)
   }, [])
 
   return (
@@ -325,7 +293,7 @@ export default function NewPersonnel() {
         </div>
 
         {/* Form Section */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={submit} className="space-y-6">
           {/* Personal Information Section */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 bg-blue-50">
@@ -375,16 +343,16 @@ export default function NewPersonnel() {
                         <Input
                           id="surname"
                           name="surname"
-                          value={data.surname}
-                          className={`w-full ${invalid('surname') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                          onChange={(e) => setData('surname', e.target.value)}
-                          onBlur={() => validate('surname')}
+                          value={form.data.surname}
+                          className={`w-full ${form.invalid('surname') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => form.setData('surname', e.target.value)}
+                          onBlur={() => form.validate('surname')}
                           placeholder="e.g. Dela Cruz"
                         />
-                        {invalid('surname') && (
+                        {form.invalid('surname') && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                            <span className="break-words">{errors.surname}</span>
+                            <span className="break-words">{form.errors.surname}</span>
                           </div>
                         )}
                       </div>
@@ -396,16 +364,16 @@ export default function NewPersonnel() {
                         <Input
                           id="first_name"
                           name="first_name"
-                          value={data.first_name}
-                          className={`w-full ${invalid('first_name') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                          onChange={(e) => setData("first_name", e.target.value)}
-                          onBlur={() => validate('first_name')}
+                          value={form.data.first_name}
+                          className={`w-full ${form.invalid('first_name') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => form.setData("first_name", e.target.value)}
+                          onBlur={() => form.validate('first_name')}
                           placeholder="e.g. Juan"
                         />
-                        {invalid('first_name') && (
+                        {form.invalid('first_name') && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                            <span className="break-words">{errors.first_name}</span>
+                            <span className="break-words">{form.errors.first_name}</span>
                           </div>
                         )}
                       </div>
@@ -417,16 +385,16 @@ export default function NewPersonnel() {
                         <Input
                           id="middle_name"
                           name="middle_name"
-                          value={data.middle_name}
-                          className={`w-full ${validationErrors.middle_name ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                          onChange={(e) => setData("middle_name", e.target.value)}
-                          onBlur={() => validate('middle_name')}
+                          value={form.data.middle_name}
+                          className={`w-full ${form.invalid('middle_name') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => form.setData("middle_name", e.target.value)}
+                          onBlur={() => form.validate('middle_name')}
                           placeholder="e.g. Reyes"
                         />
-                        {invalid('middle_name') && (
+                        {form.invalid('middle_name') && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                            <span className="break-words">{errors.middle_name}</span>
+                            <span className="break-words">{form.errors.middle_name}</span>
                           </div>
                         )}
                       </div>
@@ -438,16 +406,16 @@ export default function NewPersonnel() {
                         <Input
                           id="name_extension"
                           name="name_extension"
-                          value={data.name_extension}
-                          className={`w-full ${validationErrors.name_extension ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                          onChange={(e) => setData("name_extension", e.target.value)}
-                          onBlur={() => validate('name_extension')}
+                          value={form.data.name_extension}
+                          className={`w-full ${form.invalid('name_extension') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => form.setData("name_extension", e.target.value)}
+                          onBlur={() => form.validate('name_extension')}
                           placeholder="e.g. Jr, Sr, III"
                         />
-                        {invalid('name_extension') && (
+                        {form.invalid('name_extension') && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                            <span className="break-words">{errors.name_extension}</span>
+                            <span className="break-words">{form.errors.name_extension}</span>
                           </div>
                         )}
                       </div>
@@ -495,8 +463,8 @@ export default function NewPersonnel() {
                         type="button"
                         onClick={() => {
                           setPositionSearch("")
-                          setData("position", "")
-                          setData("department", "")
+                          form.setData("position", "")
+                          form.setData("department", "")
                           setDepartmentSearch("")
                           handleFieldValidation("position", "")
                           handleFieldValidation("department", "")
@@ -528,7 +496,7 @@ export default function NewPersonnel() {
                               className="w-full px-3 py-2 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center justify-between group"
                             >
                               <span className="text-sm">{position}</span>
-                              {data.position === position && <Check className="h-4 w-4 text-blue-600" />}
+                              {form.data.position === position && <Check className="h-4 w-4 text-blue-600" />}
                             </button>
                           ))
                         ) : (
@@ -539,13 +507,10 @@ export default function NewPersonnel() {
                       </div>
                     )}
                   </div>
-                  {validationErrors.position && (
-                    <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                      <span className="break-words">{validationErrors.position}</span>
-                    </div>
+                  {form.invalid('position') && (
+                    <InputError message={form.errors.position} />
                   )}
-                  <InputError message={errors.position} className="text-xs" />
+                  
                   <p className="text-xs text-gray-500">Start typing to see suggestions or enter a custom position</p>
                 </div>
 
@@ -564,8 +529,8 @@ export default function NewPersonnel() {
                       onFocus={() => setIsDepartmentOpen(true)}
                       className={`w-full pl-10 pr-16 ${validationErrors.department ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
                       placeholder={
-                        data.position && positionDepartmentMapping[data.position]
-                          ? `Auto-selected: ${positionDepartmentMapping[data.position]}`
+                        form.data.position && positionDepartmentMapping[form.data.position]
+                          ? `Auto-selected: ${positionDepartmentMapping[form.data.position]}`
                           : "Type to search or select department..."
                       }
                       autoComplete="off"
@@ -577,7 +542,7 @@ export default function NewPersonnel() {
                         type="button"
                         onClick={() => {
                           setDepartmentSearch("")
-                          setData("department", "")
+                          form.setData("department", "")
                           handleFieldValidation("department", "")
                           setIsDepartmentOpen(false)
                         }}
@@ -607,13 +572,13 @@ export default function NewPersonnel() {
                               className="w-full px-3 py-2 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center justify-between group"
                             >
                               <span className="text-sm">{department}</span>
-                              {data.department === department && <Check className="h-4 w-4 text-blue-600" />}
+                              {form.data.department === department && <Check className="h-4 w-4 text-blue-600" />}
                             </button>
                           ))
                         ) : (
                           <div className="px-3 py-2 text-sm text-gray-500">
-                            {data.position && positionDepartmentMapping[data.position]
-                              ? `Only ${positionDepartmentMapping[data.position]} is available for ${data.position}`
+                            {form.data.position && positionDepartmentMapping[form.data.position]
+                              ? `Only ${positionDepartmentMapping[form.data.position]} is available for ${form.data.position}`
                               : "No departments found. You can type a custom department."}
                           </div>
                         )}
@@ -626,9 +591,9 @@ export default function NewPersonnel() {
                       <span className="break-words">{validationErrors.department}</span>
                     </div>
                   )}
-                  <InputError message={errors.department} className="text-xs" />
+                  <InputError message={form.errors.department} />
                   <p className="text-xs text-gray-500">
-                    {data.position && positionDepartmentMapping[data.position]
+                    {form.data.position && positionDepartmentMapping[form.data.position]
                       ? `Department automatically selected based on position`
                       : "Start typing to see suggestions or enter a custom department"}
                   </p>
@@ -644,7 +609,7 @@ export default function NewPersonnel() {
                 <Mail className="w-5 h-5 text-purple-600" />
                 <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
               </div>
-              <p className="text-sm text-gray-600 mt-1">Email, phone number and account security</p>
+              <p className="text-sm text-gray-600 mt-1">Email and phone number</p>
             </div>
 
             <div className="p-6">
@@ -661,19 +626,16 @@ export default function NewPersonnel() {
                         id="email"
                         type="email"
                         name="email"
-                        value={data.email}
-                        className={`pl-10 w-full ${validationErrors.email ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        value={form.data.email}
+                        className={`pl-10 w-full ${form.invalid('email') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                        onChange={(e) => form.setData("email", e.target.value)}
+                        onBlur={() => form.validate('email')}
                         placeholder="e.g. juan.delacruz@cdrrmo.gov.ph"
                       />
                     </div>
-                    {validationErrors.email && (
-                      <div className="flex items-center gap-1 text-xs text-red-600">
-                        <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                        <span className="break-words">{validationErrors.email}</span>
-                      </div>
+                    {form.invalid('email') && (
+                      <InputError message={form.errors.email} />
                     )}
-                    <InputError message={errors.email} className="text-xs" />
                   </div>
 
                   <div className="space-y-2">
@@ -688,90 +650,61 @@ export default function NewPersonnel() {
                       <Input
                         id="mobile_number"
                         name="mobile_number"
-                        value={data.mobile_number}
-                        className={`rounded-l-none border-l-0 flex-1 h-10 ${validationErrors.mobile_number ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-gray-300"}`}
-                        onChange={(e) => handleMobileNumberChange(e.target.value)}
+                        value={form.data.mobile_number}
+                        className={`rounded-l-none border-l-0 flex-1 h-10 ${form.invalid('mobile_number') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-gray-300"}`}
+                        onChange={(e) => form.setData('mobile_number', e.target.value)}
+                        onBlur={() => form.validate('mobile_number')}
                         placeholder="9123456789"
                         maxLength={10}
                       />
                     </div>
                   </div>
-                  {validationErrors.mobile_number && (
-                    <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                      <span className="break-words">{validationErrors.mobile_number}</span>
-                    </div>
+                  {form.invalid('mobile_number') && (
+                    <InputError message={form.errors.mobile_number} />
                   )}
-                  <InputError message={errors.mobile_number} className="text-xs" />
                   <p className="text-xs text-gray-500">Enter 10 digits after +63 (e.g., +639123456789)</p>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                {/* Account Security */}
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Lock className="w-4 h-4 text-gray-600" />
-                      <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                        Account Password <span className="text-red-500">*</span>
-                      </Label>
-                    </div>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <Input
-                        id="password"
-                        name="password"
-                        type="password"
-                        value={data.password}
-                        className={`pl-10 w-full ${validationErrors.password ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                        onChange={(e) => handleInputChange("password", e.target.value)}
-                        placeholder="Enter a secure password"
-                      />
-                    </div>
-                    {validationErrors.password && (
-                      <div className="flex items-center gap-1 text-xs text-red-600">
-                        <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                        <span className="break-words">{validationErrors.password}</span>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-red-50">
+              <div className="flex items-center gap-2">
+                <Mail className="w-5 h-5 text-red-600" />
+                <h3 className="text-lg font-semibold text-gray-900">Account security</h3>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">Initial password</p>
+            </div>
+
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div>
+                        <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                          Initial Account Password <span className="text-red-500">*</span>
+                        </Label>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                            <Input
+                              id="password"
+                              type="text"
+                              name="password"
+                              value={form.data.password}
+                              className="pl-10 w-full"
+                              placeholder="test"
+                            />
+                          </div>
+                          <Button onClick={generateRandomPassword}>
+                            Generate Random Password
+                          </Button>
+                        </div>
                       </div>
-                    )}
-                    <InputError message={errors.password} className="text-xs" />
+                      
+                    </div>
                   </div>
-
-                  <div className="bg-gray-50 rounded-lg p-4 mt-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Password Requirements</h4>
-                    <ul className="text-xs text-gray-600 space-y-1">
-                      <li className={`flex items-center gap-2 ${data.password.length >= 8 ? "text-green-600" : ""}`}>
-                        <div
-                          className={`w-2 h-2 rounded-full ${data.password.length >= 8 ? "bg-green-500" : "bg-gray-300"}`}
-                        ></div>
-                        At least 8 characters
-                      </li>
-                      <li
-                        className={`flex items-center gap-2 ${/(?=.*[a-z])/.test(data.password) ? "text-green-600" : ""}`}
-                      >
-                        <div
-                          className={`w-2 h-2 rounded-full ${/(?=.*[a-z])/.test(data.password) ? "bg-green-500" : "bg-gray-300"}`}
-                        ></div>
-                        One lowercase letter
-                      </li>
-                      <li
-                        className={`flex items-center gap-2 ${/(?=.*[A-Z])/.test(data.password) ? "text-green-600" : ""}`}
-                      >
-                        <div
-                          className={`w-2 h-2 rounded-full ${/(?=.*[A-Z])/.test(data.password) ? "bg-green-500" : "bg-gray-300"}`}
-                        ></div>
-                        One uppercase letter
-                      </li>
-                      <li
-                        className={`flex items-center gap-2 ${/(?=.*\d)/.test(data.password) ? "text-green-600" : ""}`}
-                      >
-                        <div
-                          className={`w-2 h-2 rounded-full ${/(?=.*\d)/.test(data.password) ? "bg-green-500" : "bg-gray-300"}`}
-                        ></div>
-                        One number
-                      </li>
-                    </ul>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -790,10 +723,10 @@ export default function NewPersonnel() {
 
                 <Button
                   type="submit"
-                  disabled={processing}
+                  disabled={form.processing}
                   className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-6"
                 >
-                  {processing ? (
+                  {form.processing ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       Creating...

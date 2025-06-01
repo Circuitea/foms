@@ -30,7 +30,7 @@ class NewPersonnelRequest extends FormRequest
             'middle_name' => 'nullable|string|alpha|max:255',
             'name_extension' => 'nullable|string|alpha|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.Personnel::class,
-            'mobile_number' => 'nullable|string|max:255',
+            'mobile_number' => 'nullable|string|size:10',
             'password' => ['required', Rules\Password::defaults()],
         ];
     }
