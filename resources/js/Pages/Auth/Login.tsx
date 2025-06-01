@@ -61,7 +61,7 @@ export default function Login({
               placeholder="name@example.com"
               onChange={(e) => setData("email", e.target.value)}
             />
-            <InputError message={errors.email} className="mt-1" />
+            <InputError message={errors.email} />
           </div>
 
           <div className="space-y-2">
@@ -88,7 +88,7 @@ export default function Login({
               placeholder="••••••••"
               onChange={(e) => setData("password", e.target.value)}
             />
-            <InputError message={errors.password} className="mt-1" />
+            <InputError message={errors.password} />
           </div>
 
           <div className="flex items-center space-x-2">
