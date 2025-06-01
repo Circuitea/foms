@@ -298,7 +298,7 @@ export default function NewPersonnel() {
   }, [])
 
   return (
-    <Authenticated>
+    <div>
       <Head title="Add New Personnel" />
 
       <div className="px-6 py-6 bg-gray-50 min-h-screen">
@@ -821,6 +821,8 @@ export default function NewPersonnel() {
           />
         ) : null}
       </div>
-    </Authenticated>
+    </div>
   )
 }
+
+NewPersonnel.layout = (e:JSX.Element) => <Authenticated children={e} />

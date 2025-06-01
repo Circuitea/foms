@@ -140,9 +140,9 @@ export default function ListPersonnel({ personnel }: PageProps<{ personnel?: Pag
   }, [])
 
   return (
-    <Authenticated>
+    <div>
       <Head title="Staff Management - Personnel List" />
-      <div className="px-6 py-6 bg-gray-50 min-h-screen">
+      <div className="px-6 py-6 bg-gray-50">
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex justify-between items-start mb-6">
@@ -307,9 +307,11 @@ export default function ListPersonnel({ personnel }: PageProps<{ personnel?: Pag
           </div>
         </div>
       </div>
-    </Authenticated>
+    </div>
   )
 }
+
+ListPersonnel.layout = (e: JSX.Element) => <Authenticated children={e} />
 
 function getCurrentTime() {
   const date = new Date()
