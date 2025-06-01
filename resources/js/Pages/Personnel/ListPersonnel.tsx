@@ -121,43 +121,68 @@ interface PaginatedPersonnel {
   }[]
 }
 
+// Real-time clock hook
+function useRealTimeClock() {
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    })
+  }
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })
+  }
+
+  return `${formatDate(currentTime)}, ${formatTime(currentTime)}`
+}
+
 export default function ListPersonnel({ personnel }: PageProps<{ personnel?: PaginatedPersonnel }>) {
-  const [currentTime, setCurrentTime] = useState(getCurrentTime())
+  const currentTime = useRealTimeClock()
   const [searchTerm, setSearchTerm] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
 
   const tableData = personnel?.data || []
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(getCurrentTime())
-    }, 1000)
-
-    return () => {
-      clearInterval(interval)
-    }
-  }, [])
-
   return (
     <Authenticated>
       <Head title="Staff Management - Personnel List" />
-      <div className="px-6 py-6 bg-gray-50 min-h-screen">
-        {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Staff Management</h1>
-              <p className="text-gray-600">Manage and monitor your organization's personnel</p>
+      <div className="min-h-screen bg-gray-50">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-40 bg-[#1B2560] border-b border-gray-300 shadow-sm">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Users className="w-6 h-6 text-white" />
+                <h1 className="text-xl font-semibold text-white">Staff Management</h1>
+              </div>
+              <div className="text-sm font-mono text-white">{currentTime}</div>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-gray-500 mb-1">Current Time</div>
-              <div className="text-lg font-semibold text-gray-900">{currentTime}</div>
-            </div>
+            <div className="mt-2 text-sm text-gray-300">CDRRMO Staff Portal › Personnel Directory</div>
           </div>
+        </div>
 
+        <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
               <div className="flex items-center">
                 <div className="p-2 bg-blue-100 rounded-lg">
@@ -206,117 +231,110 @@ export default function ListPersonnel({ personnel }: PageProps<{ personnel?: Pag
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Controls Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Personnel Directory</h3>
-          </div>
-          <div className="p-6">
-            <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
-              {/* Search */}
-              <div className="relative flex-1 min-w-0">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
-                <Input
-                  type="text"
-                  placeholder="Search by name, email, or position..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                />
-              </div>
-
-              {/* Filters */}
-              <div className="flex gap-2 flex-shrink-0">
-                <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2.5 bg-white min-w-[140px]">
-                  <Filter className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
-                  <select
-                    value={departmentFilter}
-                    onChange={(e) => setDepartmentFilter(e.target.value)}
-                    className="border-none outline-none bg-transparent text-sm w-full"
-                  >
-                    <option value="all">All Departments</option>
-                    <option value="it">IT</option>
-                    <option value="hr">HR</option>
-                    <option value="finance">Finance</option>
-                    <option value="others">Others</option>
-                  </select>
+          {/* Controls Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Personnel Directory</h3>
+            </div>
+            <div className="p-6">
+              <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+                {/* Search */}
+                <div className="relative flex-1 min-w-0">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
+                  <Input
+                    type="text"
+                    placeholder="Search by name, email, or position..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  />
                 </div>
 
-                <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2.5 bg-white min-w-[100px]">
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="border-none outline-none bg-transparent text-sm w-full"
-                  >
-                    <option value="all">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="on-leave">On Leave</option>
-                  </select>
+                {/* Filters */}
+                <div className="flex gap-2 flex-shrink-0">
+                  <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2.5 bg-white min-w-[140px]">
+                    <Filter className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                    <select
+                      value={departmentFilter}
+                      onChange={(e) => setDepartmentFilter(e.target.value)}
+                      className="border-none outline-none bg-transparent text-sm w-full"
+                    >
+                      <option value="all">All Departments</option>
+                      <option value="it">IT</option>
+                      <option value="hr">HR</option>
+                      <option value="finance">Finance</option>
+                      <option value="others">Others</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2.5 bg-white min-w-[100px]">
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="border-none outline-none bg-transparent text-sm w-full"
+                    >
+                      <option value="all">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="on-leave">On Leave</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-2 flex-shrink-0">
-                <Button className="bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 px-4 py-2.5" asChild>
-                  <Link href="/personnel/track">
-                    <MapPin className="w-4 h-4" />
-                    Track Employees
-                  </Link>
-                </Button>
+                {/* Action Buttons */}
+                <div className="flex gap-2 flex-shrink-0">
+                  <Button
+                    className="bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 px-4 py-2.5"
+                    asChild
+                  >
+                    <Link href="/personnel/track">
+                      <MapPin className="w-4 h-4" />
+                      Track Employees
+                    </Link>
+                  </Button>
 
-                <Button
-                  asChild
-                  className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5"
-                >
-                  <Link href="/personnel/new">
-                    <Plus className="w-4 h-4" />
-                    Add Personnel
-                  </Link>
-                </Button>
+                  <Button
+                    asChild
+                    className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5"
+                  >
+                    <Link href="/personnel/new">
+                      <Plus className="w-4 h-4" />
+                      Add Personnel
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Data Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="overflow-x-auto">
-            <DataTable
-              columns={columns}
-              data={tableData}
-              className="[&_thead]:bg-[#1B2560] [&_thead_tr]:border-0 [&_thead_tr:hover]:bg-[#1B2560] [&_tbody_tr]:border-b [&_tbody_tr]:border-gray-100 [&_tbody_tr:hover]:bg-transparent"
-            />
+          {/* Data Table */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="overflow-x-auto">
+              <DataTable
+                columns={columns}
+                data={tableData}
+                className="[&_thead]:bg-[#1B2560] [&_thead_tr]:border-0 [&_thead_tr:hover]:bg-[#1B2560] [&_tbody_tr]:border-b [&_tbody_tr]:border-gray-100 [&_tbody_tr:hover]:bg-transparent"
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Pagination */}
-        <div className="mt-6 flex justify-between items-center">
-          <p className="text-sm text-gray-600">
-            Showing {tableData.length > 0 ? 1 : 0} to {tableData.length} of {tableData.length} results
-          </p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-            <Button variant="outline" size="sm" disabled>
-              Next
-            </Button>
+          {/* Pagination */}
+          <div className="mt-6 flex justify-between items-center">
+            <p className="text-sm text-gray-600">
+              Showing {tableData.length > 0 ? 1 : 0} to {tableData.length} of {tableData.length} results
+            </p>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" disabled>
+                Previous
+              </Button>
+              <Button variant="outline" size="sm" disabled>
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </div>
     </Authenticated>
   )
-}
-
-function getCurrentTime() {
-  const date = new Date()
-  return new Intl.DateTimeFormat("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  }).format(date)
 }

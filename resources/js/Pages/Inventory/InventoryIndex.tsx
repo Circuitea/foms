@@ -53,7 +53,6 @@ interface EquipmentItem {
   }[]
 }
 
-
 // Success notification component
 interface SuccessNotificationProps {
   show: boolean
@@ -65,8 +64,8 @@ const SuccessNotification: React.FC<SuccessNotificationProps> = ({ show, message
   useEffect(() => {
     if (show) {
       const timer = setTimeout(() => {
-        onClose();
-      }, 1000); // Auto-close after 1 second
+        onClose()
+      }, 1000) // Auto-close after 1 second
       return () => clearTimeout(timer)
     }
   }, [show, onClose])
@@ -2944,10 +2943,14 @@ export default function InventoryIndex() {
         <div className="min-h-screen bg-gray-50">
           <div className="sticky top-0 z-40 bg-[#1B2560] border-b border-gray-300 shadow-sm">
             <div className="max-w-7xl mx-auto px-6 py-4">
-              <div className="flex items-center gap-3">
-                <Package className="w-6 h-6 text-white" />
-                <h1 className="text-xl font-semibold text-white">Emergency Equipment Inventory</h1>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Package className="w-6 h-6 text-white" />
+                  <h1 className="text-xl font-semibold text-white">Emergency Equipment Inventory</h1>
+                </div>
+                <div className="text-sm font-mono text-white">{currentTime}</div>
               </div>
+              <div className="mt-2 text-sm text-gray-300">CDRRMO Staff Portal › Equipment Management</div>
             </div>
           </div>
 
