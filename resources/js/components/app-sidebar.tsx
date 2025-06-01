@@ -16,6 +16,9 @@ import {
   useSidebar,
 } from "./ui/sidebar"
 import { Link, router, usePage } from "@inertiajs/react"
+import { Dialog, DialogContent, DialogFooter, DialogTrigger } from "./ui/dialog"
+import { Button } from "./ui/button"
+import { useState } from "react"
 
 const navItems = [
   {
@@ -53,6 +56,9 @@ const navItems = [
 export function AppSidebar() {
   const user = usePage().props.auth.user
   const { open } = useSidebar()
+
+  const [ isLogoutDialogOpen, setIsLogoutDialogOpen ] = useState(false);
+  
   return (
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarHeader className="px-4">
@@ -117,14 +123,24 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              className="py-3 px-4 rounded-lg hover:shadow-sm transition-all duration-200"
-              tooltip="Logout"
-              onClick={() => router.post(route("logout"))}
-            >
-              <LogOut />
-              <span>Logout</span>
-            </SidebarMenuButton>
+            <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+              <DialogTrigger>
+                <SidebarMenuButton
+                  className="py-3 px-4 rounded-lg hover:shadow-sm transition-all duration-200"
+                  tooltip="Logout"
+                >
+                  <LogOut />
+                  <span>Logout</span>
+                </SidebarMenuButton>
+              </DialogTrigger>
+              <DialogContent>
+                Are you sure you want to logout?
+                <DialogFooter>
+                  <Button onClick={() => setIsLogoutDialogOpen(false)}>Cancel</Button>
+                  <Button variant='destructive' onClick={() => router.post(route('logout'))}>Confirm</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
