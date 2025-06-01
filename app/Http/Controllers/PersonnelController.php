@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NewPersonnelRequest;
 use App\Models\Personnel;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
@@ -19,7 +20,11 @@ class PersonnelController extends Controller
     }
 
     public function new() {
-        return Inertia::render('Personnel/NewPersonnel');
+        $roles = Role::all();
+
+        return Inertia::render('Personnel/NewPersonnel', [
+            'roles' => $roles,
+        ]);
     }
 
     public function create(NewPersonnelRequest $request) {

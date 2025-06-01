@@ -11,8 +11,9 @@ import { useForm } from 'laravel-precognition-react-inertia';
 import { ArrowLeft, User, Mail, Phone, Lock, Save, Loader2, Briefcase, ChevronDown, Check, Building, AlertCircle, X } from 'lucide-react'
 import type { FormEventHandler, MouseEventHandler } from "react"
 import { useState, useEffect } from "react"
+import Select from 'react-select';
+import { PageProps, Role } from "@/types"
 
-const positions = ["IT Staff", "Administrative Staff", "Logistic Staff"]
 
 const departments = ["Administration", "IT Department", "Logistic"]
 
@@ -34,7 +35,7 @@ interface ValidationErrors {
   [key: string]: string
 }
 
-export default function NewPersonnel() {
+export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
   const form = useForm('post', '/personnel/new', {
     first_name: "",
     middle_name: "",
@@ -42,6 +43,7 @@ export default function NewPersonnel() {
     name_extension: "",
     email: "",
     mobile_number: "",
+    positions: [],
     position: "",
     department: "",
     password: "",
@@ -74,9 +76,6 @@ export default function NewPersonnel() {
   // Validation states
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
 
-  const filteredPositions = positions.filter((position) =>
-    position.toLowerCase().includes(positionSearch.toLowerCase()),
-  )
 
   // Filter departments based on selected position
   const getAvailableDepartments = () => {
@@ -444,74 +443,28 @@ export default function NewPersonnel() {
                   <Label htmlFor="position" className="text-sm font-medium text-gray-700">
                     Position/Role <span className="text-red-500">*</span>
                   </Label>
-                  <div className="relative">
-                    <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
-                    <Input
-                      id="position"
-                      name="position"
-                      value={positionSearch}
-                      onChange={(e) => handlePositionInputChange(e.target.value)}
-                      onFocus={() => setIsPositionOpen(true)}
-                      className={`w-full pl-10 pr-16 ${validationErrors.position ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                      placeholder="Type to search or select position..."
-                      autoComplete="off"
-                    />
+                  
 
-                    {/* Clear button */}
-                    {positionSearch && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPositionSearch("")
-                          form.setData("position", "")
-                          form.setData("department", "")
-                          setDepartmentSearch("")
-                          handleFieldValidation("position", "")
-                          handleFieldValidation("department", "")
-                          setIsPositionOpen(false)
-                        }}
-                        className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
+                  {/* TODO: fucking fix the typescript error here */}
+                  <Select 
+                    options={roles.reduce((arr: {value: number, label: string}[], role, i) => {
+                      arr[i] = {
+                        value: role.id,
+                        label: role.name,
+                      }
 
-                    <button
-                      type="button"
-                      onClick={() => setIsPositionOpen(!isPositionOpen)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      <ChevronDown className={`h-4 w-4 transition-transform ${isPositionOpen ? "rotate-180" : ""}`} />
-                    </button>
+                      return arr;
+                    }, [])}
+                    value={form.data.positions}
+                    onChange={(e) => form.setData('positions', e)}
+                    isMulti
+                    closeMenuOnSelect={false}
+                  />
 
-                    {/* Position Dropdown Options */}
-                    {isPositionOpen && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                        {filteredPositions.length > 0 ? (
-                          filteredPositions.map((position, index) => (
-                            <button
-                              key={index}
-                              type="button"
-                              onClick={() => handlePositionSelect(position)}
-                              className="w-full px-3 py-2 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center justify-between group"
-                            >
-                              <span className="text-sm">{position}</span>
-                              {form.data.position === position && <Check className="h-4 w-4 text-blue-600" />}
-                            </button>
-                          ))
-                        ) : (
-                          <div className="px-3 py-2 text-sm text-gray-500">
-                            No positions found. You can type a custom position.
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
                   {form.invalid('position') && (
                     <InputError message={form.errors.position} />
                   )}
                   
-                  <p className="text-xs text-gray-500">Start typing to see suggestions or enter a custom position</p>
                 </div>
 
                 {/* Department Field */}
