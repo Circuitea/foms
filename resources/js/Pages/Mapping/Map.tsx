@@ -151,27 +151,27 @@ function MapPage() {
             <TrackingMap />
 
             {/* Map Controls - Bottom Right - Floating and Separate - Moved higher */}
-            <div className="absolute bottom-16 right-4 flex flex-col gap-3 items-center">
-              {/* Zoom In Button - Floating */}
+            <div className="absolute bottom-16 right-4 flex flex-col gap-1 items-center">
+              {/* Zoom In Button - Bigger and closer */}
               <Button
                 variant="outline"
                 size="sm"
-                className="w-10 h-10 bg-white border-gray-300 hover:bg-gray-50 text-sm font-bold flex items-center justify-center shadow-lg rounded-lg"
+                className="w-12 h-12 bg-white border-gray-300 hover:bg-gray-50 text-lg font-bold flex items-center justify-center shadow-lg rounded-lg"
               >
                 +
               </Button>
 
-              {/* Zoom Out Button - Floating */}
+              {/* Zoom Out Button - Bigger and closer */}
               <Button
                 variant="outline"
                 size="sm"
-                className="w-10 h-10 bg-white border-gray-300 hover:bg-gray-50 text-sm font-bold flex items-center justify-center shadow-lg rounded-lg"
+                className="w-12 h-12 bg-white border-gray-300 hover:bg-gray-50 text-lg font-bold flex items-center justify-center shadow-lg rounded-lg"
               >
                 -
               </Button>
 
-              {/* Export Button */}
-              <div className="group relative">
+              {/* Export Button - with gap */}
+              <div className="group relative mt-2">
                 <Button
                   variant="outline"
                   size="sm"
