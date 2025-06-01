@@ -5,7 +5,12 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
 import { Head, Link } from "@inertiajs/react"
 import { useState, useEffect } from "react"
 import { Users, MapPin, Calendar, Maximize2, AlertTriangle, CheckCircle, X, ChevronLeft, RefreshCw } from "lucide-react"
-import TrackingMap from "./Mapping/TrackingMap"
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet"
+import PersonnelMarkersLayer from "./Mapping/PersonnelMarkersLayer"
+import SanJuanBoundary from './Mapping/sanjuan-boundary.json';
+
+import 'leaflet/dist/leaflet.css';
+
 
 // Mock data for charts
 const requestOverviewData = [
@@ -828,7 +833,18 @@ export default function Dashboard() {
                         <div className="absolute top-20 left-1/2 w-4  -4 bg-orange-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
                         <div className="absolute top-1/2 right-1/4 w-4 h-4 bg-pink-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div> */}
                         <Link href={route('map')}>
-                          <TrackingMap dragging={false} />
+                          <MapContainer className='min-h-full h-[16rem] z-0 border-2 border-dashed border-gray-300 rounded-lg' center={[14.6034363, 121.0389469]} zoom={14} scrollWheelZoom={false} dragging={false} zoomControl={false}>
+                            <TileLayer
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            />
+                            <GeoJSON
+                                style={{color: '#0000CC', weight: 4}}
+                                // @ts-ignore
+                                data={SanJuanBoundary}
+                            />
+                            <PersonnelMarkersLayer />
+                        </MapContainer>
                         </Link>
                       </div>
                     </div>
