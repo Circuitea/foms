@@ -472,84 +472,16 @@ export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
                   <Label htmlFor="department" className="text-sm font-medium text-gray-700">
                     Department <span className="text-red-500">*</span>
                   </Label>
-                  <div className="relative">
-                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
-                    <Input
-                      id="department"
-                      name="department"
-                      value={departmentSearch}
-                      onChange={(e) => handleDepartmentInputChange(e.target.value)}
-                      onFocus={() => setIsDepartmentOpen(true)}
-                      className={`w-full pl-10 pr-16 ${validationErrors.department ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                      placeholder={
-                        form.data.position && positionDepartmentMapping[form.data.position]
-                          ? `Auto-selected: ${positionDepartmentMapping[form.data.position]}`
-                          : "Type to search or select department..."
-                      }
-                      autoComplete="off"
-                    />
 
-                    {/* Clear button */}
-                    {departmentSearch && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setDepartmentSearch("")
-                          form.setData("department", "")
-                          handleFieldValidation("department", "")
-                          setIsDepartmentOpen(false)
-                        }}
-                        className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => setIsDepartmentOpen(!isDepartmentOpen)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      <ChevronDown className={`h-4 w-4 transition-transform ${isDepartmentOpen ? "rotate-180" : ""}`} />
-                    </button>
-
-                    {/* Department Dropdown Options */}
-                    {isDepartmentOpen && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                        {filteredDepartments.length > 0 ? (
-                          filteredDepartments.map((department, index) => (
-                            <button
-                              key={index}
-                              type="button"
-                              onClick={() => handleDepartmentSelect(department)}
-                              className="w-full px-3 py-2 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center justify-between group"
-                            >
-                              <span className="text-sm">{department}</span>
-                              {form.data.department === department && <Check className="h-4 w-4 text-blue-600" />}
-                            </button>
-                          ))
-                        ) : (
-                          <div className="px-3 py-2 text-sm text-gray-500">
-                            {form.data.position && positionDepartmentMapping[form.data.position]
-                              ? `Only ${positionDepartmentMapping[form.data.position]} is available for ${form.data.position}`
-                              : "No departments found. You can type a custom department."}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {validationErrors.department && (
-                    <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                      <span className="break-words">{validationErrors.department}</span>
-                    </div>
-                  )}
-                  <InputError message={form.errors.department} />
-                  <p className="text-xs text-gray-500">
-                    {form.data.position && positionDepartmentMapping[form.data.position]
-                      ? `Department automatically selected based on position`
-                      : "Start typing to see suggestions or enter a custom department"}
-                  </p>
+                  <Select
+                    options={[
+                      {value: 1, label: 'Department 1'},
+                      {value: 2, label: 'Department 2'},
+                      {value: 3, label: 'Department 3'},
+                    ]}
+                    isMulti
+                    closeMenuOnSelect={false}
+                  />
                 </div>
               </div>
             </div>
