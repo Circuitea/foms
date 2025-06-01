@@ -18,6 +18,16 @@ Route::get('/map', function () {
     return Inertia::render('Mapping/Map');
 })->middleware(['auth', 'verified'])->name('map');
 
+Route::prefix('map')->middleware(['auth', 'verified'])->group(function() {
+    Route::get('/', function () {
+        return Inertia::render('Mapping/Map');
+    });
+
+    Route::get('/report', function () {
+        return Inertia::render('Mapping/Report');
+    });
+});
+
 Route::prefix('personnel')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [PersonnelController::class, 'list']);
     Route::get('/new', [PersonnelController::class, 'new']);
