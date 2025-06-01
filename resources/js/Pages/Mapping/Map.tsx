@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Users, MapPin, Eye, EyeOff, ChevronUp, ChevronDown } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
+import TrackingMap from "./TrackingMap"
 
 // Mock data for personnel
 const personnelData = {
@@ -114,19 +115,7 @@ function MapPage() {
           {/* Map Container */}
           <div className="w-full h-full bg-gray-100 relative overflow-hidden">
             {/* Map Placeholder - In real implementation, use Leaflet, Google Maps, etc. */}
-            <div className="w-full h-full bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="h-16 w-16 text-[#1B2560] mx-auto mb-4" />
-                <p className="text-lg font-medium text-gray-700">Interactive Map View</p>
-                <p className="text-sm text-gray-500 mt-2">
-                  {prioritizedUser
-                    ? `Focused on: ${prioritizedUser.name} (${prioritizedUser.position})`
-                    : selectedCategory
-                      ? `Showing ${selectedCategory} personnel`
-                      : "Select a category to view personnel locations"}
-                </p>
-              </div>
-            </div>
+            <TrackingMap />
 
             {/* Map Controls - Bottom Right - Floating and Separate */}
             <div className="absolute bottom-4 right-4 flex flex-col gap-3 items-center">
