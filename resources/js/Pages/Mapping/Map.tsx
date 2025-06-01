@@ -7,6 +7,7 @@ import { Users, MapPin, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
 import TrackingMap from "./TrackingMap"
+import { Link } from "@inertiajs/react"
 
 // Mock data for personnel
 const personnelData = {
@@ -170,8 +171,11 @@ function MapPage() {
                 <Button
                   variant="outline"
                   className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-white border-gray-300 hover:bg-gray-50 px-4 py-2 h-12 whitespace-nowrap transform -translate-x-[calc(100%-3rem)] flex items-center justify-center shadow-lg rounded-lg"
+                  asChild
                 >
-                  Export Report
+                  <Link href='/map/report'>
+                    Export Report
+                  </Link>
                 </Button>
               </div>
             </div>
