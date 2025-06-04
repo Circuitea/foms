@@ -144,7 +144,7 @@ function MapPage() {
         {/* Right side - Presentation View Button */}
         <div className="flex items-center">
           <Link
-            href="/presentation"
+            href="/map/presentation"
             className="flex items-center gap-3 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-lg transition-all duration-200 group border border-white/20 hover:border-white/30 shadow-sm"
           >
             <Monitor className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
