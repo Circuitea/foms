@@ -73,7 +73,8 @@ function MapPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [prioritizedUser, setPrioritizedUser] = useState<Personnel | null>(null)
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
-  const mapContainerRef = useRef<HTMLDivElement>(null)
+
+  const [ map, setMap ] = useState(null);
 
   const handleCategoryClick = (category: Category) => {
     if (selectedCategory === category) {
@@ -109,8 +110,8 @@ function MapPage() {
 
       // If you have access to the map instance, you can also call map.invalidateSize() here
       // This is for Leaflet specifically - adjust based on your mapping library
-      if (window.map && typeof window.map.invalidateSize === "function") {
-        window.map.invalidateSize()
+      if (map && typeof map.invalidateSize === "function") {
+        map.invalidateSize();
       }
     }, 350) // Wait for sidebar animation to complete
 
@@ -165,9 +166,9 @@ function MapPage() {
         {/* Map Area - Flexible Width */}
         <div className="flex-1 min-w-0">
           {/* Map Container */}
-          <div ref={mapContainerRef} className="w-full h-full bg-gray-100 relative overflow-hidden">
+          <div className="w-full h-full bg-gray-100 relative overflow-hidden">
             {/* Map Placeholder - In real implementation, use Leaflet, Google Maps, etc. */}
-            <TrackingMap />
+            <TrackingMap ref={setMap} />
 
             {/* Map Controls - Bottom Right - Floating and Separate - Moved higher */}
             <div className="absolute bottom-16 right-4 flex flex-col gap-1 items-center">
@@ -176,6 +177,7 @@ function MapPage() {
                 variant="outline"
                 size="sm"
                 className="w-12 h-12 bg-white border-gray-300 hover:bg-gray-50 text-lg font-bold flex items-center justify-center shadow-lg rounded-lg"
+                onClick={() => map.zoomIn()}
               >
                 +
               </Button>
@@ -185,6 +187,7 @@ function MapPage() {
                 variant="outline"
                 size="sm"
                 className="w-12 h-12 bg-white border-gray-300 hover:bg-gray-50 text-lg font-bold flex items-center justify-center shadow-lg rounded-lg"
+                onClick={() => map.zoomOut()}
               >
                 -
               </Button>

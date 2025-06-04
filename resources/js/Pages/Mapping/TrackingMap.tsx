@@ -1,12 +1,13 @@
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import SanJuanBoundary from './sanjuan-boundary.json';
-import { PropsWithChildren, useState } from "react";
+import { LegacyRef, PropsWithChildren, useState } from "react";
 import PersonnelMarkersLayer from "./PersonnelMarkersLayer";
 import 'leaflet/dist/leaflet.css';
+import { Map } from "leaflet";
 
-export default function TrackingMap({ children } : PropsWithChildren) {
+export default function TrackingMap({ ref } : {ref: LegacyRef<Map>}) {
     return (
-        <MapContainer className='min-h-full h-full z-0' center={[14.6034363, 121.0389469]} zoom={14} scrollWheelZoom={false}>
+        <MapContainer ref={ref} className='min-h-full h-full z-0' center={[14.6034363, 121.0389469]} zoom={15} scrollWheelZoom={false} zoomControl={false}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
