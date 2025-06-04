@@ -15,6 +15,7 @@ import {
   History,
   Check,
   X,
+  Plus,
 } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type React from "react"
@@ -2974,6 +2975,222 @@ export default function InventoryIndex() {
     )
   }
 
+  const [showAddItemModal, setShowAddItemModal] = useState(false)
+  const [newItem, setNewItem] = useState<Omit<EquipmentItem, "id">>({
+    name: "",
+    category: "rescue",
+    quantity: 0,
+    available: 0,
+    inUse: 0,
+    maintenance: 0,
+    condition: "Good",
+    location: "",
+    lastInspection: new Date().toISOString().split("T")[0],
+    nextInspection: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split("T")[0],
+    serialNumber: "",
+    description: "",
+    notes: "",
+    lastUsed: "",
+    thresholds: {
+      excellent: 10,
+      good: 5,
+      fair: 2,
+    },
+    maintenanceHistory: [],
+    deploymentHistory: [],
+  })
+
+  const handleAddItem = () => {
+    if (!newItem.name || !newItem.category || !newItem.quantity || !newItem.location) {
+      alert("Please fill in all required fields")
+      return
+    }
+
+    const newId = String(equipmentList.length + 1)
+    const newItemWithId: EquipmentItem = { id: newId, ...newItem }
+
+    setEquipmentList([...equipmentList, newItemWithId])
+    setNewItem({
+      name: "",
+      category: "rescue",
+      quantity: 0,
+      available: 0,
+      inUse: 0,
+      maintenance: 0,
+      condition: "Good",
+      location: "",
+      lastInspection: new Date().toISOString().split("T")[0],
+      nextInspection: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split("T")[0],
+      serialNumber: "",
+      description: "",
+      notes: "",
+      lastUsed: "",
+      thresholds: {
+        excellent: 10,
+        good: 5,
+        fair: 2,
+      },
+      maintenanceHistory: [],
+      deploymentHistory: [],
+    })
+    setShowAddItemModal(false)
+
+    showSuccess(`Successfully added new equipment item: ${newItemWithId.name}.`)
+  }
+
+  const renderAddItemModal = () => {
+    if (!showAddItemModal) return null
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] p-4">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <Package className="w-6 h-6 text-[#1B2560]" />
+              <span className="text-lg font-semibold text-gray-900">Add New Equipment</span>
+            </div>
+            <button
+              onClick={() => setShowAddItemModal(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Equipment Name *</label>
+                <input
+                  type="text"
+                  value={newItem.name}
+                  onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter equipment name..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                <select
+                  value={newItem.category}
+                  onChange={(e) =>
+                    setNewItem({
+                      ...newItem,
+                      category: e.target.value as "rescue" | "medical" | "tools" | "shelter" | "safety" | "logistics",
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="rescue">Rescue Equipment</option>
+                  <option value="medical">Medical Equipment</option>
+                  <option value="tools">Tools & Equipment</option>
+                  <option value="shelter">Shelter & Supply</option>
+                  <option value="safety">Safety Equipment</option>
+                  <option value="logistics">Logistics Equipment</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+                <input
+                  type="number"
+                  value={newItem.quantity}
+                  onChange={(e) =>
+                    setNewItem({ ...newItem, quantity: Number(e.target.value), available: Number(e.target.value) })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter quantity..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+                <input
+                  type="text"
+                  value={newItem.location}
+                  onChange={(e) => setNewItem({ ...newItem, location: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter location..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Serial Number</label>
+                <input
+                  type="text"
+                  value={newItem.serialNumber}
+                  onChange={(e) => setNewItem({ ...newItem, serialNumber: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter serial number..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Last Inspection Date</label>
+                <input
+                  type="date"
+                  value={newItem.lastInspection}
+                  onChange={(e) => setNewItem({ ...newItem, lastInspection: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Next Inspection Date</label>
+                <input
+                  type="date"
+                  value={newItem.nextInspection}
+                  onChange={(e) => setNewItem({ ...newItem, nextInspection: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  value={newItem.description}
+                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter description..."
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                <textarea
+                  value={newItem.notes}
+                  onChange={(e) => setNewItem({ ...newItem, notes: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter notes..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+            <button
+              onClick={() => setShowAddItemModal(false)}
+              className="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleAddItem}
+              className="px-6 py-3 bg-[#1B2560] text-white rounded-md hover:bg-[#2A3B70] transition-colors font-medium"
+            >
+              Add Equipment
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
       <SuccessNotification
@@ -3085,6 +3302,13 @@ export default function InventoryIndex() {
                 >
                   <Wrench className="w-4 h-4" />
                   Bulk Maintenance
+                </button>
+                <button
+                  onClick={() => setShowAddItemModal(true)}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Item
                 </button>
               </div>
             </div>
@@ -3208,6 +3432,7 @@ export default function InventoryIndex() {
       {renderAddDeploymentForm()}
       {renderBulkDeploymentModal()}
       {renderBulkMaintenanceModal()}
+      {renderAddItemModal()}
     </>
   )
 }

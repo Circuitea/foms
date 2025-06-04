@@ -110,20 +110,18 @@ export default function UpdatePasswordForm() {
 
   return (
     <div className="max-w-6xl mx-auto mt-8">
-      {/* Light Red Header */}
-      <Card className="mb-6 bg-red-50/70 border-red-200/50">
-        <CardHeader className="text-center py-4">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="p-2 bg-red-100/80 rounded-full border border-red-200/60">
-              <Shield className="w-5 h-5 text-red-600" />
-            </div>
+      {/* Compact Header */}
+      <div className="mb-6 bg-red-50/30 border border-red-100 rounded-lg px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Lock className="w-4 h-4 text-red-600" />
+          <div>
+            <h1 className="text-lg font-medium text-red-900">Update Password</h1>
+            <p className="text-red-700/70 text-sm">
+              Ensure your account is using a long, random password to stay secure
+            </p>
           </div>
-          <h1 className="text-xl font-semibold text-red-900">Update Password</h1>
-          <p className="text-red-700/80 text-sm mt-1">
-            Ensure your account is using a long, random password to stay secure
-          </p>
-        </CardHeader>
-      </Card>
+        </div>
+      </div>
 
       {/* Success Message */}
       {recentlySuccessful && (

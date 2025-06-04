@@ -78,18 +78,16 @@ export default function PersonalInformation({
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Light Blue Header */}
-      <Card className="mb-6 bg-blue-50/70 border-blue-200/50">
-        <CardHeader className="text-center py-4">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100/80 rounded-full border border-blue-200/60">
-              <User className="w-5 h-5 text-blue-600" />
-            </div>
+      {/* Compact Header */}
+      <div className="mb-6 bg-blue-50/30 border border-blue-100 rounded-lg px-4 py-3">
+        <div className="flex items-center gap-3">
+          <User className="w-4 h-4 text-blue-600" />
+          <div>
+            <h1 className="text-lg font-medium text-blue-900">Personal Information</h1>
+            <p className="text-blue-700/70 text-sm">Employee photo and basic personal details</p>
           </div>
-          <h1 className="text-xl font-semibold text-blue-900">Personal Information</h1>
-          <p className="text-blue-700/80 text-sm mt-1">Manage your employee photo and basic personal details</p>
-        </CardHeader>
-      </Card>
+        </div>
+      </div>
 
       {/* Success Message */}
       {recentlySaved && (
