@@ -60,6 +60,6 @@ class Personnel extends Authenticatable
 
     public function sections(): BelongsToMany
     {
-        return $this->belongsToMany(Section::class, 'departments_personnel');
+        return $this->belongsToMany(Section::class, 'personnel_sections');
     }
 }
