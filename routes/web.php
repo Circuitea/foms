@@ -26,6 +26,10 @@ Route::prefix('map')->middleware(['auth', 'verified'])->group(function() {
     Route::get('/report', function () {
         return Inertia::render('Mapping/Report');
     });
+
+    Route::get('/presentation', function () {
+        return Inertia::render('Mapping/Presentation');
+    });
 });
 
 Route::prefix('personnel')->middleware(['auth', 'verified'])->group(function () {
