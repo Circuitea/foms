@@ -650,7 +650,6 @@ function Report() {
                     <li>• Position and Department</li>
                     <li>• GPS Coordinates (Latitude/Longitude)</li>
                     <li>• Timestamp of Location</li>
-                    <li>• Personnel Status (Active/Inactive)</li>
                   </ul>
                 </div>
                 <div>
