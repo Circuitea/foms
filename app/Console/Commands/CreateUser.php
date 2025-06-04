@@ -50,10 +50,6 @@ class CreateUser extends Command implements PromptsForMissingInput
         $roles = Role::all()->keyBy('id')->map(function (Role $role) {
             return $role->name;
         });
-
-        foreach ($roles as $id => $role) {
-            info('Role ' . $id . ' available');
-        }
         
         note('Press CTRL+U to go back to the previous field.');
 
@@ -80,6 +76,6 @@ class CreateUser extends Command implements PromptsForMissingInput
         
         $personnel->save();
         
-        outro('User ' . $responses['first_name'] . ' created.');
+        outro('User ' . $responses['first_name'] . '(ID:' . $personnel->id . ') created.');
     }
 }
