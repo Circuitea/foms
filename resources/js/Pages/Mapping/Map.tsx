@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Users, Eye, EyeOff, ChevronUp, ChevronDown } from "lucide-react"
+import { Users, Eye, EyeOff, ChevronUp, ChevronDown, Monitor } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
 import TrackingMap from "./TrackingMap"
@@ -139,6 +139,25 @@ function MapPage() {
           <div className="w-px h-6 bg-white/20"></div>
           <h1 className="text-2xl font-bold text-white">PERSONNEL TRACKING</h1>
           <Badge className="bg-red-500 hover:bg-red-600 text-white border-0">LIVE</Badge>
+        </div>
+
+        {/* Right side - Presentation View Button */}
+        <div className="flex items-center">
+          <Link
+            href="/presentation"
+            className="flex items-center gap-3 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-lg transition-all duration-200 group border border-white/20 hover:border-white/30 shadow-sm"
+          >
+            <Monitor className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
+            <span className="text-sm font-medium">Presentation View</span>
+            <svg
+              className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
         </div>
       </div>
 
