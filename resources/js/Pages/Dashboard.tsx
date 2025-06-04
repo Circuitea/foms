@@ -843,7 +843,7 @@ export default function Dashboard() {
                                 // @ts-ignore
                                 data={SanJuanBoundary}
                             />
-                            <PersonnelMarkersLayer />
+                            <PersonnelMarkersLayer isClickable={false} />
                         </MapContainer>
                         </Link>
                       </div>

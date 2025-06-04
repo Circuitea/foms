@@ -25,10 +25,10 @@ const personnelMarkers: PersonnelMarkerDetails[] = [
     },
 ]
 
-export default function PersonnelMarkersLayer() {
+export default function PersonnelMarkersLayer({ isClickable = true }: { isClickable?: boolean }) {
   return (
     <LayerGroup>
-        {personnelMarkers.map((personnelMarker) => <PersonnelMarker marker={personnelMarker} />)}
+        {personnelMarkers.map((personnelMarker) => <PersonnelMarker isClickable={isClickable} marker={personnelMarker} />)}
     </LayerGroup>
   )
 }
