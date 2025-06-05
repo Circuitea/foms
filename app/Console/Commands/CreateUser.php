@@ -9,6 +9,7 @@ use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
+use function Laravel\Prompts\error;
 use function Laravel\Prompts\form;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
@@ -45,8 +46,16 @@ class CreateUser extends Command implements PromptsForMissingInput
         // $newUser->roles()->attach($roleID);
         // $newUser->save();
 
-        info('Creating a new Personnel.');
         
+        if (Role::doesntExist()) {
+            // error('No Roles found. Please create a Role before creating new Personnel.');
+            // return 1;
+
+            $this->fail('No Roles found. Please create a Role before creating new Personnel.');
+        }
+        
+        info('Creating a new Personnel.');
+
         $roles = Role::all()->keyBy('id')->map(function (Role $role) {
             return $role->name;
         });
