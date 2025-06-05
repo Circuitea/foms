@@ -74,16 +74,20 @@ const DepartmentFilter = ({ onReset }: { onReset: () => void }) => {
     setSelectedDepartment(dept)
     setIsOpen(false)
   }
+  
+  const resetDepartmentFilter = () => {
+    setSelectedDepartment(null);
+  }
 
-  // Expose reset function to parent component
-  useEffect(() => {
-    if (onReset) {
-      // Store the reset function reference
-      window.resetDepartmentFilter = () => {
-        setSelectedDepartment(null)
-      }
-    }
-  }, [onReset])
+  // // Expose reset function to parent component
+  // useEffect(() => {
+  //   if (onReset) {
+  //     // Store the reset function reference
+  //     window.resetDepartmentFilter = () => {
+  //       setSelectedDepartment(null)
+  //     }
+  //   }
+  // }, [onReset])
 
   return (
     <div className="relative">
@@ -1156,9 +1160,13 @@ export default function Dashboard() {
                   <button
                     onClick={() => {
                       // Reset department filter
-                      if (window.resetDepartmentFilter) {
-                        window.resetDepartmentFilter()
-                      }
+                      // if (window.resetDepartmentFilter) {
+                      //   window.resetDepartmentFilter()
+                      // }
+
+                      // TODO: re-setup department filter resetting
+                      
+
                       // You can add more reset functionality here like clearing search
                       console.log("Refreshing map and resetting all filters")
                     }}

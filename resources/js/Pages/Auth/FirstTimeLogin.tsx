@@ -77,7 +77,7 @@ export default function FirstTimeLogin({ status }: { status?: string }) {
               placeholder="Enter a secure password"
               onChange={(e) => setData("password", e.target.value)}
             />
-            <InputError message={errors.password} className="mt-2" />
+            <InputError message={errors.password} />
           </div>
 
           {/* Password Requirements */}
@@ -115,7 +115,7 @@ export default function FirstTimeLogin({ status }: { status?: string }) {
               placeholder="Confirm your new password"
               onChange={(e) => setData("password_confirmation", e.target.value)}
             />
-            <InputError message={errors.password_confirmation} className="mt-2" />
+            <InputError message={errors.password_confirmation} />
           </div>
         </div>
 
