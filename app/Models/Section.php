@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Section extends Model
 {
     public $timestamps = false;
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'manager_id'];
 
     public function personnel(): BelongsToMany
     {
