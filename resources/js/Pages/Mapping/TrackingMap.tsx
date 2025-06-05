@@ -4,6 +4,7 @@ import { LegacyRef, PropsWithChildren, useState } from "react";
 import PersonnelMarkersLayer from "./PersonnelMarkersLayer";
 import 'leaflet/dist/leaflet.css';
 import { Map } from "leaflet";
+import ZoomControl from "./ZoomControl";
 
 export default function TrackingMap({ ref } : {ref: LegacyRef<Map>}) {
     return (
@@ -12,6 +13,7 @@ export default function TrackingMap({ ref } : {ref: LegacyRef<Map>}) {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            <ZoomControl />
             <GeoJSON
                 style={{color: '#0000CC', weight: 4}}
                 // @ts-ignore

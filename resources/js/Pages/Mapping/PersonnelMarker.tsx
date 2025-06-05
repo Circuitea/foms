@@ -26,7 +26,7 @@ export default function PersonnelMarker({ marker, isClickable }: { marker: Perso
                             <User className="w-6 h-6 text-blue-600" />
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-900">{marker.personnel.first_name} {marker.personnel.surname}</h3>
-                                <p className="text-sm text-gray-600">Sex Master</p>
+                                <p className="text-sm text-gray-600">POSITION</p>
                             </div>
                         </DialogTitle>
                     </DialogHeader>

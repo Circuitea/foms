@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, LegacyRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Users, Eye, EyeOff, ChevronUp, ChevronDown, Monitor } from "lucide-react"
@@ -8,6 +8,7 @@ import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
 import TrackingMap from "./TrackingMap"
 import { Link } from "@inertiajs/react"
+import { Map } from "leaflet"
 
 // Mock data for personnel
 const personnelData = {
@@ -74,7 +75,7 @@ function MapPage() {
   const [prioritizedUser, setPrioritizedUser] = useState<Personnel | null>(null)
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
 
-  const [ map, setMap ] = useState(null);
+  const map = useRef<Map>(null);
 
   const handleCategoryClick = (category: Category) => {
     if (selectedCategory === category) {
@@ -110,8 +111,8 @@ function MapPage() {
 
       // If you have access to the map instance, you can also call map.invalidateSize() here
       // This is for Leaflet specifically - adjust based on your mapping library
-      if (map && typeof map.invalidateSize === "function") {
-        map.invalidateSize();
+      if (map.current && typeof map.current.invalidateSize === "function") {
+        map.current.invalidateSize();
       }
     }, 350) // Wait for sidebar animation to complete
 
@@ -168,31 +169,31 @@ function MapPage() {
           {/* Map Container */}
           <div className="w-full h-full bg-gray-100 relative overflow-hidden">
             {/* Map Placeholder - In real implementation, use Leaflet, Google Maps, etc. */}
-            <TrackingMap ref={setMap} />
+            <TrackingMap ref={map} />
 
-            {/* Map Controls - Bottom Right - Floating and Separate - Moved higher */}
+            {/* Map Controls - Bottom Right - Floating and Separate - Moved higher
             <div className="absolute bottom-16 right-4 flex flex-col gap-1 items-center">
-              {/* Zoom In Button - Bigger and closer */}
+              {/* Zoom In Button - Bigger and closer *
               <Button
                 variant="outline"
                 size="sm"
                 className="w-12 h-12 bg-white border-gray-300 hover:bg-gray-50 text-lg font-bold flex items-center justify-center shadow-lg rounded-lg"
-                onClick={() => map.zoomIn()}
+                onClick={() => map.current.zoomIn()}
               >
                 +
               </Button>
 
-              {/* Zoom Out Button - Bigger and closer */}
+              {/* Zoom Out Button - Bigger and closer *
               <Button
                 variant="outline"
                 size="sm"
                 className="w-12 h-12 bg-white border-gray-300 hover:bg-gray-50 text-lg font-bold flex items-center justify-center shadow-lg rounded-lg"
-                onClick={() => map.zoomOut()}
+                onClick={() => map.current.zoomOut()}
               >
                 -
               </Button>
 
-              {/* Export Button - with gap */}
+              {/* Export Button - with gap *
               <div className="group relative mt-2">
                 <Button
                   variant="outline"
@@ -204,7 +205,7 @@ function MapPage() {
                   </svg>
                 </Button>
 
-                {/* Expanded Export Button on Hover */}
+                {/* Expanded Export Button on Hover *
                 <Button
                   variant="outline"
                   className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-white border-gray-300 hover:bg-gray-50 px-4 py-2 h-12 whitespace-nowrap transform -translate-x-[calc(100%-3rem)] flex items-center justify-center shadow-lg rounded-lg"
@@ -213,7 +214,7 @@ function MapPage() {
                   <Link href="/map/report">Export Report</Link>
                 </Button>
               </div>
-            </div>
+            </div> */}
 
             {/* Legend */}
             {selectedCategory && (
