@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Role;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Role::create(['name' => 'IT Staff']);
-        Role::create(['name' => 'Administrative Staff']);
+        Schema::table('roles', function (Blueprint $table) {
+            $table->dropForeign(['department_id']);
+            $table->dropColumn('department_id');
+        });
     }
 
     /**
@@ -21,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Role::whereIn('name', ['IT Staff', 'Administrative Staff'])->delete();
+        Schema::table('roles', function (Blueprint $table) {
+            $table->foreignId('department_id')->nullable()->constrained(table: 'departments');
+        });
     }
 };

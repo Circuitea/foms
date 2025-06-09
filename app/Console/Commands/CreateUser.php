@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Models\Personnel;
+use App\Models\Role;
+use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+
+use function Laravel\Prompts\error;
+use function Laravel\Prompts\form;
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\note;
+use function Laravel\Prompts\outro;
+
+class CreateUser extends Command implements PromptsForMissingInput
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'create:personnel';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create a new Personnel';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
+    {
+        // $password = $this->secret('What is the user\'s password?');
+
+        // $roleID = Role::firstWhere('name', 'IT Staff')->id;
+        // $newUser = Personnel::create([
+        //     'password' => Hash::make($password),
+        //     ... $this->arguments(),
+        // ]);
+        // $newUser->roles()->attach($roleID);
+        // $newUser->save();
+
+        
+        if (Role::doesntExist()) {
+            // error('No Roles found. Please create a Role before creating new Personnel.');
+            // return 1;
+
+            $this->fail('No Roles found. Please create a Role before creating new Personnel.');
+        }
+        
+        info('Creating a new Personnel.');
+
+        $roles = Role::all()->keyBy('id')->map(function (Role $role) {
+            return $role->name;
+        });
+        
+        note('Press CTRL+U to go back to the previous field.');
+
+        $responses = form()
+            ->text('First name?', name: 'first_name', required: true)
+            ->text('Middle name?', name: 'middle_name')
+            ->text('Surname?', name: 'surname', required: true)
+            ->text('Name extension?', name: 'name_extension')
+            ->text('Email address?', name: 'email', required: true, validate: ['email' => 'unique:'.Personnel::class])
+            ->multiselect('Roles?', name: 'roles', required: true, options: $roles)
+            ->password('Password?', name: 'password', required: true, validate: ['password' => Password::defaults()])
+            ->submit();
+
+        $personnel = Personnel::create([
+            'first_name' => $responses['first_name'],
+            'middle_name' => $responses['middle_name'],
+            'surname' => $responses['surname'],
+            'name_extension' => $responses['name_extension'],
+            'email' => $responses['email'],
+            'password' => Hash::make($responses['password']),
+        ]);
+
+        $personnel->roles()->attach($responses['roles']);
+        
+        $personnel->save();
+        
+        outro('User ' . $responses['first_name'] . '(ID:' . $personnel->id . ') created.');
+    }
+}
