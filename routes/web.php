@@ -4,8 +4,10 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MeetingsController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonnelController;
+use App\Http\Controllers\PersonnelLocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TasksController;
+use App\Models\PersonnelLocation;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,6 +33,7 @@ Route::prefix('map')->middleware(['auth', 'verified'])->group(function() {
         return Inertia::render('Mapping/Presentation');
     });
 });
+Route::post('location', [PersonnelLocationController::class, 'store']);
 
 Route::prefix('personnel')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [PersonnelController::class, 'list']);

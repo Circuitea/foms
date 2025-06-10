@@ -66,6 +66,6 @@ class Personnel extends Authenticatable
 
     public function location(): HasOne
     {
-        return $this->hasOne(PersonnelLocation::class, 'id', 'id');
+        return $this->hasOne(PersonnelLocation::class, 'id');
     }
 }

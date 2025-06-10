@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PersonnelLocation extends Model
 {
+    protected $fillable = ['id', 'latitude', 'longitude'];
+
     protected function casts() {
         return [
             'latitude' => 'decimal:8',
@@ -16,6 +18,6 @@ class PersonnelLocation extends Model
 
     public function personnel(): BelongsTo
     {
-        return $this->belongsTo(Personnel::class, 'id', 'id');
+        return $this->belongsTo(Personnel::class, 'id');
     }
 }
