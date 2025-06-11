@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\NewPersonnelRequest;
 use App\Models\Personnel;
 use App\Models\Role;
+use App\Models\Section;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
@@ -21,16 +22,18 @@ class PersonnelController extends Controller
 
     public function new() {
         $roles = Role::all();
+        $sections = Section::all(['id', 'name']);
 
         return Inertia::render('Personnel/NewPersonnel', [
             'roles' => $roles,
+            'sections' => $sections,
         ]);
     }
 
     public function create(NewPersonnelRequest $request) {
         $validated = $request->validated();
 
-        Personnel::create([
+        $personnel = Personnel::create([
             'first_name' => $validated['first_name'],
             'middle_name' => $validated['middle_name'],
             'surname' => $validated['surname'],
@@ -39,6 +42,9 @@ class PersonnelController extends Controller
             'mobile_number' => $validated['mobile_number'],
             'password' => Hash::make($validated['password'],),
         ]);
+
+        $personnel->roles()->attach($validated['roles']);
+        $personnel->sections()->attach($validated['sections']);
 
         return redirect('/personnel');
     }

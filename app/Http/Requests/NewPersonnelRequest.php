@@ -3,7 +3,12 @@
 namespace App\Http\Requests;
 
 use App\Models\Personnel;
+use App\Models\Role;
+use App\Models\Section;
+use App\Rules\ValidRole;
+use App\Rules\ValidSection;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
 
@@ -24,6 +29,9 @@ class NewPersonnelRequest extends FormRequest
      */
     public function rules(): array
     {
+        $roleIDs = Role::all(['id'])->pluck('id')->toArray();
+        $sectionIDs = Section::all(['id'])->pluck('id')->toArray();
+
         return [
             'surname' => 'required|string|alpha|max:255',
             'first_name' => 'required|string|alpha|max:255',
@@ -31,6 +39,8 @@ class NewPersonnelRequest extends FormRequest
             'name_extension' => 'nullable|string|alpha|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.Personnel::class,
             'mobile_number' => 'nullable|string|size:10',
+            'roles' => ['required', 'list', new ValidRole],
+            'sections' => ['required', 'list', new ValidSection],
             'password' => ['required', Rules\Password::defaults()],
         ];
     }

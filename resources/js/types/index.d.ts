@@ -40,3 +40,9 @@ export interface PersonnelLocation {
     created_at: string,
     updated_at: string,
 };
+
+export interface Section {
+    id: number,
+    name: string,
+    manager?: Personnel,
+}
