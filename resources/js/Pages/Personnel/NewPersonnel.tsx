@@ -447,6 +447,7 @@ export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
 
                   {/* TODO: fucking fix the typescript error here */}
                   <Select 
+                    // @ts-ignore
                     options={roles.reduce((arr: {value: number, label: string}[], role, i) => {
                       arr[i] = {
                         value: role.id,
@@ -456,6 +457,7 @@ export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
                       return arr;
                     }, [])}
                     value={form.data.positions}
+                    // @ts-ignore
                     onChange={(e) => form.setData('positions', e)}
                     isMulti
                     closeMenuOnSelect={false}

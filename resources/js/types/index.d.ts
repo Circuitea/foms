@@ -32,3 +32,11 @@ export type PageProps<
         user: Personnel;
     };
 };
+
+export interface PersonnelLocation {
+    personnel: Personnel,
+    latitude: number,
+    longitude: number,
+    created_at: string,
+    updated_at: string,
+};

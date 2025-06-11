@@ -1,7 +1,4 @@
 import InputError from '@/components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -47,7 +44,7 @@ export default function ResetPassword({
                         onChange={(e) => setData('email', e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email} />
                 </div>
 
                 <div className="mt-4">
@@ -60,7 +57,7 @@ export default function ResetPassword({
                         className='mt-1 block w-full bg-background text-foreground'
                         onChange={(e) => setData('password', e.target.value)}
                     />
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password} />
                 </div>
 
                 <div className="mt-4">
@@ -79,7 +76,6 @@ export default function ResetPassword({
 
                     <InputError
                         message={errors.password_confirmation}
-                        className="mt-2"
                     />
                 </div>
 

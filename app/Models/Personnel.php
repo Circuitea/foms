@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -61,5 +62,10 @@ class Personnel extends Authenticatable
     public function sections(): BelongsToMany
     {
         return $this->belongsToMany(Section::class, 'personnel_sections');
+    }
+
+    public function location(): HasOne
+    {
+        return $this->hasOne(PersonnelLocation::class, 'id');
     }
 }
