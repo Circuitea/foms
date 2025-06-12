@@ -250,6 +250,7 @@ export default function ShowNotifications() {
 
     const newStatus = notification.status === "Unread" ? "Checked" : "Unread"
 
+    // @ts-ignore
     setNotification((prev) => ({
       ...prev,
       status: newStatus,

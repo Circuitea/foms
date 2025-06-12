@@ -129,7 +129,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
-              <DialogTrigger>
+              <DialogTrigger asChild>
                 <SidebarMenuButton
                   className="py-3 px-4 rounded-lg hover:shadow-sm transition-all duration-200"
                   tooltip="Logout"

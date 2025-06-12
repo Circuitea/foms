@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import {
   Search,
@@ -19,6 +17,8 @@ import {
   User,
 } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
+import { Button } from "@/components/ui/button"
+import { Link } from "@inertiajs/react"
 
 // Simple interfaces
 interface Personnel {
@@ -485,20 +485,20 @@ export default function ListPersonnel() {
 
               {/* Action Buttons */}
               <div className="flex gap-2 flex-shrink-0">
-                <button
+                <Button
                   onClick={() => setShowTrackEmployeesModal(true)}
                   className="bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
                 >
                   <MapPin className="w-4 h-4" />
                   Track Employees
-                </button>
-                <button
-                  onClick={() => (window.location.href = "/personnel/new")}
+                </Button>
+                <Link
+                  href='/personnel/new'
                   className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
                 >
                   <Plus className="w-4 h-4" />
                   Add Personnel
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -987,4 +987,4 @@ export default function ListPersonnel() {
   )
 }
 
-ListPersonnel.layout = (e: React.JSX.Element) => <Authenticated children={e} />
+ListPersonnel.layout = (e: JSX.Element) => <Authenticated children={e} />

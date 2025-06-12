@@ -8,48 +8,58 @@ import Authenticated from "@/Layouts/AuthenticatedLayout"
 import toast from "@/components/toast";
 import { Head, Link } from "@inertiajs/react"
 import { useForm } from 'laravel-precognition-react-inertia';
-import { ArrowLeft, User, Mail, Phone, Lock, Save, Loader2, Briefcase, ChevronDown, Check, Building, AlertCircle, X } from 'lucide-react'
-import type { FormEventHandler, MouseEventHandler } from "react"
-import { useState, useEffect } from "react"
+import { ArrowLeft, User, Mail, Phone, Lock, Save, Loader2, Briefcase, AlertCircle } from 'lucide-react'
+import { useRef, useState, type FormEventHandler, type MouseEventHandler } from "react"
 import Select from 'react-select';
-import { PageProps, Role } from "@/types"
+import { PageProps, Role, Section } from "@/types"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
-
-const departments = ["Administration", "IT Department", "Logistic"]
-
-// Position to Department mapping
-const positionDepartmentMapping: Record<string, string> = {
-  "IT Staff": "IT Department",
-  "Administrative Staff": "Administration",
-  "Logistic Staff": "Logistic",
+interface Option {
+  value: number,
+  label: string,
 }
 
-// Department to positions mapping (for filtering)
-const departmentPositionsMapping: Record<string, string[]> = {
-  "IT Department": ["IT Staff"],
-  Administration: ["Administrative Staff"],
-  Logistic: ["Logistic Staff"],
-}
-
-interface ValidationErrors {
-  [key: string]: string
-}
-
-export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
-  const form = useForm('post', '/personnel/new', {
+export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Role[], sections: Section[] }>) {
+  const form = useForm<{
+    first_name: string,
+    middle_name: string,
+    surname: string,
+    name_extension: string
+    email: string,
+    mobile_number: string,
+    roles: number[],
+    sections: number[],
+    password: string,
+  }>('post', '/personnel/new', {
     first_name: "",
     middle_name: "",
     surname: "",
     name_extension: "",
     email: "",
     mobile_number: "",
-    positions: [],
-    position: "",
-    department: "",
+    roles: [],
+    sections: [],
     password: "",
   });
 
   form.setValidationTimeout(3000);
+
+  const [ isConfirmDialogOpen, setConfirmDialogOpen ] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const roleOptions: Option[] = roles.map((role) => {
+    return {
+      value: role.id,
+      label: role.name,
+    };
+  });
+
+  const sectionOptions: Option[] = sections.map((section) => {
+    return {
+      value: section.id,
+      label: section.name,
+    };
+  });
 
   const generateRandomPassword: MouseEventHandler = (e) => {
     e.preventDefault();
@@ -63,180 +73,6 @@ export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
     }
 
     form.setData('password', newPassword);
-  }
-
-  // Position dropdown states
-  const [isPositionOpen, setIsPositionOpen] = useState(false)
-  const [positionSearch, setPositionSearch] = useState("")
-
-  // Department dropdown states
-  const [isDepartmentOpen, setIsDepartmentOpen] = useState(false)
-  const [departmentSearch, setDepartmentSearch] = useState("")
-
-  // Validation states
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
-
-
-  // Filter departments based on selected position
-  const getAvailableDepartments = () => {
-    if (form.data.position && positionDepartmentMapping[form.data.position]) {
-      // If position is selected and has a mapping, only show the mapped department
-      return [positionDepartmentMapping[form.data.position]]
-    }
-    // Otherwise show all departments
-    return departments
-  }
-
-  const filteredDepartments = getAvailableDepartments().filter((department) =>
-    department.toLowerCase().includes(departmentSearch.toLowerCase()),
-  )
-
-  // Validation functions
-  const validateEmail = (email: string): string | null => {
-    if (!email) return "Email address is required"
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) return "Please enter a valid email address"
-    return null
-  }
-
-  const validateMobileNumber = (mobile: string): string | null => {
-    if (!mobile) return "Mobile number is required"
-    if (!/^[0-9]+$/.test(mobile)) return "Mobile number should only contain numbers"
-    if (mobile.length !== 10) return "Please enter exactly 10 digits after +63"
-    return null
-  }
-
-  const validatePassword = (password: string): string | null => {
-    if (!password) return "Password is required"
-    if (password.length < 8) return "Password must be at least 8 characters long"
-    if (!/(?=.*[a-z])/.test(password)) return "Password must contain at least one lowercase letter"
-    if (!/(?=.*[A-Z])/.test(password)) return "Password must contain at least one uppercase letter"
-    if (!/(?=.*\d)/.test(password)) return "Password must contain at least one number"
-    return null
-  }
-
-  const validateName = (name: string, fieldName: string, required = true): string | null => {
-    if (required && !name) return `${fieldName} is required`
-    if (name && !/^[a-zA-Z\s\-.]+$/.test(name))
-      return `${fieldName} should only contain letters, spaces, hyphens, and periods`
-    if (name && name.length > 50) return `${fieldName} should not exceed 50 characters`
-    return null
-  }
-
-  const validateRequired = (value: string, fieldName: string): string | null => {
-    if (!value || value.trim() === "") return `${fieldName} is required`
-    return null
-  }
-
-  // Real-time validation
-  const handleFieldValidation = (field: string, value: string) => {
-    let error: string | null = null
-
-    switch (field) {
-      case "first_name":
-        error = validateName(value, "First name")
-        break
-      case "surname":
-        error = validateName(value, "Surname")
-        break
-      case "middle_name":
-        error = validateName(value, "Middle name", false)
-        break
-      case "name_extension":
-        error = validateName(value, "Name extension", false)
-        break
-      case "email":
-        error = validateEmail(value)
-        break
-      case "mobile_number":
-        error = validateMobileNumber(value)
-        break
-      case "password":
-        error = validatePassword(value)
-        break
-      case "position":
-        error = validateRequired(value, "Position")
-        break
-      case "department":
-        error = validateRequired(value, "Department")
-        break
-    }
-
-    setValidationErrors((prev) => ({
-      ...prev,
-      [field]: error || "",
-    }))
-  }
-
-  // Handle input changes with validation
-  const handleInputChange = (field: string, value: string) => {
-    form.setData(field as any, value)
-    handleFieldValidation(field, value)
-  }
-
-  const handleMobileNumberChange = (value: string) => {
-    // Only allow numbers
-    const numbersOnly = value.replace(/[^0-9]/g, "")
-    // Limit to 10 digits (after +63)
-    const limitedValue = numbersOnly.slice(0, 10)
-
-    if (value !== numbersOnly) {
-      toast('error', 'Invalid Input', "Mobile number should only contain numbers");
-    }
-
-    handleInputChange("mobile_number", limitedValue)
-  }
-
-  const handlePositionSelect = (position: string) => {
-    form.setData("position", position)
-    setPositionSearch(position)
-    setIsPositionOpen(false)
-    handleFieldValidation("position", position)
-
-    // Auto-set department based on position
-    const mappedDepartment = positionDepartmentMapping[position]
-    if (mappedDepartment) {
-      form.setData("department", mappedDepartment)
-      setDepartmentSearch(mappedDepartment)
-      handleFieldValidation("department", mappedDepartment)
-
-      toast(
-        'success',
-        'Department Auto Selected',
-        `${mappedDepartment} has been automatically selected for ${position}`,
-      );
-    }
-  }
-
-  const handlePositionInputChange = (value: string) => {
-    setPositionSearch(value)
-    form.setData("position", value)
-    setIsPositionOpen(true)
-    handleFieldValidation("position", value)
-
-    // If user is typing a custom position, clear the department auto-selection
-    if (!positionDepartmentMapping[value]) {
-      // Only clear if the current department was auto-selected
-      const currentDepartment = form.data.department
-      if (currentDepartment && Object.values(positionDepartmentMapping).includes(currentDepartment)) {
-        form.setData("department", "")
-        setDepartmentSearch("")
-      }
-    }
-  }
-
-  const handleDepartmentSelect = (department: string) => {
-    form.setData("department", department)
-    setDepartmentSearch(department)
-    setIsDepartmentOpen(false)
-    handleFieldValidation("department", department)
-  }
-
-  const handleDepartmentInputChange = (value: string) => {
-    setDepartmentSearch(value)
-    form.setData("department", value)
-    setIsDepartmentOpen(true)
-    handleFieldValidation("department", value)
   }
 
   // Form submission with validation
@@ -257,12 +93,6 @@ export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
       },
     })
   }
-
-  // Initialize validation on mount
-  useEffect(() => {
-    if (form.data.position) setPositionSearch(form.data.position)
-    if (form.data.department) setDepartmentSearch(form.data.department)
-  }, [])
 
   return (
     <div>
@@ -292,7 +122,7 @@ export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
         </div>
 
         {/* Form Section */}
-        <form onSubmit={submit} className="space-y-6">
+        <form onSubmit={submit} className="space-y-6" ref={formRef}>
           {/* Personal Information Section */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 bg-blue-50">
@@ -305,6 +135,7 @@ export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
 
             <div className="p-6">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* TODO: FIGURE OUT FILE UPLOADING */}
                 {/* Employee Photo Section */}
                 <div className="lg:col-span-3">
                   <div className="space-y-3">
@@ -443,45 +274,46 @@ export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
                   <Label htmlFor="position" className="text-sm font-medium text-gray-700">
                     Position/Role <span className="text-red-500">*</span>
                   </Label>
-                  
 
-                  {/* TODO: fucking fix the typescript error here */}
-                  <Select 
-                    options={roles.reduce((arr: {value: number, label: string}[], role, i) => {
-                      arr[i] = {
-                        value: role.id,
-                        label: role.name,
-                      }
-
-                      return arr;
-                    }, [])}
-                    value={form.data.positions}
-                    onChange={(e) => form.setData('positions', e)}
+                  <Select
+                    options={roleOptions}
                     isMulti
+                    isClearable
+                    required
                     closeMenuOnSelect={false}
+                    name="roles"
+                    value={roleOptions.filter((role) => form.data.roles.includes(role.value))}
+                    onChange={(newRoles) => form.setData('roles', newRoles ? newRoles.map((newRole) => newRole.value) : [])}
+                    onBlur={() => form.validate('roles')}
                   />
 
-                  {form.invalid('position') && (
-                    <InputError message={form.errors.position} />
+                  {form.invalid('roles') && (
+                    <InputError message={form.errors.roles} />
                   )}
                   
                 </div>
 
                 {/* Department Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="department" className="text-sm font-medium text-gray-700">
-                    Department <span className="text-red-500">*</span>
+                  <Label htmlFor="sections" className="text-sm font-medium text-gray-700">
+                    Section <span className="text-red-500">*</span>
                   </Label>
 
                   <Select
-                    options={[
-                      {value: 1, label: 'Department 1'},
-                      {value: 2, label: 'Department 2'},
-                      {value: 3, label: 'Department 3'},
-                    ]}
+                    options={sectionOptions}
                     isMulti
+                    isClearable
+                    required
                     closeMenuOnSelect={false}
+                    name='sections'
+                    value={sectionOptions.filter((section) => form.data.sections.includes(section.value))}
+                    onChange={(newSections) => newSections ? form.setData('sections', newSections.map((newSection) => newSection.value)) : []}
+                    onBlur={() => form.validate('sections')}
                   />
+
+                  {form.invalid('sections') && (
+                    <InputError message={form.errors.sections} />
+                  )}
                 </div>
               </div>
             </div>
@@ -581,6 +413,7 @@ export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
                               value={form.data.password}
                               className="pl-10 w-full"
                               placeholder="test"
+                              readOnly
                             />
                           </div>
                           <Button onClick={generateRandomPassword}>
@@ -608,37 +441,43 @@ export default function NewPersonnel({ roles }: PageProps<{ roles: Role[] }>) {
                 </Button>
 
                 <Button
-                  type="submit"
-                  disabled={form.processing}
+                  type="button"
                   className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-6"
+                  onClick={() => {
+                    console.log('boutta validate?');
+                    form.validate({
+                      only: ['first_name', 'surname', 'middle_name', 'name_extension', 'email', 'mobile_number', 'roles', 'sections', 'password'],
+                      onSuccess: () => {
+                        setConfirmDialogOpen(true);
+                        console.log(form.data);
+                      },
+                      onValidationError: () => {
+                        toast('error', 'Submission Failed', 'There was an error creating the personnel. Please try again.');
+                      }
+                    });
+                  }}
                 >
-                  {form.processing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      Create Personnel
-                    </>
-                  )}
+                  <Save className="w-4 h-4" />
+                  Create Personnel
                 </Button>
+
+                <Dialog open={isConfirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+                  <DialogContent className="max-w-5xl">
+                    <DialogHeader>
+                      <DialogTitle>Confirm Personnel Details</DialogTitle>
+                      <DialogDescription>Hmm</DialogDescription>
+                    </DialogHeader>
+                    insert confirm dialog contents here
+                    <DialogFooter>
+                      <Button type="button" variant="outline" onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
+                      <Button type="submit" onClick={() => formRef.current?.submit()}>Confirm</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>
         </form>
-
-        {/* Click outside to close dropdowns */}
-        {isPositionOpen || isDepartmentOpen ? (
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => {
-              setIsPositionOpen(false)
-              setIsDepartmentOpen(false)
-            }}
-          />
-        ) : null}
       </div>
     </div>
   )
