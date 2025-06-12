@@ -5,32 +5,39 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
-import toast from "@/components/toast";
+import toast from "@/components/toast"
 import { Head, Link } from "@inertiajs/react"
-import { useForm } from 'laravel-precognition-react-inertia';
-import { ArrowLeft, User, Mail, Phone, Lock, Save, Loader2, Briefcase, AlertCircle } from 'lucide-react'
+import { useForm } from "laravel-precognition-react-inertia"
+import { ArrowLeft, User, Mail, Phone, Lock, Save, Briefcase, AlertCircle } from "lucide-react"
 import { useRef, useState, type FormEventHandler, type MouseEventHandler } from "react"
-import Select from 'react-select';
-import { PageProps, Role, Section } from "@/types"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import Select from "react-select"
+import type { PageProps, Role, Section } from "@/types"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface Option {
-  value: number,
-  label: string,
+  value: number
+  label: string
 }
 
-export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Role[], sections: Section[] }>) {
+export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Role[]; sections: Section[] }>) {
   const form = useForm<{
-    first_name: string,
-    middle_name: string,
-    surname: string,
+    first_name: string
+    middle_name: string
+    surname: string
     name_extension: string
-    email: string,
-    mobile_number: string,
-    roles: number[],
-    sections: number[],
-    password: string,
-  }>('post', '/personnel/new', {
+    email: string
+    mobile_number: string
+    roles: number[]
+    sections: number[]
+    password: string
+  }>("post", "/personnel/new", {
     first_name: "",
     middle_name: "",
     surname: "",
@@ -40,39 +47,39 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
     roles: [],
     sections: [],
     password: "",
-  });
+  })
 
-  form.setValidationTimeout(3000);
+  form.setValidationTimeout(3000)
 
-  const [ isConfirmDialogOpen, setConfirmDialogOpen ] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [isConfirmDialogOpen, setConfirmDialogOpen] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const roleOptions: Option[] = roles.map((role) => {
     return {
       value: role.id,
       label: role.name,
-    };
-  });
+    }
+  })
 
   const sectionOptions: Option[] = sections.map((section) => {
     return {
       value: section.id,
       label: section.name,
-    };
-  });
+    }
+  })
 
   const generateRandomPassword: MouseEventHandler = (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    let charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-    let newPassword = '';
-    let passwordLength = 8;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+    let newPassword = ""
+    const passwordLength = 8
 
     for (let i = 0; i < passwordLength; i++) {
-      newPassword += charset.charAt(Math.floor(Math.random() * charset.length));
+      newPassword += charset.charAt(Math.floor(Math.random() * charset.length))
     }
 
-    form.setData('password', newPassword);
+    form.setData("password", newPassword)
   }
 
   // Form submission with validation
@@ -82,11 +89,11 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
     form.submit({
       onSuccess: () => {
         // addToast("success", "Success!", "Personnel has been created successfully")
-        toast('success', 'Success!', 'Personnel has been created successfully');
+        toast("success", "Success!", "Personnel has been created successfully")
       },
       onError: (errors) => {
         // addToast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
-        toast('error', 'Submission Failed', 'There was an error creating the personnel. Please try again.');
+        toast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
       },
       onFinish: () => {
         form.reset("password")
@@ -165,7 +172,6 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                   <div className="pt-8">
                     <p className="text-sm font-medium text-gray-700 mb-4 block">Full Name</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-
                       <div className="space-y-2">
                         <Label htmlFor="surname" className="text-sm font-medium text-gray-700">
                           Surname <span className="text-red-500">*</span>
@@ -174,12 +180,12 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                           id="surname"
                           name="surname"
                           value={form.data.surname}
-                          className={`w-full ${form.invalid('surname') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
-                          onChange={(e) => form.setData('surname', e.target.value)}
-                          onBlur={() => form.validate('surname')}
+                          className={`w-full ${form.invalid("surname") ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          onChange={(e) => form.setData("surname", e.target.value)}
+                          onBlur={() => form.validate("surname")}
                           placeholder="e.g. Dela Cruz"
                         />
-                        {form.invalid('surname') && (
+                        {form.invalid("surname") && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
                             <span className="break-words">{form.errors.surname}</span>
@@ -195,12 +201,12 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                           id="first_name"
                           name="first_name"
                           value={form.data.first_name}
-                          className={`w-full ${form.invalid('first_name') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          className={`w-full ${form.invalid("first_name") ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
                           onChange={(e) => form.setData("first_name", e.target.value)}
-                          onBlur={() => form.validate('first_name')}
+                          onBlur={() => form.validate("first_name")}
                           placeholder="e.g. Juan"
                         />
-                        {form.invalid('first_name') && (
+                        {form.invalid("first_name") && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
                             <span className="break-words">{form.errors.first_name}</span>
@@ -216,12 +222,12 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                           id="middle_name"
                           name="middle_name"
                           value={form.data.middle_name}
-                          className={`w-full ${form.invalid('middle_name') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          className={`w-full ${form.invalid("middle_name") ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
                           onChange={(e) => form.setData("middle_name", e.target.value)}
-                          onBlur={() => form.validate('middle_name')}
+                          onBlur={() => form.validate("middle_name")}
                           placeholder="e.g. Reyes"
                         />
-                        {form.invalid('middle_name') && (
+                        {form.invalid("middle_name") && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
                             <span className="break-words">{form.errors.middle_name}</span>
@@ -237,19 +243,18 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                           id="name_extension"
                           name="name_extension"
                           value={form.data.name_extension}
-                          className={`w-full ${form.invalid('name_extension') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                          className={`w-full ${form.invalid("name_extension") ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
                           onChange={(e) => form.setData("name_extension", e.target.value)}
-                          onBlur={() => form.validate('name_extension')}
+                          onBlur={() => form.validate("name_extension")}
                           placeholder="e.g. Jr, Sr, III"
                         />
-                        {form.invalid('name_extension') && (
+                        {form.invalid("name_extension") && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
                             <AlertCircle className="h-3 w-3 flex-shrink-0" />
                             <span className="break-words">{form.errors.name_extension}</span>
                           </div>
                         )}
                       </div>
-                      
                     </div>
                   </div>
                 </div>
@@ -283,14 +288,13 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                     closeMenuOnSelect={false}
                     name="roles"
                     value={roleOptions.filter((role) => form.data.roles.includes(role.value))}
-                    onChange={(newRoles) => form.setData('roles', newRoles ? newRoles.map((newRole) => newRole.value) : [])}
-                    onBlur={() => form.validate('roles')}
+                    onChange={(newRoles) =>
+                      form.setData("roles", newRoles ? newRoles.map((newRole) => newRole.value) : [])
+                    }
+                    onBlur={() => form.validate("roles")}
                   />
 
-                  {form.invalid('roles') && (
-                    <InputError message={form.errors.roles} />
-                  )}
-                  
+                  {form.invalid("roles") && <InputError message={form.errors.roles} />}
                 </div>
 
                 {/* Department Field */}
@@ -305,15 +309,15 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                     isClearable
                     required
                     closeMenuOnSelect={false}
-                    name='sections'
+                    name="sections"
                     value={sectionOptions.filter((section) => form.data.sections.includes(section.value))}
-                    onChange={(newSections) => newSections ? form.setData('sections', newSections.map((newSection) => newSection.value)) : []}
-                    onBlur={() => form.validate('sections')}
+                    onChange={(newSections) =>
+                      form.setData("sections", newSections ? newSections.map((newSection) => newSection.value) : [])
+                    }
+                    onBlur={() => form.validate("sections")}
                   />
 
-                  {form.invalid('sections') && (
-                    <InputError message={form.errors.sections} />
-                  )}
+                  {form.invalid("sections") && <InputError message={form.errors.sections} />}
                 </div>
               </div>
             </div>
@@ -344,15 +348,13 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                         type="email"
                         name="email"
                         value={form.data.email}
-                        className={`pl-10 w-full ${form.invalid('email') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+                        className={`pl-10 w-full ${form.invalid("email") ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
                         onChange={(e) => form.setData("email", e.target.value)}
-                        onBlur={() => form.validate('email')}
+                        onBlur={() => form.validate("email")}
                         placeholder="e.g. juan.delacruz@cdrrmo.gov.ph"
                       />
                     </div>
-                    {form.invalid('email') && (
-                      <InputError message={form.errors.email} />
-                    )}
+                    {form.invalid("email") && <InputError message={form.errors.email} />}
                   </div>
 
                   <div className="space-y-2">
@@ -368,17 +370,15 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                         id="mobile_number"
                         name="mobile_number"
                         value={form.data.mobile_number}
-                        className={`rounded-l-none border-l-0 flex-1 h-10 ${form.invalid('mobile_number') ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-gray-300"}`}
-                        onChange={(e) => form.setData('mobile_number', e.target.value)}
-                        onBlur={() => form.validate('mobile_number')}
+                        className={`rounded-l-none border-l-0 flex-1 h-10 ${form.invalid("mobile_number") ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-gray-300"}`}
+                        onChange={(e) => form.setData("mobile_number", e.target.value)}
+                        onBlur={() => form.validate("mobile_number")}
                         placeholder="9123456789"
                         maxLength={10}
                       />
                     </div>
                   </div>
-                  {form.invalid('mobile_number') && (
-                    <InputError message={form.errors.mobile_number} />
-                  )}
+                  {form.invalid("mobile_number") && <InputError message={form.errors.mobile_number} />}
                   <p className="text-xs text-gray-500">Enter 10 digits after +63 (e.g., +639123456789)</p>
                 </div>
               </div>
@@ -397,33 +397,30 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
 
             <div className="p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <div>
-                        <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                          Initial Account Password <span className="text-red-500">*</span>
-                        </Label>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                          <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                            <Input
-                              id="password"
-                              type="text"
-                              name="password"
-                              value={form.data.password}
-                              className="pl-10 w-full"
-                              placeholder="test"
-                              readOnly
-                            />
-                          </div>
-                          <Button onClick={generateRandomPassword}>
-                            Generate Random Password
-                          </Button>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div>
+                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                        Initial Account Password <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                          <Input
+                            id="password"
+                            type="text"
+                            name="password"
+                            value={form.data.password}
+                            className="pl-10 w-full"
+                            placeholder="test"
+                            readOnly
+                          />
                         </div>
+                        <Button onClick={generateRandomPassword}>Generate Random Password</Button>
                       </div>
-                      
                     </div>
                   </div>
+                </div>
               </div>
             </div>
           </div>
@@ -444,17 +441,31 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                   type="button"
                   className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-6"
                   onClick={() => {
-                    console.log('boutta validate?');
+                    console.log("boutta validate?")
                     form.validate({
-                      only: ['first_name', 'surname', 'middle_name', 'name_extension', 'email', 'mobile_number', 'roles', 'sections', 'password'],
+                      only: [
+                        "first_name",
+                        "surname",
+                        "middle_name",
+                        "name_extension",
+                        "email",
+                        "mobile_number",
+                        "roles",
+                        "sections",
+                        "password",
+                      ],
                       onSuccess: () => {
-                        setConfirmDialogOpen(true);
-                        console.log(form.data);
+                        setConfirmDialogOpen(true)
+                        console.log(form.data)
                       },
                       onValidationError: () => {
-                        toast('error', 'Submission Failed', 'There was an error creating the personnel. Please try again.');
-                      }
-                    });
+                        toast(
+                          "error",
+                          "Submission Failed",
+                          "There was an error creating the personnel. Please try again.",
+                        )
+                      },
+                    })
                   }}
                 >
                   <Save className="w-4 h-4" />
@@ -465,12 +476,108 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                   <DialogContent className="max-w-5xl">
                     <DialogHeader>
                       <DialogTitle>Confirm Personnel Details</DialogTitle>
-                      <DialogDescription>Hmm</DialogDescription>
+                      <DialogDescription>Please review the personnel information before submitting</DialogDescription>
                     </DialogHeader>
-                    insert confirm dialog contents here
-                    <DialogFooter>
-                      <Button type="button" variant="outline" onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
-                      <Button type="submit" onClick={() => formRef.current?.submit()}>Confirm</Button>
+                    <div className="py-4 space-y-6">
+                      {/* Personal Information Preview */}
+                      <div className="border rounded-lg overflow-hidden">
+                        <div className="bg-blue-50 px-4 py-2 border-b">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-blue-600" />
+                            <h3 className="font-medium text-gray-900">Personal Information</h3>
+                          </div>
+                        </div>
+                        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-500">Full Name</p>
+                            <p className="font-medium">
+                              {form.data.surname}, {form.data.first_name} {form.data.middle_name}{" "}
+                              {form.data.name_extension}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Organization Information Preview */}
+                      <div className="border rounded-lg overflow-hidden">
+                        <div className="bg-green-50 px-4 py-2 border-b">
+                          <div className="flex items-center gap-2">
+                            <Briefcase className="w-4 h-4 text-green-600" />
+                            <h3 className="font-medium text-gray-900">Organization Information</h3>
+                          </div>
+                        </div>
+                        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-500">Position/Role</p>
+                            <p className="font-medium">
+                              {roleOptions
+                                .filter((role) => form.data.roles.includes(role.value))
+                                .map((role) => role.label)
+                                .join(", ")}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-500">Section</p>
+                            <p className="font-medium">
+                              {sectionOptions
+                                .filter((section) => form.data.sections.includes(section.value))
+                                .map((section) => section.label)
+                                .join(", ")}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Contact Information Preview */}
+                      <div className="border rounded-lg overflow-hidden">
+                        <div className="bg-purple-50 px-4 py-2 border-b">
+                          <div className="flex items-center gap-2">
+                            <Mail className="w-4 h-4 text-purple-600" />
+                            <h3 className="font-medium text-gray-900">Contact Information</h3>
+                          </div>
+                        </div>
+                        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-500">Email Address</p>
+                            <p className="font-medium">{form.data.email}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-500">Mobile Number</p>
+                            <p className="font-medium">+63{form.data.mobile_number}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Account Security Preview */}
+                      <div className="border rounded-lg overflow-hidden">
+                        <div className="bg-red-50 px-4 py-2 border-b">
+                          <div className="flex items-center gap-2">
+                            <Lock className="w-4 h-4 text-red-600" />
+                            <h3 className="font-medium text-gray-900">Account Security</h3>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <div>
+                            <p className="text-sm text-gray-500">Initial Password</p>
+                            <p className="font-medium">{form.data.password}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter className="gap-2">
+                      <Button type="button" variant="outline" onClick={() => setConfirmDialogOpen(false)}>
+                        Go Back & Edit
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white"
+                        onClick={() => {
+                          formRef.current?.submit()
+                          setConfirmDialogOpen(false)
+                        }}
+                      >
+                        Confirm & Submit
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -483,4 +590,4 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
   )
 }
 
-NewPersonnel.layout = (e:JSX.Element) => <Authenticated children={e} />
+NewPersonnel.layout = (e: JSX.Element) => <Authenticated children={e} />
