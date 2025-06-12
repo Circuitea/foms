@@ -13,10 +13,11 @@ use Inertia\Inertia;
 class PersonnelController extends Controller
 {
     public function list() {
-        $personnel = Personnel::paginate(15);
+        $personnel = Personnel::with(['sections', 'roles'])->simplePaginate(15);
 
         return Inertia::render('Personnel/ListPersonnel', [
             'personnel' => $personnel,
+            'total' => Personnel::count(),
         ]);
     }
 

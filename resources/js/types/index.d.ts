@@ -9,6 +9,7 @@ export interface Personnel {
     email: string;
     mobile_number?: string;
     roles: Role[],
+    sections: Section[],
 }
 
 export interface Role {

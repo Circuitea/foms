@@ -19,27 +19,20 @@ import {
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { Button } from "@/components/ui/button"
 import { Link } from "@inertiajs/react"
+import { DataTable } from "@/components/data-table"
+import { ColumnDef } from "@tanstack/react-table"
+import { PageProps, Personnel } from "@/types"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
-// Simple interfaces
-interface Personnel {
-  id: string
-  first_name: string
-  surname?: string
-  email: string
-  roles?: Array<{ name: string }>
-  department?: string
-  status?: string
-  location?: string
-}
 
 // Updated mock data with new status options
 const mockPersonnel: Personnel[] = [
   {
-    id: "1",
+    id: 1,
     first_name: "John",
     surname: "Doe",
     email: "john.doe@cdrrmo.gov.ph",
-    roles: [{ name: "Emergency Response Coordinator" }],
+    roles: [{ id: 1, name: "Emergency Response Coordinator" }],
     department: "Operations",
     status: "On Duty",
     location: "On-site",
@@ -114,6 +107,82 @@ const mockLocationHistory: Record<
   ],
 }
 
+const columns: ColumnDef<Personnel>[] = [
+  {
+    id: 'employeeInfo',
+    header: 'EMPLOYEE INFO',
+    accessorFn: (row) => `${toProperCase(row.first_name)} ${row.middle_name && row.middle_name.toUpperCase().charAt(0) + "."} ${toProperCase(row.surname)} ${row.name_extension && row.name_extension.toUpperCase() + '.'}`,
+    cell: (({ row }) => (
+      <div>
+        <p className="font-medium text-gray-900">{row.getValue('employeeInfo')}</p>
+        <p className="text-sm text-gray-500">{row.original.email}</p>
+      </div>
+    ))
+  },
+  {
+    id: 'sections',
+    accessorKey: 'sections',
+    header: 'SECTIONS',
+    cell: (props) => props.row.original.sections?.map((section) => (
+      <span>{section.name}</span>
+    ))
+  },
+  {
+    accessorKey: 'roles',
+    header: 'ROLES',
+    cell: (props) => props.row.original.roles?.map((role) => (
+      <span>{role.name}</span>
+    )),
+  },
+  {
+    id: 'status',
+    header: 'STATUS',
+    accessorFn: () => 'On Duty',
+  },
+  {
+    id: 'location',
+    header: 'LOCATION',
+    accessorFn: () => 'There',
+    cell: (props) => (
+      <div className="flex">
+        <MapPin className="w-4 h-4 mr-1" />
+        <span>{props.row.getValue('location')}</span>
+      </div>
+    )
+  },
+  {
+    id: 'actions',
+    header: 'ACTIONS',
+    cell: (props) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem>
+            <Eye className="h-4 w-4" />
+            View Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Clock className="h-4 w-4" />
+            View Schedule
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Edit className="h-4 w-4" />
+            Edit Details
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Trash2 className="h-4 w-4" />
+            Remove
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+]
+
 // Real-time clock hook
 function useRealTimeClock() {
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -147,7 +216,22 @@ function useRealTimeClock() {
   return `${formatDate(currentTime)}, ${formatTime(currentTime)}`
 }
 
-export default function ListPersonnel() {
+interface PersonnelPaginatorProps {
+  data: Personnel[],
+  
+  from: number,
+  to: number,
+  per_page: number,
+  
+  prev_page_url?: string,
+  next_page_url?: string,
+
+  current_page: number,
+  current_page_url: string,
+  first_page_url: string,
+}
+
+export default function ListPersonnel({ personnel, total }: PageProps<{ personnel: PersonnelPaginatorProps, total: number }>) {
   const currentTime = useRealTimeClock()
   const [searchTerm, setSearchTerm] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState("all")
@@ -505,7 +589,7 @@ export default function ListPersonnel() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
@@ -627,21 +711,30 @@ export default function ListPersonnel() {
               )}
             </div>
           )}
-        </div>
+        </div> */}
+
+        <DataTable
+          columns={columns}
+          data={personnel.data}
+        ></DataTable>
 
         {/* Pagination */}
         <div className="mt-6 flex justify-between items-center">
           <p className="text-sm text-gray-600">
-            Showing {filteredData.length > 0 ? 1 : 0} to {filteredData.length} of {filteredData.length} results
+            Showing {personnel.from} to {personnel.to} of {total} results
             {hasActiveFilters && ` (filtered from ${tableData.length} total)`}
           </p>
           <div className="flex gap-2">
-            <button className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50" disabled>
-              Previous
-            </button>
-            <button className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50" disabled>
-              Next
-            </button>
+            {personnel.prev_page_url && (
+              <Link href={personnel.prev_page_url} className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                Previous
+              </Link>
+            )}
+            {personnel.next_page_url && (
+              <Link href={personnel.next_page_url} className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                Next
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -988,3 +1081,7 @@ export default function ListPersonnel() {
 }
 
 ListPersonnel.layout = (e: JSX.Element) => <Authenticated children={e} />
+
+function toProperCase(str: string) {
+  return str.split(' ').map((word) => word.slice(0, 1).toUpperCase() + word.slice(1)).join(' ');
+}
