@@ -21,8 +21,9 @@ import { Button } from "@/components/ui/button"
 import { Link } from "@inertiajs/react"
 import { DataTable } from "@/components/data-table"
 import { ColumnDef } from "@tanstack/react-table"
-import { PageProps, Personnel } from "@/types"
+import { PageProps, Personnel, Section, Status } from "@/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import Select from 'react-select';
 
 
 // Updated mock data with new status options
@@ -107,6 +108,19 @@ const mockLocationHistory: Record<
   ],
 }
 
+const getStatusColor = (status: Status | null) => {
+    if (!status) {
+      return 'bg-gray-100 text-gray-800';
+    }
+    const colors: Record<Status, string> = {
+      'active': "bg-green-100 text-green-800",
+      'on duty': "bg-blue-100 text-blue-800",
+      'on site': "bg-purple-100 text-purple-800",
+      'on leave': "bg-yellow-100 text-yellow-800",
+    }
+    return colors[status];
+  }
+
 const columns: ColumnDef<Personnel>[] = [
   {
     id: 'employeeInfo',
@@ -137,7 +151,12 @@ const columns: ColumnDef<Personnel>[] = [
   {
     id: 'status',
     header: 'STATUS',
-    accessorFn: () => 'On Duty',
+    accessorKey: 'status',
+    cell: ({ row }) => (
+      <div className="px-6 py-4 whitespace-nowrap">
+        <span className={getStatusColor(row.getValue('status')) + ' inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium'}>{row.getValue('status') ? toProperCase(row.getValue('status')) : 'Unavailable'}</span>
+      </div>
+    )
   },
   {
     id: 'location',
@@ -231,7 +250,27 @@ interface PersonnelPaginatorProps {
   first_page_url: string,
 }
 
-export default function ListPersonnel({ personnel, total }: PageProps<{ personnel: PersonnelPaginatorProps, total: number }>) {
+interface Option {
+  value: number,
+  label: string,
+}
+
+export default function ListPersonnel({ personnel, total, sections }: PageProps<{ personnel: PersonnelPaginatorProps, total: number, sections: Section[] }>) {
+  const sectionOptions: Option[] = [
+    {value: 0, label: 'All Departments'},
+    ...sections.map((section) => {
+      return {value: section.id, label: section.name};
+    }),
+  ];
+
+  const statusOptions: Option[] = [
+    {value: 0, label: 'All Statuses'},
+    {value: 1, label: 'Active'},
+    {value: 2, label: 'On Duty'},
+    {value: 3, label: 'On Leave'},
+    {value: 4, label: 'On Site'},
+  ]
+  
   const currentTime = useRealTimeClock()
   const [searchTerm, setSearchTerm] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState("all")
@@ -420,7 +459,7 @@ export default function ListPersonnel({ personnel, total }: PageProps<{ personne
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Staff</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                {hasActiveFilters && <p className="text-xs text-gray-500">of {tableData.length} total</p>}
+                {hasActiveFilters && <p className="text-xs text-gray-500">of {total} total</p>}
               </div>
             </div>
           </div>
@@ -463,7 +502,7 @@ export default function ListPersonnel({ personnel, total }: PageProps<{ personne
         </div>
 
         {/* Active Filters */}
-        {hasActiveFilters && (
+        {/* {hasActiveFilters && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 flex-wrap">
@@ -504,7 +543,7 @@ export default function ListPersonnel({ personnel, total }: PageProps<{ personne
               </button>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Controls */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
@@ -535,35 +574,24 @@ export default function ListPersonnel({ personnel, total }: PageProps<{ personne
 
               {/* Filters */}
               <div className="flex gap-2 flex-shrink-0">
-                <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2.5 bg-white min-w-[140px]">
+                <div className="flex items-center rounded-lg px-3 py-2 5 bg-white min-w-[140px]">
                   <Filter className="w-4 h-4 mr-2 text-gray-400" />
-                  <select
-                    value={departmentFilter}
-                    onChange={(e) => setDepartmentFilter(e.target.value)}
-                    className="border-none outline-none bg-transparent text-sm w-full"
-                  >
-                    <option value="all">All Departments</option>
-                    {departments.map((dept) => (
-                      <option key={dept} value={dept}>
-                        {dept}
-                      </option>
-                    ))}
-                  </select>
+                  <Select className="w-full border-none"
+                    options={sectionOptions}
+                    defaultValue={sectionOptions[0]}
+                    classNames={{
+                      'input': () => 'border-none',
+                    }}
+                  />
                 </div>
 
-                <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2.5 bg-white min-w-[120px]">
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="border-none outline-none bg-transparent text-sm w-full"
-                  >
-                    <option value="all">All Status</option>
-                    {statuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
+
+                <div className="flex items-center rounded-lg px-3 py-2.5 bg-white min-w-[120px]">
+                  
+                  <Select className="w-full"
+                    options={statusOptions}
+                    defaultValue={statusOptions[0]}
+                  />
                 </div>
               </div>
 
@@ -726,12 +754,12 @@ export default function ListPersonnel({ personnel, total }: PageProps<{ personne
           </p>
           <div className="flex gap-2">
             {personnel.prev_page_url && (
-              <Link href={personnel.prev_page_url} className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+              <Link preserveScroll only={['personnel']} href={personnel.prev_page_url} className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
                 Previous
               </Link>
             )}
             {personnel.next_page_url && (
-              <Link href={personnel.next_page_url} className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+              <Link preserveScroll only={['personnel']} href={personnel.next_page_url} className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
                 Next
               </Link>
             )}

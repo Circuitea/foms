@@ -10,7 +10,10 @@ export interface Personnel {
     mobile_number?: string;
     roles: Role[],
     sections: Section[],
+    status: Status | null,
 }
+
+export type Status = 'active' | 'on site' | 'on duty' | 'on leave';
 
 export interface Role {
     id: number;
