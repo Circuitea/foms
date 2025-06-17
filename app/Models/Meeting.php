@@ -42,7 +42,7 @@ class Meeting extends Model
 
     public function agendas(): HasMany
     {
-        return $this->hasMany(MeetingAgenda::class. 'meeting_id');
+        return $this->hasMany(MeetingAgenda::class, 'meeting_id');
     }
 
 
