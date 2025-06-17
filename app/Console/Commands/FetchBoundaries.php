@@ -74,6 +74,9 @@ class FetchBoundaries extends Command
             $barangays->each(function ($barangay) {
                 Storage::put('boundaries/boundary-' . $barangay['osm_id'] . '.json', collect($barangay)->toJson());
             });
+
+            // add 1s sleep to comply with OSM Nominatim Usage Policy
+            sleep(1);
         }
 
         outro('Fetched.');
