@@ -1,8 +1,11 @@
 import { LayerGroup, Tooltip, GeoJSON, Marker } from "react-leaflet";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { usePage } from "@inertiajs/react";
 import { PageProps } from "@/types";
 import type { GeoJsonObject, Polygon } from "geojson";
+import { Layers } from "lucide-react";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenuItemIndicator } from "@radix-ui/react-dropdown-menu";
 
 const POSITION_CLASSES = {
     bottomleft: 'leaflet-bottom leaflet-left',
@@ -17,7 +20,7 @@ interface Barangay {
     geojson: GeoJsonObject & Polygon;
 }
 
-const colors = ['#33A1FF', '#28B463', '#F1C40F', '#9B59B6', '#E74C3C'];
+const colors = ['#1E90FF', '#FF4136', '#2ECC40', '#FF851B', '#B10DC9', '#FFDC00', '39CCCC'];
 
 export default function BarangayBoundaries() {
     const { barangays } = usePage<PageProps<{ barangays: Barangay[] }>>().props;
@@ -27,13 +30,53 @@ export default function BarangayBoundaries() {
         return col;
     }, {}));
 
-    // const barangaysVisible: Record<Barangay['id'], boolean> = {};
-    // barangays.forEach((barangay) => barangaysVisible[barangay.id] = true);
-    // setBarangayVisible(barangaysVisible);
+    const barangayToggleControl = (
+        <div className="absolute top-4 right-0">
+            <DropdownMenu>
+                <DropdownMenuTrigger>
+                    <div className="w-12 h-12 bg-white border-gray-300 text-lg font-bold shadow-lg rounded-lg flex items-center justify-center">
+                        <Layers className="w-7 h-7" />
+                    </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" side="bottom">
+                    <DropdownMenuLabel>Barangays Overlay</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuCheckboxItem
+                        checked={isVisible}
+                        onCheckedChange={setVisible}
+                        onSelect={(e) => e.preventDefault()}
+                    >
+                        Toggle All
+                    </DropdownMenuCheckboxItem>
+                    {isVisible && (
+                        <div>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                {barangays.map((barangay) => (
+                                    
+                                    <DropdownMenuCheckboxItem
+                                        checked={isBarangayVisible[barangay.osm_id]}
+                                        onCheckedChange={(checked) => setBarangayVisible({...isBarangayVisible, [barangay.osm_id]: checked})}
+                                        onSelect={(e) => e.preventDefault()}
+                                    >
+                                        Brgy. {barangay.name}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuGroup>
+                        </div>
+                    )}
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+    );
 
     return (    
         <LayerGroup>
-            
+            <div className="leaflet-top leaflet-right">
+                <div className="leaflet-control leaflet-bar">
+                    {barangayToggleControl}
+                </div>
+            </div>
             {isVisible && barangays.map((barangay, i) => {
                 if (isBarangayVisible[barangay.osm_id]) {
                     return (
