@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -51,6 +53,7 @@ class Personnel extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'first_time_login' => 'boolean',
+            'status' => Status::class,
         ];
     }
 
