@@ -45,5 +45,9 @@ class Meeting extends Model
         return $this->hasMany(MeetingAgenda::class, 'meeting_id');
     }
 
+    public function organizer(): BelongsTo
+    {
+        return $this->belongsTo(Personnel::class, 'organizer_id');
+    }
 
 }

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -70,5 +71,10 @@ class Personnel extends Authenticatable
     public function location(): HasOne
     {
         return $this->hasOne(PersonnelLocation::class, 'id');
+    }
+
+    public function meetingsOrganized(): HasMany
+    {
+        return $this->hasMany(Meeting::class, 'organizer_id');
     }
 }
