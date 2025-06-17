@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class ZoomMeeting extends Model
 {
+    public $timestamps = false;
     protected $fillable = ['meeting_link', 'meeting_id', 'meeting_passcode'];
-
 
     public function meeting(): MorphOne
     {

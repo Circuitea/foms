@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MeetingType extends Model
 {
+    public $timestamps = false;
     protected $fillable = ['name'];
 
     public function meetings(): HasMany

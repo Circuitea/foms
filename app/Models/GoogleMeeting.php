@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class GoogleMeeting extends Model
 {
+    public $timestamps = false;
     protected $fillable = ['meeting_link'];
 
     public function meeting(): MorphOne
