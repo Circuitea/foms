@@ -7,7 +7,7 @@ import { useState, useEffect } from "react"
 import { Users, MapPin, Calendar, Maximize2, AlertTriangle, CheckCircle, X, ChevronLeft, RefreshCw } from "lucide-react"
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet"
 import PersonnelMarkersLayer from "./Mapping/Partials/PersonnelMarkersLayer"
-import SanJuanBoundary from './Mapping/GeoJSON/sanjuan-boundary.json';
+import SanJuanBoundary from './Mapping/sanjuan-boundary.json';
 
 import 'leaflet/dist/leaflet.css';
 
