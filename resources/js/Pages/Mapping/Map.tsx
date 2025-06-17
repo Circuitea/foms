@@ -70,7 +70,7 @@ const personnelData = {
 type Category = keyof typeof personnelData
 type Personnel = (typeof personnelData)[Category][0]
 
-function MapPage() {
+export default function MapPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [prioritizedUser, setPrioritizedUser] = useState<Personnel | null>(null)
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
@@ -406,4 +406,3 @@ function MapPage() {
 
 MapPage.layout = (e: JSX.Element) => <Authenticated children={e} />
 
-export default MapPage

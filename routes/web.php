@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\MapController;
 use App\Http\Controllers\MeetingsController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonnelController;
@@ -21,9 +22,7 @@ Route::get('/map', function () {
 })->middleware(['auth', 'verified'])->name('map');
 
 Route::prefix('map')->middleware(['auth', 'verified'])->group(function() {
-    Route::get('/', function () {
-        return Inertia::render('Mapping/Map');
-    });
+    Route::get('/', [MapController::class, 'index']);
 
     Route::get('/report', function () {
         return Inertia::render('Mapping/Report');

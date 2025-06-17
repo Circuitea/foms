@@ -1,10 +1,11 @@
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, Tooltip, LayersControl } from "react-leaflet";
 import SanJuanBoundary from './sanjuan-boundary.json';
 import { LegacyRef, PropsWithChildren, useState } from "react";
-import PersonnelMarkersLayer from "./PersonnelMarkersLayer";
+import PersonnelMarkersLayer from "./Partials/PersonnelMarkersLayer";
 import 'leaflet/dist/leaflet.css';
 import { Map } from "leaflet";
-import ZoomControl from "./ZoomControl";
+import ZoomControl from "./Partials/ZoomControl";
+import BarangayBoundaries from "./Partials/BarangayBoundaries";
 
 export default function TrackingMap({ ref } : {ref: LegacyRef<Map>}) {
     return (
@@ -20,6 +21,8 @@ export default function TrackingMap({ ref } : {ref: LegacyRef<Map>}) {
                 data={SanJuanBoundary}
                 
             />
+
+            <BarangayBoundaries />
             <PersonnelMarkersLayer />
         </MapContainer>
     );
