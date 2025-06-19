@@ -19,36 +19,7 @@ import { Popover, PopoverTrigger } from "@radix-ui/react-popover"
 import { PopoverContent } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import toast from "@/components/toast"
-
-// Real-time clock hook
-function useRealTimeClock() {
-  
-  const [currentTime, setCurrentTime] = useState(new Date())
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
-
-  const formatDateTime = (date: Date) => {
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    }
-    return date.toLocaleDateString("en-US", options)
-  }
-
-  return formatDateTime(currentTime)
-}
+import { useRealTimeClock } from "@/hooks/use-clock"
 
 export default function NewMeeting({ types, priorityLevels, sections }: PageProps<{ types: MeetingType[], priorityLevels: MeetingPriority[], sections: Section[] }>) {
   const defaultDate = new Date()
