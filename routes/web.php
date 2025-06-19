@@ -40,10 +40,10 @@ Route::prefix('personnel')->middleware(['auth', 'verified'])->group(function () 
     Route::post('/new', [PersonnelController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
 });
 
-Route::prefix('meetings')-> middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', [MeetingsController::class, 'list']);
-    Route::get('/new', [MeetingsController::class, 'new']);
-    Route::post('/new', [MeetingsController::class, 'create']);
+Route::prefix('meetings')->middleware(['auth', 'verified'])->name('meetings.')->group(function () {
+    Route::get('/', [MeetingsController::class, 'list'])->name('list');
+    Route::get('/new', [MeetingsController::class, 'new'])->name('new');
+    Route::post('/new', [MeetingsController::class, 'create'])->name('create')->middleware([HandlePrecognitiveRequests::class]);
 });
 
 Route::prefix('notifications')->middleware(['auth', 'verified'])->group(function() {

@@ -24,89 +24,8 @@ import { ColumnDef } from "@tanstack/react-table"
 import { PageProps, Personnel, Section, Status } from "@/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Select from 'react-select';
+import { toProperCase } from "@/lib/utils"
 
-
-// Updated mock data with new status options
-const mockPersonnel: Personnel[] = [
-  {
-    id: 1,
-    first_name: "John",
-    surname: "Doe",
-    email: "john.doe@cdrrmo.gov.ph",
-    roles: [{ id: 1, name: "Emergency Response Coordinator" }],
-    department: "Operations",
-    status: "On Duty",
-    location: "On-site",
-  },
-  {
-    id: "2",
-    first_name: "Jane",
-    surname: "Smith",
-    email: "jane.smith@cdrrmo.gov.ph",
-    roles: [{ name: "Medical Officer" }],
-    department: "Medical",
-    status: "On Duty",
-    location: "Field",
-  },
-  {
-    id: "3",
-    first_name: "Mike",
-    surname: "Johnson",
-    email: "mike.johnson@cdrrmo.gov.ph",
-    roles: [{ name: "Communications Specialist" }],
-    department: "Communications",
-    status: "On Leave",
-    location: "Remote",
-  },
-  {
-    id: "4",
-    first_name: "Sarah",
-    surname: "Wilson",
-    email: "sarah.wilson@cdrrmo.gov.ph",
-    roles: [{ name: "Logistics Manager" }],
-    department: "Logistics",
-    status: "On-site",
-    location: "On-site",
-  },
-  {
-    id: "5",
-    first_name: "David",
-    surname: "Brown",
-    email: "david.brown@cdrrmo.gov.ph",
-    roles: [{ name: "IT Support" }],
-    department: "IT",
-    status: "Active",
-    location: "On-site",
-  },
-]
-
-// Mock location history data
-const mockLocationHistory: Record<
-  string,
-  Array<{
-    timestamp: string
-    location: string
-    relativePlace: string
-    coordinates?: { lat: number; lng: number }
-  }>
-> = {
-  "1": [
-    { timestamp: "2024-12-01 14:30:00", location: "On-site", relativePlace: "CDRRMO Main Office" },
-    { timestamp: "2024-12-01 12:15:00", location: "Field", relativePlace: "Barangay San Miguel" },
-    { timestamp: "2024-12-01 09:00:00", location: "On-site", relativePlace: "CDRRMO Main Office" },
-    { timestamp: "2024-11-30 16:45:00", location: "Field", relativePlace: "Evacuation Center Alpha" },
-  ],
-  "2": [
-    { timestamp: "2024-12-01 15:00:00", location: "Field", relativePlace: "Medical Station Beta" },
-    { timestamp: "2024-12-01 11:30:00", location: "On-site", relativePlace: "CDRRMO Medical Wing" },
-    { timestamp: "2024-12-01 08:45:00", location: "Field", relativePlace: "Emergency Response Site" },
-  ],
-  "4": [
-    { timestamp: "2024-12-01 14:45:00", location: "On-site", relativePlace: "Logistics Department" },
-    { timestamp: "2024-12-01 10:20:00", location: "Field", relativePlace: "Supply Distribution Point" },
-    { timestamp: "2024-12-01 08:00:00", location: "On-site", relativePlace: "CDRRMO Main Office" },
-  ],
-}
 
 const getStatusColor = (status: Status | null) => {
     if (!status) {
@@ -273,9 +192,6 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
   
   const currentTime = useRealTimeClock()
   const [searchTerm, setSearchTerm] = useState("")
-  const [departmentFilter, setDepartmentFilter] = useState("all")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [showDropdown, setShowDropdown] = useState<string | null>(null)
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false)
   const [showTrackEmployeesModal, setShowTrackEmployeesModal] = useState(false)
   const [newEmployee, setNewEmployee] = useState({
@@ -290,72 +206,11 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
   const [showPersonnelDetailModal, setShowPersonnelDetailModal] = useState(false)
   const [selectedPersonnelForDetail, setSelectedPersonnelForDetail] = useState<Personnel | null>(null)
 
-  const tableData = mockPersonnel
-
-  // Enhanced data with default values
-  const enhancedTableData = tableData.map((person) => ({
-    ...person,
-    department: person.department || "Others",
-    status: person.status || "Active",
-    location: person.location || "On-site",
-  }))
-
-  // Filter data
-  const filteredData = enhancedTableData.filter((person) => {
-    // Search filter
-    let matchesSearch = true
-    if (searchTerm.trim()) {
-      const searchLower = searchTerm.toLowerCase()
-      const fullName = `${person.first_name} ${person.surname || ""}`.toLowerCase()
-      const email = person.email.toLowerCase()
-      const position = person.roles?.[0]?.name?.toLowerCase() || ""
-
-      matchesSearch = fullName.includes(searchLower) || email.includes(searchLower) || position.includes(searchLower)
-    }
-
-    // Department filter
-    const matchesDepartment =
-      departmentFilter === "all" || person.department?.toLowerCase() === departmentFilter.toLowerCase()
-
-    // Status filter
-    const matchesStatus = statusFilter === "all" || person.status?.toLowerCase() === statusFilter.toLowerCase()
-
-    return matchesSearch && matchesDepartment && matchesStatus
-  })
-
-  // Calculate stats with updated logic
   const stats = {
-    total: filteredData.length,
-    active: filteredData.filter((p) => p.status?.toLowerCase() === "active").length,
-    onDuty: filteredData.filter((p) => p.status?.toLowerCase() === "on duty").length,
-    onSite: filteredData.filter((p) => p.status?.toLowerCase() === "on-site").length,
-  }
-
-  // Get unique values for filters
-  const departments = [...new Set(enhancedTableData.map((p) => p.department).filter(Boolean))].sort()
-  const statuses = [...new Set(enhancedTableData.map((p) => p.status).filter(Boolean))].sort()
-
-  // Clear filters
-  const clearFilters = () => {
-    setSearchTerm("")
-    setDepartmentFilter("all")
-    setStatusFilter("all")
-  }
-
-  // Check if filters are active
-  const hasActiveFilters = searchTerm.trim() || departmentFilter !== "all" || statusFilter !== "all"
-
-  // Updated color functions with new statuses
-  const getDepartmentColor = (dept: string) => {
-    const colors: Record<string, string> = {
-      Operations: "bg-blue-100 text-blue-800",
-      Medical: "bg-red-100 text-red-800",
-      Communications: "bg-purple-100 text-purple-800",
-      Logistics: "bg-green-100 text-green-800",
-      IT: "bg-yellow-100 text-yellow-800",
-      Others: "bg-gray-100 text-gray-800",
-    }
-    return colors[dept] || colors["Others"]
+    total: 15,
+    active: 15,
+    onDuty: 15,
+    onSite: 15,
   }
 
   const getStatusColor = (status: string) => {
@@ -380,57 +235,57 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
     return colors[status] || colors["Active"]
   }
 
-  const exportToExcel = () => {
-    const activePersonnel = filteredData.filter((p) => ["Active", "On Duty", "On-site"].includes(p.status || ""))
+  // const exportToExcel = () => {
+  //   const activePersonnel = filteredData.filter((p) => ["Active", "On Duty", "On-site"].includes(p.status || ""))
 
-    const exportData = activePersonnel.map((person) => {
-      const locationHistory = mockLocationHistory[person.id] || []
-      const currentTime = new Date().toLocaleString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-      })
+  //   const exportData = activePersonnel.map((person) => {
+  //     const locationHistory = mockLocationHistory[person.id] || []
+  //     const currentTime = new Date().toLocaleString("en-US", {
+  //       year: "numeric",
+  //       month: "2-digit",
+  //       day: "2-digit",
+  //       hour: "2-digit",
+  //       minute: "2-digit",
+  //       second: "2-digit",
+  //       hour12: true,
+  //     })
 
-      return {
-        "Full Name": `${person.first_name} ${person.surname || ""}`,
-        Position: person.roles?.[0]?.name || "N/A",
-        Department: person.department || "Others",
-        "Current Status": person.status || "Active",
-        "Current Location": person.location || "On-site",
-        "Recent Locations": locationHistory
-          .slice(0, 3)
-          .map((loc) => `${loc.relativePlace} (${loc.timestamp})`)
-          .join("; "),
-        "Total Location Changes": locationHistory.length,
-        "Last Location Update": locationHistory[0]?.timestamp || "No history",
-        "Export Time": currentTime,
-      }
-    })
+  //     return {
+  //       "Full Name": `${person.first_name} ${person.surname || ""}`,
+  //       Position: person.roles?.[0]?.name || "N/A",
+  //       Department: person.department || "Others",
+  //       "Current Status": person.status || "Active",
+  //       "Current Location": person.location || "On-site",
+  //       "Recent Locations": locationHistory
+  //         .slice(0, 3)
+  //         .map((loc) => `${loc.relativePlace} (${loc.timestamp})`)
+  //         .join("; "),
+  //       "Total Location Changes": locationHistory.length,
+  //       "Last Location Update": locationHistory[0]?.timestamp || "No history",
+  //       "Export Time": currentTime,
+  //     }
+  //   })
 
-    // Create CSV content
-    const headers = Object.keys(exportData[0] || {})
-    const csvContent = [
-      headers.join(","),
-      ...exportData.map((row) => headers.map((header) => `"${row[header as keyof typeof row] || ""}"`).join(",")),
-    ].join("\n")
+  //   // Create CSV content
+  //   const headers = Object.keys(exportData[0] || {})
+  //   const csvContent = [
+  //     headers.join(","),
+  //     ...exportData.map((row) => headers.map((header) => `"${row[header as keyof typeof row] || ""}"`).join(",")),
+  //   ].join("\n")
 
-    // Download CSV file
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    const link = document.createElement("a")
-    const url = URL.createObjectURL(blob)
-    link.setAttribute("href", url)
-    link.setAttribute("download", `personnel_tracking_report_${new Date().toISOString().split("T")[0]}.csv`)
-    link.style.visibility = "hidden"
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  //   // Download CSV file
+  //   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+  //   const link = document.createElement("a")
+  //   const url = URL.createObjectURL(blob)
+  //   link.setAttribute("href", url)
+  //   link.setAttribute("download", `personnel_tracking_report_${new Date().toISOString().split("T")[0]}.csv`)
+  //   link.style.visibility = "hidden"
+  //   document.body.appendChild(link)
+  //   link.click()
+  //   document.body.removeChild(link)
 
-    alert(`Exported ${exportData.length} personnel records to CSV file`)
-  }
+  //   alert(`Exported ${exportData.length} personnel records to CSV file`)
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -459,7 +314,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Staff</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                {hasActiveFilters && <p className="text-xs text-gray-500">of {total} total</p>}
+                {/* {hasActiveFilters && <p className="text-xs text-gray-500">of {total} total</p>} */}
               </div>
             </div>
           </div>
@@ -500,50 +355,6 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
             </div>
           </div>
         </div>
-
-        {/* Active Filters */}
-        {/* {hasActiveFilters && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm font-medium text-blue-900">Active Filters:</span>
-                {searchTerm.trim() && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    Search: "{searchTerm}"
-                    <button onClick={() => setSearchTerm("")} className="ml-1 text-blue-600 hover:text-blue-800">
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                )}
-                {departmentFilter !== "all" && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    Department: {departmentFilter}
-                    <button
-                      onClick={() => setDepartmentFilter("all")}
-                      className="ml-1 text-blue-600 hover:text-blue-800"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                )}
-                {statusFilter !== "all" && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    Status: {statusFilter}
-                    <button onClick={() => setStatusFilter("all")} className="ml-1 text-blue-600 hover:text-blue-800">
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={clearFilters}
-                className="px-3 py-1 text-sm text-blue-700 border border-blue-300 rounded-md hover:bg-blue-100"
-              >
-                Clear All
-              </button>
-            </div>
-          </div>
-        )} */}
 
         {/* Controls */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
@@ -616,131 +427,6 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
           </div>
         </div>
 
-        {/* Table */}
-        {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr>
-                  <th className="bg-[#1B2560] text-white px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                    Employee
-                  </th>
-                  <th className="bg-[#1B2560] text-white px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                    Department
-                  </th>
-                  <th className="bg-[#1B2560] text-white px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                    Position
-                  </th>
-                  <th className="bg-[#1B2560] text-white px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="bg-[#1B2560] text-white px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                    Location
-                  </th>
-                  <th className="bg-[#1B2560] text-white px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredData.map((person) => (
-                  <tr key={person.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex flex-col">
-                        <div className="font-medium text-gray-900">
-                          {person.first_name} {person.surname || ""}
-                        </div>
-                        <div className="text-sm text-gray-500">{person.email}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getDepartmentColor(person.department || "Others")}`}
-                      >
-                        {person.department || "Others"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-700">{person.roles?.[0]?.name || "N/A"}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(person.status || "Active")}`}
-                      >
-                        <div className={`w-2 h-2 ${getStatusDot(person.status || "Active")} rounded-full mr-2`}></div>
-                        {person.status || "Active"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-gray-600">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {person.location || "On-site"}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <div className="relative">
-                        <button
-                          onClick={() => setShowDropdown(showDropdown === person.id ? null : person.id)}
-                          className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </button>
-                        {showDropdown === person.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
-                            <div className="py-1">
-                              <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase">Quick Actions</div>
-                              <hr className="my-1" />
-                              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <Eye className="mr-2 h-4 w-4" />
-                                View Profile
-                              </button>
-                              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <Clock className="mr-2 h-4 w-4" />
-                                View Schedule
-                              </button>
-                              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit Details
-                              </button>
-                              <hr className="my-1" />
-                              <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Remove
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {filteredData.length === 0 && (
-            <div className="text-center py-12">
-              <Users className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">
-                {hasActiveFilters ? "No personnel match your filters" : "No personnel found"}
-              </h3>
-              <p className="mt-1 text-sm text-gray-500">
-                {hasActiveFilters
-                  ? "Try adjusting your search criteria or clearing filters."
-                  : "Get started by adding a new staff member."}
-              </p>
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="mt-4 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  Clear All Filters
-                </button>
-              )}
-            </div>
-          )}
-        </div> */}
-
         <DataTable
           columns={columns}
           data={personnel.data}
@@ -750,7 +436,6 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
         <div className="mt-6 flex justify-between items-center">
           <p className="text-sm text-gray-600">
             Showing {personnel.from} to {personnel.to} of {total} results
-            {hasActiveFilters && ` (filtered from ${tableData.length} total)`}
           </p>
           <div className="flex gap-2">
             {personnel.prev_page_url && (
@@ -1110,6 +795,4 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
 
 ListPersonnel.layout = (e: JSX.Element) => <Authenticated children={e} />
 
-function toProperCase(str: string) {
-  return str.split(' ').map((word) => word.slice(0, 1).toUpperCase() + word.slice(1)).join(' ');
-}
+

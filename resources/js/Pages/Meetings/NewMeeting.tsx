@@ -1,17 +1,28 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
-import { ArrowLeft, Calendar, MapPin, Video, Users, Clock } from "lucide-react"
+import { useState, useEffect, FormEventHandler } from "react"
+import { ArrowLeft, MapPin, Video, Users, Clock, ChevronDown, CalendarIcon, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { useForm } from "laravel-precognition-react-inertia"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { PageProps, Section } from "@/types"
+import { MeetingPriority, MeetingType } from "@/types/meetings"
+import { Link } from "@inertiajs/react"
+import { toProperCase } from "@/lib/utils"
+import { Popover, PopoverTrigger } from "@radix-ui/react-popover"
+import { PopoverContent } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import toast from "@/components/toast"
 
 // Real-time clock hook
 function useRealTimeClock() {
+  
   const [currentTime, setCurrentTime] = useState(new Date())
 
   useEffect(() => {
@@ -39,140 +50,60 @@ function useRealTimeClock() {
   return formatDateTime(currentTime)
 }
 
-// Simple select component as fallback
-const SimpleSelect = ({
-  value,
-  onValueChange,
-  children,
-  placeholder,
-}: {
-  value: string
-  onValueChange: (value: string) => void
-  children: React.ReactNode
-  placeholder?: string
-}) => (
-  <select
-    value={value}
-    onChange={(e) => onValueChange(e.target.value)}
-    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-  >
-    {placeholder && <option value="">{placeholder}</option>}
-    {children}
-  </select>
-)
+export default function NewMeeting({ types, priorityLevels, sections }: PageProps<{ types: MeetingType[], priorityLevels: MeetingPriority[], sections: Section[] }>) {
+  const defaultDate = new Date()
+  defaultDate.setSeconds(0);
 
-const SimpleSelectItem = ({ value, children }: { value: string; children: React.ReactNode }) => (
-  <option value={value}>{children}</option>
-)
+  const form = useForm<{
+    title: string,
+    type: number,
+    priority: string,
+    section: number,
+    description: string,
 
-interface NewMeetingProps {
-  onNavigateBack?: () => void
-}
+    meetingFormat: 'in-person' | 'zoom' | 'google-meet'
+    meetingLocation: string,
+    meetingLink: string,
+    meetingID: string,
+    meetingPasscode: string,
 
-export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
-  const [formData, setFormData] = useState({
-    title: "",
-    type: "",
-    priority: "",
-    department: "",
-    location: "",
-    date: "",
-    time: "",
-    duration: "",
-    description: "",
-    meetingFormat: "in-person",
-    meetingLink: "",
-    meetingId: "",
-    passcode: "",
-    sendNotification: true,
-  })
+    sendNotification: boolean,
 
-  const [agenda, setAgenda] = useState<string[]>([""])
+    agendas: string[],
 
-  const addAgendaItem = () => {
-    setAgenda([...agenda, ""])
-  }
+    dateTime: Date,
+    duration: number,
+  }>('post', route('meetings.create'), {
+    title: '',
+    type: 0,
+    priority: '',
+    section: 0,
+    description: '',
 
-  const removeAgendaItem = (index: number) => {
-    if (agenda.length > 1) {
-      setAgenda(agenda.filter((_, i) => i !== index))
-    }
-  }
+    meetingFormat: 'in-person',
+    meetingLocation: '',
+    meetingLink: '',
+    meetingID: '',
+    meetingPasscode: '',
 
-  const updateAgendaItem = (index: number, value: string) => {
-    const newAgenda = [...agenda]
-    newAgenda[index] = value
-    setAgenda(newAgenda)
-  }
+    sendNotification: false,
+
+    agendas: [''],
+
+    dateTime: defaultDate,
+    duration: 60,
+  });
+
+  const [ isDatePickerOpen, setDatePickerOpen ] = useState(false);
 
   const currentDateTime = useRealTimeClock()
-
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const handleBack = () => {
-    if (onNavigateBack) {
-      onNavigateBack()
-    } else {
-      // Fallback navigation
-      window.history.back()
-    }
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // Validate required fields
-    if (
-      !formData.title ||
-      !formData.type ||
-      !formData.priority ||
-      !formData.department ||
-      !formData.date ||
-      !formData.time ||
-      !formData.description
-    ) {
-      alert("Please fill in all required fields.")
-      return
-    }
-
-    // Validate meeting format specific fields
-    if (formData.meetingFormat === "in-person" && !formData.location) {
-      alert("Please enter a meeting location for in-person meetings.")
-      return
-    }
-
-    if (formData.meetingFormat !== "in-person" && !formData.meetingLink) {
-      alert("Please enter a meeting link for virtual meetings.")
-      return
-    }
-
-    // Store the meeting data in localStorage so it persists across page navigation
-    const existingMeetings = JSON.parse(localStorage.getItem("newMeetings") || "[]")
-    const newMeetingData = {
-      ...formData,
-      agenda: agenda.filter((item) => item.trim() !== ""),
-      createdAt: new Date().toISOString(),
-    }
-    existingMeetings.push(newMeetingData)
-    localStorage.setItem("newMeetings", JSON.stringify(existingMeetings))
-
-    // Also try to add to the global function if it exists - pass the complete newMeetingData
-    if ((window as any).addNewMeeting) {
-      ;(window as any).addNewMeeting(newMeetingData)
-    }
-
-    alert(`Meeting "${formData.title}" created successfully!`)
-
-    // Navigate back to list after successful creation
-    handleBack()
-  }
-
-  const handleCancel = () => {
-    if (confirm("Are you sure you want to cancel? All changes will be lost.")) {
-      handleBack()
-    }
+  
+  const submit: FormEventHandler = (e) => {
+    e.preventDefault();
+    form.submit({
+      onFinish: () => form.reset(),
+      onError: (err) => toast('error', 'Submission Error', err),
+    });
   }
 
   return (
@@ -181,13 +112,15 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
       <div className="sticky top-0 z-50 bg-[#1B2560] px-4 md:px-6 py-4 shadow-lg">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10" onClick={handleBack}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Meetings
+            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10" asChild>
+              <Link href='/meetings'>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Meetings
+              </Link>
             </Button>
           </div>
           <div className="text-right">
-            <div className="text-sm font-mono text-white">{currentDateTime}</div>
+            <div className="text-sm font-mono text-white">{currentDateTime} </div>
           </div>
         </div>
         <div className="mt-2 text-sm text-gray-300">CDRRMO Staff Portal › Meetings › Create New Meeting</div>
@@ -197,12 +130,12 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
       <div className="container mx-auto px-4 md:px-6 py-6 max-w-4xl">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold text-[#1B2560] flex items-center gap-2">
-            <Calendar className="w-6 h-6 text-[#1B2560]" />
+            <CalendarIcon className="w-6 h-6 text-[#1B2560]" />
             Create New Meeting
           </h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={submit} className="space-y-6">
           {/* Basic Information */}
           <Card className="border-gray-200 shadow-sm">
             <CardHeader className="bg-gray-50/50">
@@ -220,27 +153,39 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                   <Input
                     id="title"
                     placeholder="Enter meeting title"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange("title", e.target.value)}
+                    value={form.data.title}
+                    onChange={(e) => form.setData("title", e.target.value)}
+                    onBlur={() => form.validate('title')}
                     required
                     className="border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
                   />
+                  {form.invalid("title") && (
+                    <div className="flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <span className="break-words">{form.errors.title}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="type" className="text-gray-700 font-medium">
                     Meeting Type *
                   </Label>
-                  <SimpleSelect
-                    value={formData.type}
-                    onValueChange={(value) => handleInputChange("type", value)}
-                    placeholder="Select type"
-                  >
-                    <SimpleSelectItem value="team-meeting">Team Meeting</SimpleSelectItem>
-                    <SimpleSelectItem value="training">Training Session</SimpleSelectItem>
-                    <SimpleSelectItem value="planning">Planning Meeting</SimpleSelectItem>
-                    <SimpleSelectItem value="briefing">Emergency Briefing</SimpleSelectItem>
-                    <SimpleSelectItem value="drill">Drill Exercise</SimpleSelectItem>
-                  </SimpleSelect>
+                  <Select onValueChange={(newType) => form.setData('type', parseInt(newType))}>
+                    <SelectTrigger className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                      <SelectValue placeholder="Select Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {types.map((type) => (
+                        <SelectItem value={type.id.toString()}>{type.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.invalid("type") && (
+                    <div className="flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <span className="break-words">{form.errors.type}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -249,30 +194,43 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                   <Label htmlFor="priority" className="text-gray-700 font-medium">
                     Priority Level *
                   </Label>
-                  <SimpleSelect
-                    value={formData.priority}
-                    onValueChange={(value) => handleInputChange("priority", value)}
-                    placeholder="Select priority"
-                  >
-                    <SimpleSelectItem value="urgent">🔴 URGENT</SimpleSelectItem>
-                    <SimpleSelectItem value="normal">🔵 NORMAL</SimpleSelectItem>
-                  </SimpleSelect>
+                  <Select onValueChange={(newPriority) => form.setData('priority', newPriority)} defaultValue="">
+                    <SelectTrigger className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                      <SelectValue placeholder="Select Priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {priorityLevels.map((level) => (
+                        <SelectItem value={level}>{toProperCase(level)}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.invalid("priority") && (
+                    <div className="flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <span className="break-words">{form.errors.priority}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="department" className="text-gray-700 font-medium">
-                    Department *
+                    Section *
                   </Label>
-                  <SimpleSelect
-                    value={formData.department}
-                    onValueChange={(value) => handleInputChange("department", value)}
-                    placeholder="Select department"
-                  >
-                    <SimpleSelectItem value="emergency">Emergency Operations</SimpleSelectItem>
-                    <SimpleSelectItem value="admin">Administration</SimpleSelectItem>
-                    <SimpleSelectItem value="community">Community Relations</SimpleSelectItem>
-                    <SimpleSelectItem value="training">Training & Development</SimpleSelectItem>
-                    <SimpleSelectItem value="logistics">Logistics</SimpleSelectItem>
-                  </SimpleSelect>
+                  <Select onValueChange={(newVal) => form.setData('section', parseInt(newVal))}>
+                    <SelectTrigger className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                      <SelectValue placeholder="Select Section" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sections.map((section) => (
+                        <SelectItem value={section.id.toString()}>{section.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.invalid("section") && (
+                    <div className="flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <span className="break-words">{form.errors.section}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -284,12 +242,20 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                   id="description"
                   placeholder="Describe the meeting agenda, objectives, and any preparation required..."
                   rows={4}
-                  value={formData.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
+                  value={form.data.description}
+                  onChange={(e) => form.setData("description", e.target.value)}
+                  onBlur={() => form.validate('description')}
                   required
                   className="border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
                 />
+                {form.invalid("description") && (
+                    <div className="flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <span className="break-words">{form.errors.description}</span>
+                    </div>
+                  )}
               </div>
+              
             </CardContent>
           </Card>
 
@@ -307,11 +273,11 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                      formData.meetingFormat === "in-person"
+                      form.data.meetingFormat === "in-person"
                         ? "border-[#1B2560] bg-[#1B2560]/5 shadow-md"
                         : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
                     }`}
-                    onClick={() => handleInputChange("meetingFormat", "in-person")}
+                    onClick={() => form.setData("meetingFormat", "in-person")}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <MapPin className="w-5 h-5 text-[#1B2560]" />
@@ -322,11 +288,11 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
 
                   <div
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                      formData.meetingFormat === "zoom"
+                      form.data.meetingFormat === "zoom"
                         ? "border-blue-500 bg-blue-50 shadow-md"
                         : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
                     }`}
-                    onClick={() => handleInputChange("meetingFormat", "zoom")}
+                    onClick={() => form.setData("meetingFormat", "zoom")}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Video className="w-5 h-5 text-blue-600" />
@@ -337,11 +303,11 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
 
                   <div
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                      formData.meetingFormat === "google-meet"
+                      form.data.meetingFormat === "google-meet"
                         ? "border-green-500 bg-green-50 shadow-md"
                         : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
                     }`}
-                    onClick={() => handleInputChange("meetingFormat", "google-meet")}
+                    onClick={() => form.setData("meetingFormat", "google-meet")}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Video className="w-5 h-5 text-green-600" />
@@ -352,7 +318,7 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                 </div>
               </div>
 
-              {formData.meetingFormat === "in-person" ? (
+              {form.data.meetingFormat === "in-person" ? (
                 <div className="space-y-2">
                   <Label htmlFor="location" className="text-gray-700 font-medium">
                     Meeting Location *
@@ -360,8 +326,8 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                   <Input
                     id="location"
                     placeholder="Enter physical location"
-                    value={formData.location}
-                    onChange={(e) => handleInputChange("location", e.target.value)}
+                    value={form.data.meetingLocation}
+                    onChange={(e) => form.setData("meetingLocation", e.target.value)}
                     required
                     className="border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
                   />
@@ -374,15 +340,15 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                     </Label>
                     <Input
                       id="meetingLink"
-                      placeholder={`Enter ${formData.meetingFormat === "zoom" ? "Zoom" : "Google Meet"} link`}
-                      value={formData.meetingLink}
-                      onChange={(e) => handleInputChange("meetingLink", e.target.value)}
+                      placeholder={`Enter ${form.data.meetingFormat === "zoom" ? "Zoom" : "Google Meet"} link`}
+                      value={form.data.meetingLink}
+                      onChange={(e) => form.setData("meetingLink", e.target.value)}
                       required
                       className="border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
                     />
                   </div>
 
-                  {formData.meetingFormat === "zoom" && (
+                  {form.data.meetingFormat === "zoom" && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="meetingId" className="text-gray-700 font-medium">
@@ -391,8 +357,8 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                         <Input
                           id="meetingId"
                           placeholder="123 456 7890"
-                          value={formData.meetingId}
-                          onChange={(e) => handleInputChange("meetingId", e.target.value)}
+                          value={form.data.meetingID}
+                          onChange={(e) => form.setData("meetingID", e.target.value)}
                           className="border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
                         />
                       </div>
@@ -403,8 +369,8 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                         <Input
                           id="passcode"
                           placeholder="Meeting passcode"
-                          value={formData.passcode}
-                          onChange={(e) => handleInputChange("passcode", e.target.value)}
+                          value={form.data.meetingPasscode}
+                          onChange={(e) => form.setData("meetingPasscode", e.target.value)}
                           className="border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
                         />
                       </div>
@@ -429,14 +395,30 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                   <Label htmlFor="date" className="text-gray-700 font-medium">
                     Date *
                   </Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => handleInputChange("date", e.target.value)}
-                    required
-                    className="border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
-                  />
+                  <Popover open={isDatePickerOpen} onOpenChange={setDatePickerOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        className="w-full bg-white text-black border-gray-300 focus:border-[#1B2560] focus:ring-[$1B2560] justify-between hover:bg-gray-50"
+                      >
+                        {form.data.dateTime.toDateString()}
+                        <ChevronDown />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar 
+                        mode="single"
+                        selected={form.data.dateTime}
+                        onSelect={(date) => {
+                          const newDate = new Date(form.data.dateTime)
+                          if (date) {
+                            newDate.setMonth(date.getMonth(), date.getDate());
+                          }
+                          form.setData('dateTime', newDate);
+                          setDatePickerOpen(false);
+                        }}  
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="time" className="text-gray-700 font-medium">
@@ -445,8 +427,13 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                   <Input
                     id="time"
                     type="time"
-                    value={formData.time}
-                    onChange={(e) => handleInputChange("time", e.target.value)}
+                    value={form.data.dateTime.toTimeString().slice(0, 5)}
+                    onChange={(e) => {
+                      const [ hours, minutes ] = e.target.value.split(':');
+                      const newDate = new Date(form.data.dateTime);
+                      newDate.setHours(parseInt(hours), parseInt(minutes));
+                      form.setData('dateTime', newDate);
+                    }}
                     required
                     className="border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
                   />
@@ -461,8 +448,8 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                     placeholder="60"
                     min="15"
                     max="480"
-                    value={formData.duration}
-                    onChange={(e) => handleInputChange("duration", e.target.value)}
+                    value={form.data.duration}
+                    onChange={(e) => form.setData("duration", parseInt(e.target.value))}
                     className="border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
                   />
                 </div>
@@ -472,8 +459,8 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                 <input
                   type="checkbox"
                   id="notifications"
-                  checked={formData.sendNotification}
-                  onChange={(e) => handleInputChange("sendNotification", e.target.checked)}
+                  checked={form.data.sendNotification}
+                  onChange={(e) => form.setData("sendNotification", e.target.checked)}
                   className="rounded border-gray-300 text-[#1B2560] focus:ring-[#1B2560]"
                 />
                 <Label htmlFor="notifications" className="text-gray-700">
@@ -487,14 +474,14 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
           <Card className="border-gray-200 shadow-sm">
             <CardHeader className="bg-gray-50/50">
               <CardTitle className="flex items-center gap-2 text-[#1B2560]">
-                <Calendar className="w-5 h-5" />
+                <CalendarIcon className="w-5 h-5" />
                 Meeting Agenda
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div className="space-y-3">
                 <Label className="text-gray-700 font-medium">Agenda Items</Label>
-                {agenda.map((item, index) => (
+                {form.data.agendas.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <span className="bg-[#1B2560] text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium flex-shrink-0">
                       {index + 1}
@@ -502,15 +489,20 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                     <Input
                       placeholder={`Agenda item ${index + 1}`}
                       value={item}
-                      onChange={(e) => updateAgendaItem(index, e.target.value)}
+                      onChange={(e) => {
+                        const agendas = form.data.agendas;
+                        agendas[index] = e.target.value;
+                        form.setData('agendas', agendas);
+                      }}
+                      required
                       className="flex-1 border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
                     />
-                    {agenda.length > 1 && (
+                    {form.data.agendas.length > 1 && (
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => removeAgendaItem(index)}
+                        onClick={() => {form.setData('agendas', form.data.agendas.filter((_, i) => i !== index))}}
                         className="text-red-600 border-red-300 hover:bg-red-50"
                       >
                         Remove
@@ -521,7 +513,7 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={addAgendaItem}
+                  onClick={() => form.setData('agendas', [...form.data.agendas, ''])}
                   className="w-full border-[#1B2560] text-[#1B2560] hover:bg-[#1B2560]/5"
                 >
                   + Add Agenda Item
@@ -535,12 +527,14 @@ export default function NewMeeting({ onNavigateBack }: NewMeetingProps = {}) {
             <Button
               type="button"
               variant="outline"
-              onClick={handleCancel}
               className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              asChild
             >
-              Cancel
+              <Link href='/meetings'>
+                Cancel
+              </Link>
             </Button>
-            <Button type="submit" className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white shadow-sm">
+            <Button disabled={form.processing} type="submit" className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white shadow-sm">
               Create Meeting
             </Button>
           </div>

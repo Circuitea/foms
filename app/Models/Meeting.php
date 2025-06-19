@@ -30,7 +30,7 @@ class Meeting extends Model
         return $this->belongsTo(MeetingType::class, 'type_id');
     }
 
-    public function department(): BelongsTo
+    public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class, 'section_id');
     }
