@@ -24,7 +24,7 @@ const colors = ['#1E90FF', '#FF4136', '#2ECC40', '#FF851B', '#B10DC9', '#FFDC00'
 
 export default function BarangayBoundaries() {
     const { barangays } = usePage<PageProps<{ barangays: Barangay[] }>>().props;
-    const [ isVisible, setVisible ] = useState(true);
+    const [ isVisible, setVisible ] = useState(false);
     const [ isBarangayVisible, setBarangayVisible ]= useState(barangays.reduce<Record<number, boolean>>((col, barangay) => {
         col[barangay.osm_id] = true;
         return col;
@@ -46,7 +46,7 @@ export default function BarangayBoundaries() {
                         onCheckedChange={setVisible}
                         onSelect={(e) => e.preventDefault()}
                     >
-                        Toggle All
+                        {isVisible ? 'Disable' : 'Enable'}
                     </DropdownMenuCheckboxItem>
                     {isVisible && (
                         <div>
