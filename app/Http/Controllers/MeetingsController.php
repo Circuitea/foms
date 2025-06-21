@@ -10,6 +10,7 @@ use App\Models\Meeting;
 use App\Models\MeetingType;
 use App\Models\Section;
 use App\Models\ZoomMeeting;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Inertia\Inertia;
@@ -24,7 +25,6 @@ class MeetingsController extends Controller
         return Inertia::render('Meetings/NewMeeting', [
             'sections' => Section::all(),
             'types' => MeetingType::all(),
-            'priorityLevels' => MeetingPriority::cases(),
         ]);
     }
 
@@ -44,33 +44,42 @@ class MeetingsController extends Controller
         $newMeeting->type()->associate(MeetingType::find($validated['type']));
         $newMeeting->section()->associate(Section::find($validated['section']));;
 
-        if ($validated['meetingFormat'] == 'in-person') {
-            $format = InPersonMeeting::create(['meeting_location' => $validated['meetingLocation']]);
-            $newMeeting->format_type = $format->getMorphClass();
-            $newMeeting->format_id = $format->id;
-        } else if ($validated['meetingFormat'] == 'google-meet') {
-            $format = GoogleMeeting::create(['meeting_link' => $validated['meetingLink']]);
-            $newMeeting->format_type = $format->getMorphClass();
-            $newMeeting->format_id = $format->id;
-        } else if ($validated['meetingFormat'] == 'zoom') {
-            $format = ZoomMeeting::create([
+        
+        $formatClass = Relation::getMorphedModel($validated['meetingFormat']);
+        $format = new $formatClass();
+        
+        if ($validated['meetingFormat'] == 'in_person_meeting') {
+            $format->fill(['meeting_location' => $validated['meetingLocation']]);
+        } else if ($validated['meetingFormat'] == 'google_meeting') {
+            $format->fill(['meeting_link' => $validated['meetingLink']]);
+        } else if ($validated['meetingFormat'] == 'zoom_meeting') {
+            $format->fill([
                 'meeting_link' => $validated['meetingLink'],
                 'meeting_id' => $validated['meetingID'],
                 'meeting_passcode' => $validated['meetingPasscode'],
             ]);
-            $newMeeting->format_type = $format->getMorphClass();
-            $newMeeting->format_id = $format->id;
         }
+        
+        $format->save();
 
+        $newMeeting->format_type = $validated['meetingFormat'];
+        $newMeeting->format_id = $format->id;
+        
         $agendas = collect($validated['agendas'])->map(function (string $agenda, int $index) {
             return ['agenda' => $agenda, 'order' => $index];
         });
-
+        
         $newMeeting->save();
 
         $newMeeting->agendas()->createMany($agendas);
 
-        return redirect("/meetings/");
-        // return response()->json($request->validated());
+        return redirect('/meetings/' . $newMeeting->id);
+    }
+
+    public function show(Request $request, int $id) {
+        $meeting = Meeting::with(['agendas', 'format', 'section', 'type'])->findOrFail($id);
+        return Inertia::render('Meetings/ShowMeeting', [
+            'meeting' => $meeting,
+        ]);
     }
 }

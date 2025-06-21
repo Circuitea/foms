@@ -32,11 +32,11 @@ class NewMeetingRequest extends FormRequest
             'section' => 'required|exists:'.Section::class.',id',
             'description' => 'required|string|max:65535',
             
-            'meetingFormat' => ['required', 'string', Rule::in(['in-person', 'zoom', 'google-meet'])],
-            'meetingLocation' => 'exclude_unless:meetingFormat,in-person',
-            'meetingLink' => 'exclude_if:meetingFormat,in-person',
-            'meetingID' => 'exclude_unless:meetingFormat,zoom|nullable|string',
-            'meetingPasscode' => 'exclude_unless:meetingFormat,zoom|nullable|string',
+            'meetingFormat' => ['required', 'string', Rule::in(['in_person_meeting', 'zoom_meeting', 'google_meeting'])],
+            'meetingLocation' => 'exclude_unless:meetingFormat,in_person_meeting',
+            'meetingLink' => 'exclude_if:meetingFormat,in_person_meeting',
+            'meetingID' => 'exclude_unless:meetingFormat,zoom_meeting|nullable|string',
+            'meetingPasscode' => 'exclude_unless:meetingFormat,zoom_meeting|nullable|string',
 
             'dateTime' => ['required', 'date', Rule::date()->afterToday()],
             'duration' => 'required|numeric|:0',

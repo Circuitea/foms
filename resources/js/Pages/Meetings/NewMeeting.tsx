@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "laravel-precognition-react-inertia"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PageProps, Section } from "@/types"
-import { MeetingPriority, MeetingType } from "@/types/meetings"
+import { MeetingFormatType, MeetingPriority, MeetingType } from "@/types/meetings"
 import { Link } from "@inertiajs/react"
 import { toProperCase } from "@/lib/utils"
 import { Popover, PopoverTrigger } from "@radix-ui/react-popover"
@@ -21,18 +21,18 @@ import { Calendar } from "@/components/ui/calendar"
 import toast from "@/components/toast"
 import { useRealTimeClock } from "@/hooks/use-clock"
 
-export default function NewMeeting({ types, priorityLevels, sections }: PageProps<{ types: MeetingType[], priorityLevels: MeetingPriority[], sections: Section[] }>) {
+export default function NewMeeting({ types, sections }: PageProps<{ types: MeetingType[], sections: Section[] }>) {
   const defaultDate = new Date()
   defaultDate.setSeconds(0);
 
   const form = useForm<{
     title: string,
     type: number,
-    priority: string,
+    priority?: MeetingPriority,
     section: number,
     description: string,
 
-    meetingFormat: 'in-person' | 'zoom' | 'google-meet'
+    meetingFormat: MeetingFormatType
     meetingLocation: string,
     meetingLink: string,
     meetingID: string,
@@ -47,11 +47,10 @@ export default function NewMeeting({ types, priorityLevels, sections }: PageProp
   }>('post', route('meetings.create'), {
     title: '',
     type: 0,
-    priority: '',
     section: 0,
     description: '',
 
-    meetingFormat: 'in-person',
+    meetingFormat: 'in_person_meeting',
     meetingLocation: '',
     meetingLink: '',
     meetingID: '',
@@ -73,6 +72,7 @@ export default function NewMeeting({ types, priorityLevels, sections }: PageProp
     e.preventDefault();
     form.submit({
       onFinish: () => form.reset(),
+      // @ts-ignore
       onError: (err) => toast('error', 'Submission Error', err),
     });
   }
@@ -165,14 +165,13 @@ export default function NewMeeting({ types, priorityLevels, sections }: PageProp
                   <Label htmlFor="priority" className="text-gray-700 font-medium">
                     Priority Level *
                   </Label>
-                  <Select onValueChange={(newPriority) => form.setData('priority', newPriority)} defaultValue="">
+                  <Select onValueChange={(newPriority: MeetingPriority) => form.setData('priority', newPriority)} defaultValue="">
                     <SelectTrigger className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                       <SelectValue placeholder="Select Priority" />
                     </SelectTrigger>
                     <SelectContent>
-                      {priorityLevels.map((level) => (
-                        <SelectItem value={level}>{toProperCase(level)}</SelectItem>
-                      ))}
+                        <SelectItem value='normal'>Normal</SelectItem>
+                        <SelectItem value='urgent'>Urgent</SelectItem>
                     </SelectContent>
                   </Select>
                   {form.invalid("priority") && (
@@ -244,11 +243,11 @@ export default function NewMeeting({ types, priorityLevels, sections }: PageProp
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                      form.data.meetingFormat === "in-person"
+                      form.data.meetingFormat === "in_person_meeting"
                         ? "border-[#1B2560] bg-[#1B2560]/5 shadow-md"
                         : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
                     }`}
-                    onClick={() => form.setData("meetingFormat", "in-person")}
+                    onClick={() => form.setData("meetingFormat", "in_person_meeting")}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <MapPin className="w-5 h-5 text-[#1B2560]" />
@@ -259,11 +258,11 @@ export default function NewMeeting({ types, priorityLevels, sections }: PageProp
 
                   <div
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                      form.data.meetingFormat === "zoom"
+                      form.data.meetingFormat === "zoom_meeting"
                         ? "border-blue-500 bg-blue-50 shadow-md"
                         : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
                     }`}
-                    onClick={() => form.setData("meetingFormat", "zoom")}
+                    onClick={() => form.setData("meetingFormat", "zoom_meeting")}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Video className="w-5 h-5 text-blue-600" />
@@ -274,11 +273,11 @@ export default function NewMeeting({ types, priorityLevels, sections }: PageProp
 
                   <div
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                      form.data.meetingFormat === "google-meet"
+                      form.data.meetingFormat === "google_meeting"
                         ? "border-green-500 bg-green-50 shadow-md"
                         : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
                     }`}
-                    onClick={() => form.setData("meetingFormat", "google-meet")}
+                    onClick={() => form.setData("meetingFormat", "google_meeting")}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Video className="w-5 h-5 text-green-600" />
@@ -289,7 +288,7 @@ export default function NewMeeting({ types, priorityLevels, sections }: PageProp
                 </div>
               </div>
 
-              {form.data.meetingFormat === "in-person" ? (
+              {form.data.meetingFormat === "in_person_meeting" ? (
                 <div className="space-y-2">
                   <Label htmlFor="location" className="text-gray-700 font-medium">
                     Meeting Location *
@@ -311,7 +310,7 @@ export default function NewMeeting({ types, priorityLevels, sections }: PageProp
                     </Label>
                     <Input
                       id="meetingLink"
-                      placeholder={`Enter ${form.data.meetingFormat === "zoom" ? "Zoom" : "Google Meet"} link`}
+                      placeholder={`Enter ${form.data.meetingFormat === "zoom_meeting" ? "Zoom" : "Google Meet"} link`}
                       value={form.data.meetingLink}
                       onChange={(e) => form.setData("meetingLink", e.target.value)}
                       required
@@ -319,7 +318,7 @@ export default function NewMeeting({ types, priorityLevels, sections }: PageProp
                     />
                   </div>
 
-                  {form.data.meetingFormat === "zoom" && (
+                  {form.data.meetingFormat === "zoom_meeting" && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="meetingId" className="text-gray-700 font-medium">

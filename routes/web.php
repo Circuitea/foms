@@ -44,6 +44,7 @@ Route::prefix('meetings')->middleware(['auth', 'verified'])->name('meetings.')->
     Route::get('/', [MeetingsController::class, 'list'])->name('list');
     Route::get('/new', [MeetingsController::class, 'new'])->name('new');
     Route::post('/new', [MeetingsController::class, 'create'])->name('create')->middleware([HandlePrecognitiveRequests::class]);
+    Route::get('/{id}', [MeetingsController::class, 'show'])->name('show');
 });
 
 Route::prefix('notifications')->middleware(['auth', 'verified'])->group(function() {
