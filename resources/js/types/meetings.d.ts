@@ -1,4 +1,4 @@
-import { Section } from ".";
+import { Personnel, Section } from ".";
 
 export interface MeetingType {
     id: number,
@@ -21,6 +21,7 @@ export interface Meeting {
     type: MeetingType,
     priority: MeetingPriority,
     section: Section,
+    organizer: Personnel,
     description: string,
 
     format_type: MeetingFormatType,

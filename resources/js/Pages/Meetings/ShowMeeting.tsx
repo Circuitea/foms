@@ -2,15 +2,21 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useRealTimeClock } from "@/hooks/use-clock"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
+import { toProperCase } from "@/lib/utils"
 import { PageProps } from "@/types"
 import { Meeting } from "@/types/meetings"
-import { Link, usePage } from "@inertiajs/react"
+import { Link } from "@inertiajs/react"
 import { ArrowLeft, Copy, ExternalLink, MapPin, Video } from "lucide-react"
 
 export default function ShowMeeting({ meeting }: PageProps<{ meeting: Meeting }>) {
     const currentDateTime = useRealTimeClock()
 
     const meetingDate = new Date(meeting.schedule);
+
+    const organizerName = toProperCase(meeting.organizer.first_name) + ' ' +
+      (meeting.organizer.middle_name && meeting.organizer.middle_name.charAt(0).toUpperCase() + '. ') +
+      toProperCase(meeting.organizer.surname) + ' ' +
+      (meeting.organizer.name_extension && toProperCase(meeting.organizer.name_extension) + '.');
     
     return (
       <div className="min-h-screen bg-gray-50">
@@ -143,15 +149,15 @@ export default function ShowMeeting({ meeting }: PageProps<{ meeting: Meeting }>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">Organized By</label>
-                    <p className="text-lg">WAITING</p>
+                    <p className="text-lg">{organizerName}</p>
                   </div>
-                  <div>
+                  {/* <div>
                     <label className="text-sm font-medium text-gray-500">Assigned To</label>
                     <p className="text-lg text-[#1B2560]">WAITING</p>
-                  </div>
+                  </div> */}
                   <div>
                     <label className="text-sm font-medium text-gray-500">Status</label>
-                    <span className="px-2 py-1 text-xs bg-[#1B2560]/10 text-[#1B2560] rounded">
+                    <span className="ml-2 px-2 py-1 text-xs bg-[#1B2560]/10 text-[#1B2560] rounded">
                       WAITING
                     </span>
                   </div>
@@ -175,15 +181,6 @@ export default function ShowMeeting({ meeting }: PageProps<{ meeting: Meeting }>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-3">Meeting Agenda</h3>
               <ul className="space-y-2">
-                {/* {meeting.agendas.map((item: string, index: number) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="bg-[#1B2560]/90 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
-                      {index + 1}
-                    </span>
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))} */}
-
                 {meeting.agendas.sort((a, b) => a.order - b.order).map((agenda) => (
                   <li key={agenda.order} className="flex items-start gap-2">
                     <span className="bg-[#1B2560]/90 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
