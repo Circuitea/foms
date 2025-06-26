@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             MeetingTypeSeeder::class,
             RoleSeeder::class,
+            InventoryItemTypeSeeder::class,
         ]);
     }
 }
