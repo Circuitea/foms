@@ -33,7 +33,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->foreignId('personnel_id')->constrained(table: 'personnel_id');
+            $table->foreignId('personnel_id')->constrained(table: 'personnel');
             $table->timestamps();
         });
 
