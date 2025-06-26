@@ -1386,7 +1386,7 @@ const equipmentData: EquipmentItem[] = [
 interface ItemType {
   id: number,
   name: string,
-  count: number,
+  items_count: number,
   icon: string,
 };
 
@@ -3266,7 +3266,7 @@ export default function InventoryIndex({ types }: PageProps<{ types: ItemType[]}
                         </div>
                       </div>
                       <h3 className="text-lg font-bold text-[#1B2560]">{type.name}</h3>
-                      <p className="text-sm text-gray-600 font-medium">{type.count} items</p>
+                      <p className="text-sm text-gray-600 font-medium">{type.items_count} items</p>
                     </div>
                   </div>
                 </Link>
