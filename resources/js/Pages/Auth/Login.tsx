@@ -69,14 +69,6 @@ export default function Login({
               <Label htmlFor="password" className="text-base text-white">
                 Password
               </Label>
-              {canResetPassword && (
-                <Link
-                  href={route("password.request")}
-                  className="text-xs font-medium text-white/80 hover:text-white transition-colors"
-                >
-                  Forgot password?
-                </Link>
-              )}
             </div>
             <Input
               id="password"
@@ -87,21 +79,33 @@ export default function Login({
               autoComplete="current-password"
               placeholder="••••••••"
               onChange={(e) => setData("password", e.target.value)}
-            />
+              />
             <InputError message={errors.password} />
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="remember"
-              name="remember"
-              checked={data.remember}
-              className="border-white/30 data-[state=checked]:bg-white data-[state=checked]:border-white"
-              onCheckedChange={(isChecked) => setData("remember", (isChecked || false) as false)}
-            />
-            <Label htmlFor="remember" className="text-sm font-normal text-white">
-              Remember me
-            </Label>
+          <div className="flex justify-between">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="remember"
+                name="remember"
+                checked={data.remember}
+                className="border-white/30 data-[state=checked]:bg-white data-[state=checked]:border-white"
+                onCheckedChange={(isChecked) => setData("remember", (isChecked || false) as false)}
+                />
+              <Label htmlFor="remember" className="text-sm font-normal text-white">
+                Remember me
+              </Label>
+            </div>
+            {canResetPassword && (
+              <div className="flex justify-end">
+                <Link
+                  href={route("password.request")}
+                  className="text-xs font-medium text-white/80 hover:text-white transition-colors"
+                  >
+                  Forgot password?
+                </Link>
+              </div>
+            )}
           </div>
 
           <Button
