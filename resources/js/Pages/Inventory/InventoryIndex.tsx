@@ -19,6 +19,8 @@ import {
 } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type React from "react"
+import { PageProps } from "@/types"
+import { Link } from "@inertiajs/react"
 
 interface EquipmentItem {
   id: string
@@ -1381,7 +1383,14 @@ const equipmentData: EquipmentItem[] = [
   },
 ]
 
-export default function InventoryIndex() {
+interface ItemType {
+  id: number,
+  name: string,
+  count: number,
+  icon: string,
+};
+
+export default function InventoryIndex({ types }: PageProps<{ types: ItemType[]}>) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterCondition, setFilterCondition] = useState<string>("all")
@@ -3218,7 +3227,7 @@ export default function InventoryIndex() {
 
           <div className="max-w-7xl mx-auto px-6 py-8">
             {/* Categories grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+            {/* <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
               {categories.map((category) => {
                 const categoryCount = equipmentList.filter((item) => item.category === category.id).length
 
@@ -3238,6 +3247,30 @@ export default function InventoryIndex() {
                   </div>
                 )
               })}
+            </div> */}
+
+            <div className={`grid grid-cols-2 md:grid-cols-${types.length/2} gap-6 mb-8`}>
+              {types.map((type) => (
+                <Link
+                  key={type.id}
+                  href="/inventory"
+                >
+                    <div
+                    key={type.id}
+                    className="bg-[#E8F4FD] border-2 border-gray-300 rounded-xl p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-[#1B2560] hover:scale-105"
+                  >
+                    <div className="flex flex-col items-center text-center space-y-3">
+                      <div className="text-[#1B2560] mb-2">
+                        <div className="w-20 h-20 flex items-center justify-center">
+                          <div className="text-4xl text-[#1B2560]">{type.icon}</div>
+                        </div>
+                      </div>
+                      <h3 className="text-lg font-bold text-[#1B2560]">{type.name}</h3>
+                      <p className="text-sm text-gray-600 font-medium">{type.count} items</p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
 
             {/* Search and filter section */}

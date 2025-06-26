@@ -10,7 +10,7 @@ class ItemType extends Model
     protected $table = 'inventory_item_types';
     public $timestamps = false;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'icon'];
 
     public function items(): HasMany
     {
