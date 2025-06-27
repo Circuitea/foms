@@ -5,23 +5,27 @@ import { Users } from "lucide-react" // Import Users component
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ReactNode } from "react"
+import { Link } from "@inertiajs/react"
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  className?: string
-  noData?: ReactNode,
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  className?: string;
+  noData?: ReactNode;
+  getRowHref?: (row: TData) => string | undefined;
 }
 
-export function DataTable<TData, TValue>({ columns, data, className, noData }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, className, noData, getRowHref }: DataTableProps<TData, TValue>) {
   const safeData = Array.isArray(data) ? data : []
   const safeColumns = Array.isArray(columns) ? columns : []
 
   const table = useReactTable({
     data: safeData,
     columns: safeColumns,
+
     getCoreRowModel: getCoreRowModel(),
-  })
+
+});
 
   const headerGroups = table.getHeaderGroups() || []
   const rows = table.getRowModel()?.rows || []
@@ -47,19 +51,30 @@ export function DataTable<TData, TValue>({ columns, data, className, noData }: D
         </TableHeader>
         <TableBody>
           {rows.length > 0 ? (
-            rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className="even:bg-blue-50 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-4 px-6">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            rows.map((row) =>  {
+              const href = getRowHref?.(row.original);
+              const rowContent = (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className={"even:bg-blue-50 border-b border-gray-100 hover:bg-gray-50 " + (href && 'cursor-pointer')}
+                  tabIndex={href ? 0 : undefined}
+                  role={href ? 'link' : undefined}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="px-6 py-4">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+
+              return href ? (
+                <Link href={href} key={row.id} tabIndex={-1} className="contents">
+                  {rowContent}
+                </Link>
+              ) : rowContent;
+            })
           ) : (
             <TableRow className="">
               <TableCell colSpan={safeColumns.length} className="h-32 text-center">

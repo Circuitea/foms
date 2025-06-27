@@ -9,6 +9,7 @@ import Paginator from "@/types/paginator"
 import Item from "@/types/inventory"
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from "@/components/data-table"
+import { Link } from "@inertiajs/react"
 
 interface EquipmentItem {
   id: string
@@ -758,9 +759,9 @@ export default function ListInventory({ items }: PageProps<{ items: Paginator<It
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <button onClick={handleBackToInventory} className="p-2 rounded-full hover:bg-gray-100">
+                <Link href="/inventory" className="p-2 rounded-full hover:bg-gray-100">
                   <ArrowLeft className="w-5 h-5 text-gray-600" />
-                </button>
+                </Link>
                 <h2 className="text-lg font-semibold text-gray-900">
                   {selectedCategory ? categoryNames[selectedCategory] : "All Equipment"}
                 </h2>
@@ -803,13 +804,18 @@ export default function ListInventory({ items }: PageProps<{ items: Paginator<It
 
           {/* Equipment List */}
           <div className="overflow-x-auto">
-            <DataTable columns={columns} data={items.data} noData={(
+            <DataTable
+              columns={columns}
+              data={items.data}
+              noData={(
               <div className="text-center py-12">
                 <Package className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-2 text-sm font-medium text-gray-900">No equipment found</h3>
                 <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
               </div>
-            )} />
+              )}
+              getRowHref={(row) => `/inventory/item/${row.id}`}
+            />
             {/* <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
