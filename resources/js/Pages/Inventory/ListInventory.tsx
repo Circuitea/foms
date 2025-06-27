@@ -80,7 +80,7 @@ const getConditionColor = (condition: string) => {
       default:
         return "bg-gray-100 text-gray-800"
     }
-  }
+}
 
 const columns: ColumnDef<Item>[] = [
   {
