@@ -54,7 +54,8 @@ Route::prefix('notifications')->middleware(['auth', 'verified'])->group(function
 
 Route::prefix('inventory')->middleware(['auth', 'verified'])->group(function() {
     Route::get('/', [InventoryController::class, 'index']);
-    Route::get('/category', [InventoryController::class, 'list']);
+    Route::get('/item/ID');
+    Route::get('/{typeID}', [InventoryController::class, 'list']);
 });
 
 Route::prefix('tasks')->middleware(['auth', 'verified'])->group(function () {

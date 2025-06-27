@@ -3253,7 +3253,7 @@ export default function InventoryIndex({ types }: PageProps<{ types: ItemType[]}
               {types.map((type) => (
                 <Link
                   key={type.id}
-                  href="/inventory"
+                  href={`/inventory/${type.id}`}
                 >
                     <div
                     key={type.id}
