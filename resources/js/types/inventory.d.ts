@@ -3,4 +3,11 @@ export default interface Item {
     name: string;
     description: string;
     imagePath: string;
+    type: ItemType,
 }
+
+export interface ItemType {
+  id: number,
+  name: string,
+  icon: string,
+};

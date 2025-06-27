@@ -21,6 +21,10 @@ import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type React from "react"
 import { PageProps } from "@/types"
 import { Link } from "@inertiajs/react"
+import { DataTable } from "@/components/data-table"
+import { ColumnDef } from "@tanstack/react-table"
+import Item, { ItemType } from "@/types/inventory"
+import Paginator from "@/types/paginator"
 
 interface EquipmentItem {
   id: string
@@ -1383,14 +1387,104 @@ const equipmentData: EquipmentItem[] = [
   },
 ]
 
-interface ItemType {
-  id: number,
-  name: string,
-  items_count: number,
-  icon: string,
-};
+const getConditionColor = (condition: string) => {
+    switch (condition) {
+      case "Excellent":
+        return "bg-green-100 text-green-800"
+      case "Good":
+        return "bg-blue-100 text-blue-800"
+      case "Fair":
+        return "bg-yellow-100 text-yellow-800"
+      case "Poor":
+        return "bg-red-100 text-red-800"
+      case "Unserviceable":
+        return "bg-gray-100 text-gray-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+}
 
-export default function InventoryIndex({ types }: PageProps<{ types: ItemType[]}>) {
+const columns: ColumnDef<Item>[] = [
+  {
+    accessorKey: 'name',
+    header: 'EQUIPMENT',
+    cell: (({ row }) => (
+      <div>
+        <div className="text-sm font-medium text-gray-900">{row.getValue('name')}</div>
+        <div className="text-sm text-gray-500">{row.original.description}</div>
+      </div>
+    ))
+  },
+  {
+    id: 'type',
+    accessorFn: (row) => row.type.name,
+    cell: (({ row }) => (
+      <span className="ml-2 text-sm text-gray-900">
+        {row.original.type.icon} {row.getValue('type')}
+      </span>
+    )),
+  },
+  {
+    id: 'status',
+    header: 'STATUS',
+    accessorFn: () => 10,
+    cell: (({ row }) => (
+      <div className="flex items-center">
+        <CheckCircle className="w-4 h-4 text-green-600" />
+        <span className="ml-2 text-sm text-gray-900">
+          {row.getValue('status')}/10 Available
+        </span>
+      </div>
+    ))
+  },
+  {
+    id: 'quantity',
+    header: 'QUANTITY',
+    accessorFn: () => 10,
+    cell: (({ row }) => (
+      <div className="text-sm text-gray-900">
+        <div>Total: {row.getValue('quantity')}</div>
+        <div className="text-xs text-gray-500">
+          Available: 10 | In Use: 0
+          {/* {item.maintenance > 0 && ` | Maintenance: ${item.maintenance}`} */}
+        </div>
+      </div>
+    ))
+  },
+  {
+    id: 'condition',
+    header: 'CONDITION',
+    cell: (() => (
+      <div className="space-x-1">
+        {['Good', 'Fair', 'Unserviceable'].map((condition) => (
+          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getConditionColor(condition)}`}>
+            {condition}
+          </span>
+        ))}
+      </div>
+    ))
+  },
+  {
+    id: 'location',
+    header: 'LOCATION',
+    accessorFn: () => 'Storage Room A',
+  },
+  {
+    id: 'inspectionDate',
+    header: 'NEXT INSPECTION',
+    accessorFn: () => new Date('1/1/2025'),
+    cell: (({ row }) => {
+      const date = row.getValue('inspectionDate') as Date;
+      return (
+        <span>{date.toDateString()}</span>
+      );
+    }),
+  },
+]
+
+type IndexItemType = ItemType & {items_count: number};
+
+export default function InventoryIndex({ types, items, totalCount }: PageProps<{ types: IndexItemType[], items: Paginator<Item>, totalCount: number }>) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterCondition, setFilterCondition] = useState<string>("all")
@@ -3359,13 +3453,13 @@ export default function InventoryIndex({ types }: PageProps<{ types: ItemType[]}
                     )}
                   </h2>
                   <span className="text-sm text-gray-600">
-                    {filteredEquipment.length} of {equipmentList.length} items
+                    {items.data.length} of {totalCount} items
                   </span>
                 </div>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                {/* <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -3435,24 +3529,20 @@ export default function InventoryIndex({ types }: PageProps<{ types: ItemType[]}
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </table> */}
+                <DataTable
+                  columns={columns}
+                  data={items.data}
+                  noData={(
+                    <div className="text-center py-12">
+                      <Package className="mx-auto h-12 w-12 text-gray-400" />
+                      <h3 className="mt-2 text-sm font-medium text-gray-900">No equipment found</h3>
+                      <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
+                    </div>
+                  )}
+                  getRowHref={(row) => `/inventory/item/${row.id}`}
+                />
               </div>
-
-              {filteredEquipment.length === 0 && (
-                <div className="text-center py-12">
-                  <Package className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No equipment found</h3>
-                  <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
-                </div>
-              )}
-              {filteredEquipment.length > 0 && (
-                <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
-                  <p className="text-sm text-gray-600">
-                    💡 Click on any equipment row to view detailed information, maintenance history, and deployment
-                    records.
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
