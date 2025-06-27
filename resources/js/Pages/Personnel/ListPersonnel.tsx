@@ -25,6 +25,7 @@ import { PageProps, Personnel, Section, Status } from "@/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Select from 'react-select';
 import { toProperCase } from "@/lib/utils"
+import Paginator from "@/types/paginator"
 
 
 const getStatusColor = (status: Status | null) => {
@@ -154,27 +155,13 @@ function useRealTimeClock() {
   return `${formatDate(currentTime)}, ${formatTime(currentTime)}`
 }
 
-interface PersonnelPaginatorProps {
-  data: Personnel[],
-  
-  from: number,
-  to: number,
-  per_page: number,
-  
-  prev_page_url?: string,
-  next_page_url?: string,
-
-  current_page: number,
-  current_page_url: string,
-  first_page_url: string,
-}
 
 interface Option {
   value: number,
   label: string,
 }
 
-export default function ListPersonnel({ personnel, total, sections }: PageProps<{ personnel: PersonnelPaginatorProps, total: number, sections: Section[] }>) {
+export default function ListPersonnel({ personnel, total, sections }: PageProps<{ personnel: Paginator<Personnel>, total: number, sections: Section[] }>) {
   const sectionOptions: Option[] = [
     {value: 0, label: 'All Departments'},
     ...sections.map((section) => {
@@ -430,6 +417,13 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
         <DataTable
           columns={columns}
           data={personnel.data}
+          noData={(
+            <div className="flex flex-col items-center justify-center text-gray-500">
+              <Users className="h-12 w-12 mb-4 text-gray-300" />
+              <p className="text-lg font-medium">No personnel found</p>
+              <p className="text-sm">Add your first team member to get started</p>
+            </div>  
+          )}
         ></DataTable>
 
         {/* Pagination */}

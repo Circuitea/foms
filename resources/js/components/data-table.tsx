@@ -4,14 +4,16 @@ import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tan
 import { Users } from "lucide-react" // Import Users component
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ReactNode } from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   className?: string
+  noData?: ReactNode,
 }
 
-export function DataTable<TData, TValue>({ columns, data, className }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, className, noData }: DataTableProps<TData, TValue>) {
   const safeData = Array.isArray(data) ? data : []
   const safeColumns = Array.isArray(columns) ? columns : []
 
@@ -26,7 +28,7 @@ export function DataTable<TData, TValue>({ columns, data, className }: DataTable
 
   return (
     <div className={className}>
-      <Table className="[&_thead]:bg-[#1B2560]">
+      <Table className="[&_thead]:bg-[#1B2560] divide-y divide-gray-200">
         <TableHeader>
           {headerGroups.map((headerGroup) => (
             <TableRow key={headerGroup.id} className="border-0 hover:bg-[#1B2560]">
@@ -34,7 +36,7 @@ export function DataTable<TData, TValue>({ columns, data, className }: DataTable
                 return (
                   <TableHead
                     key={header.id}
-                    className="text-white font-semibold py-4 px-6 first:rounded-tl-lg last:rounded-tr-lg"
+                    className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
@@ -49,7 +51,7 @@ export function DataTable<TData, TValue>({ columns, data, className }: DataTable
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="border-b border-gray-100 hover:bg-transparent"
+                className="even:bg-blue-50 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="py-4 px-6">
@@ -59,13 +61,13 @@ export function DataTable<TData, TValue>({ columns, data, className }: DataTable
               </TableRow>
             ))
           ) : (
-            <TableRow>
+            <TableRow className="">
               <TableCell colSpan={safeColumns.length} className="h-32 text-center">
-                <div className="flex flex-col items-center justify-center text-gray-500">
-                  <Users className="h-12 w-12 mb-4 text-gray-300" />
-                  <p className="text-lg font-medium">No personnel found</p>
-                  <p className="text-sm">Add your first team member to get started</p>
-                </div>
+              {noData || (
+                  <div className="flex flex-col items-center justify-center text-gray-500">
+                    <p className="text-lg font-medium">No data found</p>
+                  </div>
+              )}
               </TableCell>
             </TableRow>
           )}
