@@ -40,86 +40,97 @@ const getStatusColor = (status: Status | null) => {
     return colors[status];
   }
 
-const columns: ColumnDef<Personnel>[] = [
-  {
-    id: 'employeeInfo',
-    header: 'EMPLOYEE INFO',
-    accessorFn: (row) => `${toProperCase(row.first_name)} ${row.middle_name && row.middle_name.toUpperCase().charAt(0) + "."} ${toProperCase(row.surname)} ${row.name_extension && row.name_extension.toUpperCase() + '.'}`,
-    cell: (({ row }) => (
-      <div>
-        <p className="font-medium text-gray-900">{row.getValue('employeeInfo')}</p>
-        <p className="text-sm text-gray-500">{row.original.email}</p>
-      </div>
-    ))
-  },
-  {
-    id: 'sections',
-    accessorKey: 'sections',
-    header: 'SECTIONS',
-    cell: (props) => props.row.original.sections?.map((section) => (
-      <span>{section.name}</span>
-    ))
-  },
-  {
-    accessorKey: 'roles',
-    header: 'ROLES',
-    cell: (props) => props.row.original.roles?.map((role) => (
-      <span>{role.name}</span>
-    )),
-  },
-  {
-    id: 'status',
-    header: 'STATUS',
-    accessorKey: 'status',
-    cell: ({ row }) => (
-      <div className="px-6 py-4 whitespace-nowrap">
-        <span className={getStatusColor(row.getValue('status')) + ' inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium'}>{row.getValue('status') ? toProperCase(row.getValue('status')) : 'Unavailable'}</span>
-      </div>
-    )
-  },
-  {
-    id: 'location',
-    header: 'LOCATION',
-    accessorFn: () => 'There',
-    cell: (props) => (
-      <div className="flex">
-        <MapPin className="w-4 h-4 mr-1" />
-        <span>{props.row.getValue('location')}</span>
-      </div>
-    )
-  },
-  {
-    id: 'actions',
-    header: 'ACTIONS',
-    cell: (props) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem>
-            <Eye className="h-4 w-4" />
-            View Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Clock className="h-4 w-4" />
-            View Schedule
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Edit className="h-4 w-4" />
-            Edit Details
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Trash2 className="h-4 w-4" />
-            Remove
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    )
-  }
-]
+function getColumnDef(roleLabels: RoleLabels): ColumnDef<Personnel>[] {
+  return [
+    {
+      id: 'employeeInfo',
+      header: 'EMPLOYEE INFO',
+      accessorFn: (row) => `${toProperCase(row.first_name)} ${row.middle_name && row.middle_name.toUpperCase().charAt(0) + "."} ${toProperCase(row.surname)} ${row.name_extension && row.name_extension.toUpperCase() + '.'}`,
+      cell: (({ row }) => (
+        <div>
+          <p className="font-medium text-gray-900">{row.getValue('employeeInfo')}</p>
+          <p className="text-sm text-gray-500">{row.original.email}</p>
+        </div>
+      ))
+    },
+    // {
+    //   id: 'sections',
+    //   accessorKey: 'sections',
+    //   header: 'SECTIONS',
+    //   cell: (props) => props.row.original.sections?.map((section) => (
+    //     <span key={section.id}>{section.name}</span>
+    //   ))
+    // },
+    {
+      accessorKey: 'roles',
+      header: 'ROLES',
+      cell: (props) => (
+        <div className="space-x-1">
+          {props.row.original.roles?.map((role) => (
+            <span
+              key={role.id}
+              className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-200"
+            >
+              {roleLabels[role.name]}
+            </span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: 'status',
+      header: 'STATUS',
+      accessorKey: 'status',
+      cell: ({ row }) => (
+        <div className="whitespace-nowrap">
+          <span className={getStatusColor(row.getValue('status')) + ' inline-flex px-2 py-1 text-xs font-semibold rounded-full'}>{row.getValue('status') ? toProperCase(row.getValue('status')) : 'Unavailable'}</span>
+        </div>
+      )
+    },
+    {
+      id: 'location',
+      header: 'LOCATION',
+      accessorFn: () => 'There',
+      cell: (props) => (
+        <div className="flex">
+          <MapPin className="w-4 h-4 mr-1" />
+          <span>{props.row.getValue('location')}</span>
+        </div>
+      )
+    },
+    {
+      id: 'actions',
+      header: 'ACTIONS',
+      cell: (props) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <Eye className="h-4 w-4" />
+              View Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Clock className="h-4 w-4" />
+              View Schedule
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Edit className="h-4 w-4" />
+              Edit Details
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Trash2 className="h-4 w-4" />
+              Remove
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    }
+  ]
+}
 
 // Real-time clock hook
 function useRealTimeClock() {
@@ -174,7 +185,11 @@ interface Option {
   label: string,
 }
 
-export default function ListPersonnel({ personnel, total, sections }: PageProps<{ personnel: PersonnelPaginatorProps, total: number, sections: Section[] }>) {
+type RoleLabels = {
+  [key: string]: string;
+}
+
+export default function ListPersonnel({ personnel, total, sections, roles }: PageProps<{ personnel: PersonnelPaginatorProps, total: number, sections: Section[], roles: RoleLabels }>) {
   const sectionOptions: Option[] = [
     {value: 0, label: 'All Departments'},
     ...sections.map((section) => {
@@ -428,7 +443,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
         </div>
 
         <DataTable
-          columns={columns}
+          columns={getColumnDef(roles)}
           data={personnel.data}
         ></DataTable>
 

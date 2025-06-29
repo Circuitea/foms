@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell, CheckCheck, ClipboardCheck, LayoutDashboard, LogOut, Map, Phone, Settings, PenIcon as UserPen } from "lucide-react"
+import { Bell, CheckCheck, ClipboardCheck, LayoutDashboard, LogOut, LucideIcon, Map, Phone, Settings, PenIcon as UserPen } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -19,8 +19,16 @@ import { Link, router, usePage } from "@inertiajs/react"
 import { Dialog, DialogContent, DialogFooter, DialogTrigger } from "./ui/dialog"
 import { Button } from "./ui/button"
 import { useState } from "react"
+import { userHasPermission } from "@/lib/utils"
 
-const navItems = [
+interface NavItem {
+  title: string,
+  url: string,
+  icon: LucideIcon,
+  permissions?: RegExp,
+}
+
+const navItems: NavItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
@@ -30,31 +38,37 @@ const navItems = [
     title:"Map",
     url: "/map",
     icon: Map,
+    permissions: /map\.(?:read|\*)/,
   },
   {
     title: "Notification",
     url: "/notifications",
     icon: Bell,
+    permissions: /notifications\.(?:read|\*)/,
   },
   {
     title: "Tasks",
     url: "/tasks",
     icon: CheckCheck,
+    permissions: /tasks\.(?:read|\*)/,
   },
   {
     title: "Meetings",
     url: "/meetings",
     icon: Phone,
+    permissions: /meetings\.(?:read|\*)/,
   },
   {
     title: "Personnel",
     url: "/personnel",
     icon: UserPen,
+    permissions: /personnel\.(?:read|\*)/,
   },
   {
     title: "Inventory",
     url: "/inventory",
     icon: ClipboardCheck,
+    permissions: /inventory\.(?:read|\*)/,
   },
 ]
 
@@ -94,20 +108,28 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-3">
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    className="py-3 px-4 rounded-lg hover:shadow-sm transition-all duration-200"
-                    tooltip={item.title}
-                    asChild
-                  >
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {navItems.map((item) => {
+                const menuItemContent = (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      className="py-3 px-4 rounded-lg hover:shadow-sm transition-all duration-200"
+                      tooltip={item.title}
+                      asChild
+                    >
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+
+                if (!item.permissions) return menuItemContent;
+
+                if (item.permissions && userHasPermission(item.permissions)) {
+                  return menuItemContent;
+                }
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
