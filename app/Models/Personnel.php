@@ -58,10 +58,10 @@ class Personnel extends Authenticatable
         ];
     }
 
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class, 'personnel_role');
-    }
+    // public function roles(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(Role::class, 'personnel_role');
+    // }
 
     public function sections(): BelongsToMany
     {
