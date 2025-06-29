@@ -30,14 +30,14 @@ class CreateRole extends Command
      */
     public function handle()
     {
-        info('Creating a new Role.');
+        // info('Creating a new Role.');
 
-        $name = text('Role name?', required: true);
+        // $name = text('Role name?', required: true);
 
-        $role = Role::create([
-            'name' => $name,
-        ]);
+        // $role = Role::create([
+        //     'name' => $name,
+        // ]);
 
-        outro('Role ' . $role->name . ' (ID:' . $role->id . ') created.');
+        // outro('Role ' . $role->name . ' (ID:' . $role->id . ') created.');
     }
 }
