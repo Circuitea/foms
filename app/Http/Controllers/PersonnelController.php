@@ -46,7 +46,6 @@ class PersonnelController extends Controller
       'password' => Hash::make($validated['password'],),
     ]);
 
-    $personnel->roles()->attach($validated['roles']);
     $personnel->sections()->attach($validated['sections']);
 
     return redirect('/personnel');
