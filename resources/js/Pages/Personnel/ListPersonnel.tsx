@@ -101,7 +101,7 @@ function getColumnDef(roleLabels: RoleLabels): ColumnDef<Personnel>[] {
     {
       id: 'actions',
       header: 'ACTIONS',
-      cell: (props) => (
+      cell: () => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
@@ -117,14 +117,18 @@ function getColumnDef(roleLabels: RoleLabels): ColumnDef<Personnel>[] {
               <Clock className="h-4 w-4" />
               View Schedule
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Edit className="h-4 w-4" />
-              Edit Details
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Trash2 className="h-4 w-4" />
-              Remove
-            </DropdownMenuItem>
+            {userHasPermission(/personnel\.(?:update|\*)/) && (
+              <DropdownMenuItem>
+                <Edit className="h-4 w-4" />
+                Edit Details
+              </DropdownMenuItem>
+            )}
+            {userHasPermission(/personnel\.(?:delete|\*)/) && (
+              <DropdownMenuItem>
+                <Trash2 className="h-4 w-4" />
+                Remove
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -423,13 +427,17 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
 
               {/* Action Buttons */}
               <div className="flex gap-2 flex-shrink-0">
-                <Button
-                  onClick={() => setShowTrackEmployeesModal(true)}
-                  className="bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
-                >
-                  <MapPin className="w-4 h-4" />
-                  Track Employees
-                </Button>
+                
+
+                {userHasPermission(/locations\.(?:read|\*)/) && (
+                  <Button
+                    onClick={() => setShowTrackEmployeesModal(true)}
+                    className="bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    Track Employees
+                  </Button>
+                )}
                 
                 {userHasPermission(/personnel\.(?:create|\*)/) && (
                   <Link
@@ -469,7 +477,8 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
           </div>
         </div>
       </div>
-      {/* Add Employee Modal */}
+
+      {/* Add Employee Modal *}
       {showAddEmployeeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
@@ -609,7 +618,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
         </div>
       )}
 
-      {/* Track Employees Modal */}
+      {/* Track Employees Modal *}
       {showTrackEmployeesModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
@@ -625,7 +634,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
 
             <div className="flex-1 overflow-y-auto p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Map Placeholder */}
+                {/* Map Placeholder *}
                 <div className="bg-gray-100 rounded-lg p-8 flex items-center justify-center min-h-[400px]">
                   <div className="text-center">
                     <MapPin className="mx-auto h-16 w-16 text-gray-400 mb-4" />
@@ -634,7 +643,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
                   </div>
                 </div>
 
-                {/* Employee List */}
+                {/* Employee List *}
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold text-gray-900">Active Personnel Locations</h4>
                   {filteredData
@@ -679,7 +688,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
                 </div>
               </div>
 
-              {/* Quick Stats */}
+              {/* Quick Stats *}
               <div className="mt-6 grid grid-cols-3 gap-4">
                 <div className="bg-green-50 rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-green-600">
@@ -717,7 +726,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
         </div>
       )}
 
-      {/* Personnel Detail Modal */}
+      {/* Personnel Detail Modal *}
       {showPersonnelDetailModal && selectedPersonnelForDetail && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
@@ -737,7 +746,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
-              {/* Current Status */}
+              {/* Current Status *}
               <div className="bg-blue-50 rounded-lg p-4 mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Current Status</h4>
                 <div className="grid grid-cols-2 gap-4">
@@ -762,7 +771,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
                 </div>
               </div>
 
-              {/* Location History */}
+              {/* Location History *}
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4">Recent Location History</h4>
                 <div className="space-y-3">
@@ -806,7 +815,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

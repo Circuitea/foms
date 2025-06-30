@@ -51,6 +51,7 @@ enum PermissionsEnum: string
   case TASKS_REPORT_READ = 'tasks.report.read';
   case TASKS_ALL = 'tasks.*';
   
+  case LOCATIONS_READ = 'locations.read';
   case LOCATIONS_UPDATE = 'locations.update';
   case LOCATIONS_REPORT_READ = 'locations.report.read';
   case LOCATIONS_ALL = 'locations.*';
