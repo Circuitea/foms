@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Personnel;
 use App\PermissionsEnum;
 use App\RolesEnum;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -21,7 +23,11 @@ class RoleSeeder extends Seeder
   {
     app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-    $mapToPermission = fn (PermissionsEnum $permission) => Permission::findOrCreate($permission->value);
+    collect(PermissionsEnum::cases())->each(function (PermissionsEnum $permission) {
+      Permission::findOrCreate($permission->value);
+    });
+
+    $mapToPermission = fn (PermissionsEnum $permission) => Permission::firstWhere('name', $permission->value);
 
     Role::findOrCreate(RolesEnum::PERSONNEL->value)->syncPermissions(collect([
       PermissionsEnum::INVENTORY_READ,
@@ -43,16 +49,39 @@ class RoleSeeder extends Seeder
       PermissionsEnum::INVENTORY_ALL,
     ])->map($mapToPermission));
 
-    // if (app()->environment('production')) {
-    //   return;
-    // }
+    if (app()->environment('production')) return;
     
-    // // $shouldCreateDummyAccounts = confirm(
-    // //   label: 'Do you want to create dummy accounts?',
-    // //   default: false,
-    // //   yes: 'Yes',
-    // //   no: 'No',
-    // //   hint: 'Dummy accounts are only meant for development purposes.',
-    // // );
+    $shouldCreateDummyAccounts = confirm(
+      label: 'Do you want to create dummy accounts?',
+      default: false,
+      yes: 'Yes',
+      no: 'No',
+      hint: 'Dummy accounts are only meant for development purposes.',
+    );
+
+    if (!$shouldCreateDummyAccounts) return;
+
+    $personnel = Personnel::create([
+      'first_name' => 'Personnel',
+      'surname' => 'Account',
+      'email' => 'personnel@example.com',
+      'password' => Hash::make('password'),
+    ]);
+    $itStaff = Personnel::create([
+      'first_name' => 'IT Staff',
+      'surname' => 'Account',
+      'email' => 'itstaff@example.com',
+      'password' => Hash::make('password'),
+    ]);
+    $logisticStaff = Personnel::create([
+      'first_name' => 'Logistic Staff',
+      'surname' => 'Account',
+      'email' => 'logisticstaff@example.com',
+      'password' => Hash::make('password'),
+    ]);
+
+    $personnel->syncRoles([RolesEnum::PERSONNEL]);
+    $itStaff->syncRoles([RolesEnum::PERSONNEL, RolesEnum::IT]);
+    $logisticStaff->syncRoles([RolesEnum::PERSONNEL, RolesEnum::LOGISTIC]);
   }
 }
