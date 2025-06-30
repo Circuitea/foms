@@ -16,8 +16,8 @@ enum RolesEnum: string
             static::ADMIN => 'Administrative Staff Member',
             static::OPERATOR => 'Field Operations Manager / Leader',
             static::LOGISTIC => 'Logistics Department Staff Member',
-            static::IT => 'IT Staff Member',
-            static::PERSONNEL => 'Personnel Staff Member',
+            static::IT => 'IT Department Staff Member',
+            static::PERSONNEL => 'Personnel',
         };
     }
 }
