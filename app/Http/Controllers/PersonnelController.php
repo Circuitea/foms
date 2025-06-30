@@ -15,8 +15,8 @@ use Spatie\Permission\Models\Role;
 
 class PersonnelController extends Controller
 {
-  public function list(Request $request) {
-    Gate::authorize('viewAny', Personnel::class);
+  public function list() {
+    Gate::authorize(PermissionsEnum::PERSONNEL_READ);
 
     return Inertia::render('Personnel/ListPersonnel', [
       'personnel' => fn () => Personnel::with(['sections', 'roles'])->simplePaginate(15),
@@ -27,7 +27,7 @@ class PersonnelController extends Controller
   }
 
   public function new() {
-    Gate::authorize('create', Personnel::class);
+    Gate::authorize(PermissionsEnum::PERSONNEL_CREATE);
 
     $roles = Role::all();
     $sections = Section::all(['id', 'name']);
@@ -39,7 +39,7 @@ class PersonnelController extends Controller
   }
 
   public function create(NewPersonnelRequest $request) {
-    Gate::authorize('create', Personnel::class);
+    Gate::authorize(PermissionsEnum::PERSONNEL_CREATE);
 
     $validated = $request->validated();
 

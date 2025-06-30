@@ -23,11 +23,11 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-            Relation::enforceMorphMap([
-                'in_person_meeting' => 'App\Models\InPersonMeeting',
-                'zoom_meeting' => 'App\Models\ZoomMeeting',
-                'google_meeting' => 'App\Models\GoogleMeeting',
-                'personnel' => 'App\Models\Personnel',
-            ]);
+        Relation::enforceMorphMap([
+            'in_person_meeting' => 'App\Models\InPersonMeeting',
+            'zoom_meeting' => 'App\Models\ZoomMeeting',
+            'google_meeting' => 'App\Models\GoogleMeeting',
+            'personnel' => 'App\Models\Personnel',
+        ]);
     }
 }
