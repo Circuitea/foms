@@ -5,15 +5,18 @@ namespace App\Http\Controllers;
 use App\Http\Requests\NewPersonnelRequest;
 use App\Models\Personnel;
 use App\Models\Section;
+use App\PermissionsEnum;
 use App\RolesEnum;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
 class PersonnelController extends Controller
 {
-  public function list() {
+  public function list(Request $request) {
+    Gate::authorize('viewAny', Personnel::class);
 
     return Inertia::render('Personnel/ListPersonnel', [
       'personnel' => fn () => Personnel::with(['sections', 'roles'])->simplePaginate(15),
@@ -24,6 +27,8 @@ class PersonnelController extends Controller
   }
 
   public function new() {
+    Gate::authorize('create', Personnel::class);
+
     $roles = Role::all();
     $sections = Section::all(['id', 'name']);
 
@@ -34,6 +39,8 @@ class PersonnelController extends Controller
   }
 
   public function create(NewPersonnelRequest $request) {
+    Gate::authorize('create', Personnel::class);
+
     $validated = $request->validated();
 
     $personnel = Personnel::create([
