@@ -24,7 +24,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { PageProps, Personnel, Section, Status } from "@/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Select from 'react-select';
-import { toProperCase } from "@/lib/utils"
+import { toProperCase, userHasPermission } from "@/lib/utils"
 
 
 const getStatusColor = (status: Status | null) => {
@@ -45,7 +45,7 @@ function getColumnDef(roleLabels: RoleLabels): ColumnDef<Personnel>[] {
     {
       id: 'employeeInfo',
       header: 'EMPLOYEE INFO',
-      accessorFn: (row) => `${toProperCase(row.first_name)} ${row.middle_name && row.middle_name.toUpperCase().charAt(0) + "."} ${toProperCase(row.surname)} ${row.name_extension && row.name_extension.toUpperCase() + '.'}`,
+      accessorFn: (row) => `${toProperCase(row.first_name)} ${(row.middle_name && row.middle_name !== null) ? row.middle_name.toUpperCase().charAt(0) + "." : ''} ${toProperCase(row.surname)} ${(row.name_extension && row.name_extension !== null) ? row.name_extension.toUpperCase() + '.' : ''}`,
       cell: (({ row }) => (
         <div>
           <p className="font-medium text-gray-900">{row.getValue('employeeInfo')}</p>
@@ -65,11 +65,11 @@ function getColumnDef(roleLabels: RoleLabels): ColumnDef<Personnel>[] {
       accessorKey: 'roles',
       header: 'ROLES',
       cell: (props) => (
-        <div className="space-x-1">
+        <div className="flex flex-col space-y-2 md:inline md:space-x-2">
           {props.row.original.roles?.map((role) => (
             <span
               key={role.id}
-              className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-200"
+              className="text-center px-2 py-1 md:text-xs font-semibold rounded-xl bg-blue-200"
             >
               {roleLabels[role.name]}
             </span>
@@ -430,13 +430,16 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
                   <MapPin className="w-4 h-4" />
                   Track Employees
                 </Button>
-                <Link
-                  href='/personnel/new'
-                  className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Personnel
-                </Link>
+                
+                {userHasPermission(/personnel\.(?:create|\*)/) && (
+                  <Link
+                    href='/personnel/new'
+                    className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Personnel
+                  </Link>
+                )}
               </div>
             </div>
           </div>
