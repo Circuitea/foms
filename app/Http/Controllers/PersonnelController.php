@@ -29,7 +29,10 @@ class PersonnelController extends Controller
   public function new() {
     Gate::authorize(PermissionsEnum::PERSONNEL_CREATE);
 
-    $roles = Role::all();
+    $roles = Role::all()->map(fn (Role $role) => [
+      'id' => $role->id,
+      'name' => RolesEnum::from($role->name)->label(),
+    ]);
     $sections = Section::all(['id', 'name']);
 
     return Inertia::render('Personnel/NewPersonnel', [

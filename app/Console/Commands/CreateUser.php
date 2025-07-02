@@ -3,11 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Models\Personnel;
-use App\Models\Role;
+use App\RolesEnum;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Role;
 
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\form;
@@ -50,12 +51,19 @@ class CreateUser extends Command implements PromptsForMissingInput
 
         note('Press CTRL+U to go back to the previous field.');
 
+        $roles = Role::all()->map(fn (Role $role) => [
+            'id' => $role->id,
+            'name' => RolesEnum::from($role->name)->label(),
+        ])
+            ->pluck('name', 'id');
+
         $responses = form()
             ->text('First name?', name: 'first_name', required: true)
             ->text('Middle name?', name: 'middle_name')
             ->text('Surname?', name: 'surname', required: true)
             ->text('Name extension?', name: 'name_extension')
             ->text('Email address?', name: 'email', required: true, validate: ['email' => 'unique:'.Personnel::class])
+            ->multiselect('Roles?', name: 'roles', options: $roles)
             ->password('Password?', name: 'password', required: true, validate: ['password' => Password::defaults()])
             ->submit();
 
