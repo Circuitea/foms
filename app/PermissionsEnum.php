@@ -49,6 +49,11 @@ enum PermissionsEnum: string
   case TASKS_UPDATE = 'tasks.update';
   case TASKS_DELETE = 'tasks.delete';
   case TASKS_REPORT_READ = 'tasks.report.read';
+  case TASKS_TEMPLATES_CREATE = 'tasks.templates.create';
+  case TASKS_TEMPLATES_READ = 'tasks.templates.read';
+  case TASKS_TEMPLATES_UPDATE = 'tasks.templates.update';
+  case TASKS_TEMPLATES_DELETE = 'tasks.templates.delete';
+  case TASKS_TEMPLATES_ALL = 'tasks.templates.*';
   case TASKS_ALL = 'tasks.*';
   
   case LOCATIONS_READ = 'locations.read';
