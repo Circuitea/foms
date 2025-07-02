@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
 import { Link } from "@inertiajs/react"
+import { userHasPermission } from "@/lib/utils"
 
 // Meeting data type
 interface Meeting {
@@ -615,9 +616,11 @@ export default function ListMeetings({ onCreateMeeting }: ListMeetingsProps = {}
               <Button variant="ghost" className="text-white hover:bg-white/10" onClick={handleMarkAllRead}>
                 Mark all as read
               </Button>
-              <Button className="bg-white text-[#1B2560] hover:bg-gray-100" asChild>
-                <Link href="/meetings/new">New Meeting</Link>
-              </Button>
+              {userHasPermission(/meetings\.(?:create|\*)/) && (
+                <Button className="bg-white text-[#1B2560] hover:bg-gray-100" asChild>
+                  <Link href="/meetings/new">New Meeting</Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>

@@ -3,25 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\NewMeetingRequest;
-use App\MeetingPriority;
-use App\Models\GoogleMeeting;
-use App\Models\InPersonMeeting;
 use App\Models\Meeting;
 use App\Models\MeetingType;
 use App\Models\Section;
-use App\Models\ZoomMeeting;
+use App\PermissionsEnum;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class MeetingsController extends Controller
 {
     public function list(Request $request) {
+        if (Gate::none([PermissionsEnum::MEETINGS_READ_SELF, PermissionsEnum::MEETINGS_READ])) {
+            abort(403);
+        }
+
         return Inertia::render('Meetings/ListMeetings');
     }
 
     public function new() {
+        Gate::authorize(PermissionsEnum::MEETINGS_CREATE);
+
         return Inertia::render('Meetings/NewMeeting', [
             'sections' => Section::all(),
             'types' => MeetingType::all(),
@@ -29,6 +33,8 @@ class MeetingsController extends Controller
     }
 
     public function create(NewMeetingRequest $request) {
+        Gate::authorize(PermissionsEnum::MEETINGS_CREATE);
+
         $validated = $request->validated();
 
         $newMeeting = new Meeting();
