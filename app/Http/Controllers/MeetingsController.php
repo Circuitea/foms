@@ -20,7 +20,9 @@ class MeetingsController extends Controller
             abort(403);
         }
 
-        return Inertia::render('Meetings/ListMeetings');
+        return Inertia::render('Meetings/ListMeetings', [
+            'meetings' => Meeting::with(['organizer', 'format', 'type', 'section'])->get(),
+        ]);
     }
 
     public function new() {
@@ -43,12 +45,13 @@ class MeetingsController extends Controller
             'title' => $validated['title'],
             'priority' => $validated['priority'],
             'description' => $validated['description'],
-            'schedule' => Date::parse($validated['dateTime'])->format('Y-m-d H:m:s'),
+            'schedule' => Date::createFromFormat('Y-m-d\TH:i:s.v\Z', $validated['dateTime']),
             'duration' => $validated['duration'],
         ]);
 
         $newMeeting->type()->associate(MeetingType::find($validated['type']));
         $newMeeting->section()->associate(Section::find($validated['section']));;
+        $newMeeting->organizer()->associate($request->user());
 
         
         $formatClass = Relation::getMorphedModel($validated['meetingFormat']);

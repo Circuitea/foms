@@ -22,6 +22,7 @@ class Meeting extends Model
     {
         return [
             'priority' => MeetingPriority::class,
+            'schedule' => 'datetime'
         ];
     }
 

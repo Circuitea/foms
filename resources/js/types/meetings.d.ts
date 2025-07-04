@@ -1,4 +1,4 @@
-import { Section } from ".";
+import { Personnel, Section } from ".";
 
 export interface MeetingType {
     id: number,
@@ -35,6 +35,8 @@ export interface Meeting {
     duration: number,
 
     agendas: MeetingAgenda[],
+
+    organizer: Personnel,
 
     created_at: string,
     updated_at: string,
