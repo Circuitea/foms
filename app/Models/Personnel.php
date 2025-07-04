@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Models\Inventory\Transaction;
 use App\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -77,5 +78,10 @@ class Personnel extends Authenticatable
     public function meetingsOrganized(): HasMany
     {
         return $this->hasMany(Meeting::class, 'organizer_id');
+    }
+
+    public function inventoryTransactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'personnel_id');
     }
 }
