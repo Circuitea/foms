@@ -25,7 +25,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import Select from 'react-select';
 import { toProperCase, userHasPermission } from "@/lib/utils"
 import Paginator from "@/types/paginator"
+import { useRealTimeClock } from "@/hooks/use-clock"
 
+type RoleLabels = { [key: string]: string };
 
 const getStatusColor = (status: Status | null) => {
     if (!status) {
@@ -136,46 +138,12 @@ function getColumnDef(roleLabels: RoleLabels): ColumnDef<Personnel>[] {
   ]
 }
 
-// Real-time clock hook
-function useRealTimeClock() {
-  const [currentTime, setCurrentTime] = useState(new Date())
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    })
-  }
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
-  }
-
-  return `${formatDate(currentTime)}, ${formatTime(currentTime)}`
-}
-
-
 interface Option {
   value: number,
   label: string,
 }
 
-export default function ListPersonnel({ personnel, total, sections }: PageProps<{ personnel: Paginator<Personnel>, total: number, sections: Section[] }>) {
+export default function ListPersonnel({ personnel, total, sections, roles }: PageProps<{ personnel: Paginator<Personnel>, total: number, sections: Section[], roles: RoleLabels }>) {
   const sectionOptions: Option[] = [
     {value: 0, label: 'All Departments'},
     ...sections.map((section) => {
@@ -191,21 +159,21 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
     {value: 4, label: 'On Site'},
   ]
   
-  const currentTime = useRealTimeClock()
+  const currentTime = useRealTimeClock  ()
   const [searchTerm, setSearchTerm] = useState("")
-  const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false)
-  const [showTrackEmployeesModal, setShowTrackEmployeesModal] = useState(false)
-  const [newEmployee, setNewEmployee] = useState({
-    first_name: "",
-    surname: "",
-    email: "",
-    department: "",
-    position: "",
-    status: "Active",
-    location: "On-site",
-  })
-  const [showPersonnelDetailModal, setShowPersonnelDetailModal] = useState(false)
-  const [selectedPersonnelForDetail, setSelectedPersonnelForDetail] = useState<Personnel | null>(null)
+  // const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false)
+  // const [showTrackEmployeesModal, setShowTrackEmployeesModal] = useState(false)
+  // const [newEmployee, setNewEmployee] = useState({
+  //   first_name: "",
+  //   surname: "",
+  //   email: "",
+  //   department: "",
+  //   position: "",
+  //   status: "Active",
+  //   location: "On-site",
+  // })
+  // const [showPersonnelDetailModal, setShowPersonnelDetailModal] = useState(false)
+  // const [selectedPersonnelForDetail, setSelectedPersonnelForDetail] = useState<Personnel | null>(null)
 
   const stats = {
     total: 15,
@@ -225,7 +193,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
     return colors[status] || colors["Active"]
   }
 
-  const getStatusDot = (status: string) => {
+  const getStatusDot = (status: string) => {  
     const colors: Record<string, string> = {
       Active: "bg-green-500",
       "On Duty": "bg-blue-500",
