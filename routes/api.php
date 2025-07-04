@@ -13,7 +13,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 Route::post('/login', function (Request $request) {
-    print('test');
     $request->validate([
         'email' => 'required|email',
         'password' => 'required',
