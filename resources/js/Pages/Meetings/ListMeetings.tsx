@@ -11,6 +11,7 @@ import { userHasPermission } from "@/lib/utils"
 import { Meeting } from "@/types/meetings"
 import { PageProps } from "@/types"
 import { useRealTimeClock } from "@/hooks/use-clock"
+import dayjs from "dayjs"
 
 
 export default function ListMeetings({ meetings }: PageProps<{ meetings: Meeting[] }>) {
@@ -553,8 +554,8 @@ export default function ListMeetings({ meetings }: PageProps<{ meetings: Meeting
                   {/* Time and status */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
-                      <span>{new Date(meeting.schedule).toTimeString()}</span>
-                      <span>(TODO: AGO)</span>
+                      <span>{dayjs(meeting.schedule).format('MMM DD, YYYY - hh:mm A')}</span>
+                      <span>({dayjs(meeting.schedule).fromNow()})</span>
                       <span
                         className={`px-2 py-1 rounded text-xs ${
                           meeting.status === "Active" ? "bg-[#1B2560] text-white" : "bg-gray-200 text-gray-700"

@@ -5,12 +5,16 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { configureEcho } from '@laravel/echo-react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 configureEcho({
     broadcaster: 'reverb',
 });
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+dayjs.extend(relativeTime);
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
