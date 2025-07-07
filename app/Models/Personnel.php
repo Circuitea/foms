@@ -33,6 +33,7 @@ class Personnel extends Authenticatable
         'email',
         'mobile_number',
         'password',
+        'profile_picture_filename'
     ];
 
     /**

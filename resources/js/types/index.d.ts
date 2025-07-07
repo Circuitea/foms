@@ -35,6 +35,7 @@ export type PageProps<
     auth: {
         user: Personnel;
         permissions: string[],
+        profilePicture: string,
     };
 };
 

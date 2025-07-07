@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -31,15 +32,20 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
         $permissions = [];
+        $profilePicture = null;
 
         if ($user) {
             $permissions = $user->getAllPermissions()->pluck('name');
+            if ($user->profile_picture_filename !== null) {
+                $profilePicture = Storage::url($user->profile_picture_filename);
+            }
         }
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $user, 
                 'permissions' => $permissions,
+                'profilePicture' => $profilePicture,
             ],
         ];
     }

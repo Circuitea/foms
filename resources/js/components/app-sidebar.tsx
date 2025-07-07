@@ -74,6 +74,7 @@ const navItems: NavItem[] = [
 
 export function AppSidebar() {
   const user = usePage().props.auth.user
+  const profilePicturePath = usePage().props.auth.profilePicture;
   const { open } = useSidebar()
 
   const [ isLogoutDialogOpen, setIsLogoutDialogOpen ] = useState(false);
@@ -89,15 +90,19 @@ export function AppSidebar() {
             <div className="flex flex-col items-center space-y-2 py-4 group-data-[collapsible=icon]:hidden">
               <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                 <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 24 24"> 
-                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                  </div>
+                  {profilePicturePath ? (
+                    <img src={profilePicturePath} className="w-20 h-20 rounded-full" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                      <svg className="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 24 24"> 
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                      </svg>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="text-center">
-                <p className="text-white font-medium text-lg">{user.first_name}</p>
+                <p className="text-white font-medium text-lg">{user.first_name} {user.surname.charAt(0).toUpperCase()}.</p>
                 <p className="text-white/70 text-sm">Admin</p>
               </div>
             </div>

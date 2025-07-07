@@ -2,9 +2,9 @@
 
 namespace App\Rules;
 
-use App\Models\Role;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Spatie\Permission\Models\Role;
 
 class ValidRole implements ValidationRule
 {

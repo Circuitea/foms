@@ -48,12 +48,13 @@ class PersonnelController extends Controller
 
     $personnel = Personnel::create([
       'first_name' => $validated['first_name'],
-      'middle_name' => $validated['middle_name'],
+      'middle_name' => $request->input('middle_name', null),
       'surname' => $validated['surname'],
-      'name_extension' => $validated['name_extension'],
+      'name_extension' => $request->input('name_extension', null),
       'email' => $validated['email'],
       'mobile_number' => $validated['mobile_number'],
-      'password' => Hash::make($validated['password'],),
+      'password' => Hash::make($validated['password']),
+      'profile_picture_filename' => $request->file('profile_picture')->store('profilePictures', 'public'),
     ]);
 
     $personnel->sections()->attach($validated['sections']);

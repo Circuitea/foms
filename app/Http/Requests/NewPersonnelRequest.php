@@ -10,7 +10,7 @@ use App\Rules\ValidSection;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
-
+use Illuminate\Validation\Rules\File;
 
 class NewPersonnelRequest extends FormRequest
 {
@@ -29,9 +29,6 @@ class NewPersonnelRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleIDs = Role::all(['id'])->pluck('id')->toArray();
-        $sectionIDs = Section::all(['id'])->pluck('id')->toArray();
-
         return [
             'surname' => 'required|string|alpha|max:255',
             'first_name' => 'required|string|alpha|max:255',
@@ -42,6 +39,7 @@ class NewPersonnelRequest extends FormRequest
             'roles' => ['required', 'list', new ValidRole],
             'sections' => ['required', 'list', new ValidSection],
             'password' => ['required', Rules\Password::defaults()],
+            'profile_picture' => ['nullable', File::image()->max('100mb')],
         ];
     }
 }
