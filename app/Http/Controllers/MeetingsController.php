@@ -86,7 +86,7 @@ class MeetingsController extends Controller
     }
 
     public function show(Request $request, int $id) {
-        $meeting = Meeting::with(['agendas', 'format', 'section', 'type'])->findOrFail($id);
+        $meeting = Meeting::with(['agendas', 'format', 'section', 'type', 'organizer'])->findOrFail($id);
         return Inertia::render('Meetings/ShowMeeting', [
             'meeting' => $meeting,
         ]);
