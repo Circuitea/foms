@@ -558,10 +558,11 @@ export default function ListMeetings({ meetings }: PageProps<{ meetings: Meeting
                       <span>({dayjs(meeting.schedule).fromNow()})</span>
                       <span
                         className={`px-2 py-1 rounded text-xs ${
-                          meeting.status === "Active" ? "bg-[#1B2560] text-white" : "bg-gray-200 text-gray-700"
+                          meeting.status === "Active" ? "bg-[#1B2560] text-white"
+                          : meeting.status === 'Ongoing' ? "bg-green-400 text-white" : "bg-gray-200 text-gray-700"
                         }`}
                         >
-                        STATUS
+                        {meeting.status}
                       </span>
                     </div>
                     <DropdownMenu>
@@ -572,16 +573,16 @@ export default function ListMeetings({ meetings }: PageProps<{ meetings: Meeting
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         {meeting.status === "Active" && (
-                          <DropdownMenuItem onClick={(e) => handleMarkAsRead(meeting.meetingId, e)}>
+                          <DropdownMenuItem>
                             <Check className="w-4 h-4 mr-2" />
                             Mark as read
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem onClick={(e) => handleJoinMeeting(meeting, e)}>
+                        <DropdownMenuItem>
                           <ExternalLink className="w-4 h-4 mr-2" />
                           Join meeting
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => handleCopyLink(meeting, e)}>
+                        <DropdownMenuItem>
                           <Copy className="w-4 h-4 mr-2" />
                           Copy link
                         </DropdownMenuItem>

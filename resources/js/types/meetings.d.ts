@@ -15,6 +15,8 @@ export interface MeetingAgenda {
 
 export type MeetingFormatType = 'in_person_meeting' | 'zoom_meeting' | 'google_meeting';
 
+export type MeetingStatus = 'Active' | 'Ongoing' | 'Finished';
+
 export interface Meeting {
     id: number,
     title: string,
@@ -22,6 +24,7 @@ export interface Meeting {
     priority: MeetingPriority,
     section: Section,
     description: string,
+    status: MeetingStatus,
 
     format_type: MeetingFormatType,
     format: {
