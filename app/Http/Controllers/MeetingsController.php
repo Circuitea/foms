@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\NewMeetingRequest;
+use App\MeetingStatus;
 use App\Models\Meeting;
 use App\Models\MeetingType;
 use App\Models\Section;
@@ -21,7 +22,8 @@ class MeetingsController extends Controller
         }
 
         return Inertia::render('Meetings/ListMeetings', [
-            'meetings' => Meeting::with(['organizer', 'format', 'type', 'section'])->get(),
+            'activeMeetings' => Meeting::with(['organizer', 'format', 'type', 'section'])->orderBy('schedule')->get()->where('status', '!==', MeetingStatus::FINISHED)->values(),
+            'finishedMeetings' => Meeting::with(['organizer', 'format', 'type', 'section'])->orderBy('schedule', 'desc')->get()->where('status', '===', MeetingStatus::FINISHED)->values(),
         ]);
     }
 
