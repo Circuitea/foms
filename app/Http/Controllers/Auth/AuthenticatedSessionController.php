@@ -33,10 +33,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->user()->first_time_login)  {
-            return redirect('/first-time');
-        }
-
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
