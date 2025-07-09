@@ -25,6 +25,8 @@ import { DataTable } from "@/components/data-table"
 import { ColumnDef } from "@tanstack/react-table"
 import Item, { ItemType } from "@/types/inventory"
 import Paginator from "@/types/paginator"
+import { userHasPermission } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 interface EquipmentItem {
   id: string
@@ -3410,33 +3412,39 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
               </div>
 
               <div className="flex gap-3 mt-4 pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => {
-                    setSelectedItems([])
-                    setShowBulkDeploymentModal(true)
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
-                >
-                  <User className="w-4 h-4" />
-                  Bulk Deployment
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedItems([])
-                    setShowBulkMaintenanceModal(true)
-                  }}
-                  className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center gap-2"
-                >
-                  <Wrench className="w-4 h-4" />
-                  Bulk Maintenance
-                </button>
-                <button
-                  onClick={() => setShowAddItemModal(true)}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Item
-                </button>
+                {userHasPermission(/inventory\.(?:deploy|\*)/) && (
+                  <Button
+                    onClick={() => {
+                      setSelectedItems([])
+                      setShowBulkDeploymentModal(true)
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  >
+                    <User className="w-4 h-4" />
+                    Bulk Deployment
+                  </Button>
+                )}
+                {userHasPermission(/inventory\.(?:maintenance|\*)/) && (
+                  <Button
+                    onClick={() => {
+                      setSelectedItems([])
+                      setShowBulkMaintenanceModal(true)
+                    }}
+                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center gap-2"
+                  >
+                    <Wrench className="w-4 h-4" />
+                    Bulk Maintenance
+                  </Button>
+                )}
+                {userHasPermission(/inventory\.(?:create|\*)/) && (
+                  <Button
+                    onClick={() => setShowAddItemModal(true)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Item
+                  </Button>
+                )}
               </div>
             </div>
 
