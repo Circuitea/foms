@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import toast from "@/components/toast"
-import { Head, Link } from "@inertiajs/react"
+import { Head, Link, router } from "@inertiajs/react"
 import { useForm } from "laravel-precognition-react-inertia"
 import { ArrowLeft, User, Mail, Phone, Lock, Save, Briefcase, AlertCircle } from "lucide-react"
 import { ChangeEvent, useRef, useState, type FormEventHandler, type MouseEventHandler } from "react"
@@ -24,6 +24,7 @@ import CropProfilePicture from "./Partials/CropProfilePicture"
 import Cropper, { Area, Point } from "react-easy-crop"
 import { Slider } from "@/components/ui/slider"
 import getCroppedImage from "@/lib/getCroppedImage"
+import generateRandomPassword from "@/lib/generateRandomPassword"
 
 interface Option {
   value: number
@@ -74,16 +75,10 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
     }
   })
 
-  const generateRandomPassword: MouseEventHandler = (e) => {
+  const handleGeneratePassword: MouseEventHandler = (e) => {
     e.preventDefault()
 
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-    let newPassword = ""
-    const passwordLength = 8
-
-    for (let i = 0; i < passwordLength; i++) {
-      newPassword += charset.charAt(Math.floor(Math.random() * charset.length))
-    }
+    const newPassword = generateRandomPassword();
 
     form.setData("password", newPassword)
   }
@@ -93,7 +88,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
     if (e) e.preventDefault()
 
     form.submit({
-      onSuccess: () => {
+      onSuccess: (response) => {
         // addToast("success", "Success!", "Personnel has been created successfully")
         toast("success", "Success!", "Personnel has been created successfully")
       },
@@ -101,7 +96,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
         // addToast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
         toast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
       },
-      onFinish: () => {
+      onFinish: (visit) => {
         form.reset("password")
       },
     })
@@ -512,7 +507,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                             readOnly
                           />
                         </div>
-                        <Button onClick={generateRandomPassword}>Generate Random Password</Button>
+                        <Button onClick={handleGeneratePassword}>Generate Random Password</Button>
                       </div>
                     </div>
                   </div>
