@@ -17,3 +17,9 @@ export function userHasPermission(permissionCheck: RegExp): boolean {
     return hasPermission || permissionCheck.test(permission);
   }, false);
 }
+
+export function getOrdinalSuffix(n: number) {
+  const suffix = ["th", "st", "nd", "rd"];
+  const lastTwoDigits = n % 100;
+  return n + (suffix[(lastTwoDigits - 20) % 10] || suffix[lastTwoDigits] || suffix[0]);
+}

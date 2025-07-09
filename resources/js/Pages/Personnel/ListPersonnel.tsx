@@ -14,6 +14,7 @@ import {
   Eye,
   Edit,
   Trash2,
+  Import,
 } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { Button } from "@/components/ui/button"
@@ -390,13 +391,22 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
                 )}
                 
                 {userHasPermission(/personnel\.(?:create|\*)/) && (
-                  <Link
-                    href='/personnel/new'
-                    className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Personnel
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link
+                      href='/personnel/new'
+                      className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Personnel
+                    </Link>
+                    <Link
+                      href='/personnel/import'
+                      className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
+                    >
+                      <Import className="w-4 h-4" />
+                      Import Personnel
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>

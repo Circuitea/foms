@@ -8,7 +8,6 @@ use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\PersonnelLocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TasksController;
-use App\Models\PersonnelLocation;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -38,6 +37,8 @@ Route::prefix('personnel')->middleware(['auth', 'verified'])->group(function () 
     Route::get('/', [PersonnelController::class, 'list']);
     Route::get('/new', [PersonnelController::class, 'new']);
     Route::post('/new', [PersonnelController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
+    Route::get('/import', [PersonnelController::class, 'import']);
+    Route::post('/import', [PersonnelController::class, 'add']);
 });
 
 Route::prefix('meetings')->middleware(['auth', 'verified'])->name('meetings.')->group(function () {
