@@ -75,7 +75,6 @@ const navItems: NavItem[] = [
 export function AppSidebar() {
   const user = usePage().props.auth.user
   const profilePicturePath = usePage().props.auth.profilePicture;
-  const { open } = useSidebar()
 
   const [ isLogoutDialogOpen, setIsLogoutDialogOpen ] = useState(false);
   
