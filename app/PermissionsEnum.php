@@ -9,6 +9,7 @@ enum PermissionsEnum: string
   case PERSONNEL_UPDATE = 'personnel.update';
   case PERSONNEL_DELETE = 'personnel.delete';
   case PERSONNEL_DEPLOY = 'personnel.deploy';
+  case PERSONNEL_DEPLOY_ALL = 'personnel.deploy.all';
   case PERSONNEL_STATUS_READ = 'personnel.status.read.';
   case PERSONNEL_STATUS_UPDATE = 'personnel.status.update';
   case PERSONNEL_STATUS_UPDATE_SELF = 'personnel.status.update.self';
