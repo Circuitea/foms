@@ -46,14 +46,20 @@ const columns: ColumnDef<PersonalAccessToken>[] = [
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Revoke Token?</DialogTitle>
-              <DialogDescription>Confirm Personal Access Token Deletion?</DialogDescription>
             </DialogHeader>
-            <p>Are you sure you want to revoke   this Personal Access Token?</p>
+            <div className="grid grid-cols-2 gap-2">
+              <span className="col-span-2 text-center">Are you sure you want to revoke this personal access token?</span>
+              <span className="text-right font-bold">Token Name:</span>
+              <span>{row.getValue('name')}</span>
+              <span className="text-right font-bold">Created At:</span>
+              <span>{dayjs(row.getValue('created_at')).format('YYYY-MM-DD HH:mm')}</span>
+              <span className="text-right font-bold">Token Name:</span>
+              <span>{row.getValue('last_used_at') ? dayjs(row.getValue('last_used_at')).format('YYYY-MM-DD HH:mm') : 'Never'}</span>
+            </div>
+
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button variant="destructive" asChild>
-                <Link href={`/profile/token/${row.original.id}`} method="delete">Confirm</Link>
-              </Button>
+              <Button variant="destructive" onClick={() => {router.delete(`/profile/token/${row.original.id}`, {onFinish: () => setOpen(false)})}}>Confirm</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
