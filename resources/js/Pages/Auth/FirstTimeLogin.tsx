@@ -121,7 +121,7 @@ export default function FirstTimeLogin({ status }: { status?: string }) {
 
         <div className="mt-6 flex items-center justify-end gap-3">
           <Button variant="secondary" disabled={processing} asChild>
-            <Link href={route("login")}>Cancel</Link>
+            <Link href={route("logout")} method="post">Cancel</Link>
           </Button>
 
           <Button
