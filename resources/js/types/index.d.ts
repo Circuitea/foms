@@ -34,6 +34,8 @@ export type PageProps<
 > = T & {
     auth: {
         user: Personnel;
+        permissions: string[],
+        profilePicture: string,
     };
 };
 

@@ -147,7 +147,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                     </SelectTrigger>
                     <SelectContent>
                       {types.map((type) => (
-                        <SelectItem value={type.id.toString()}>{type.name}</SelectItem>
+                        <SelectItem key={type.id} value={type.id.toString()}>{type.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

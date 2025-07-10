@@ -3,25 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\NewMeetingRequest;
-use App\MeetingPriority;
-use App\Models\GoogleMeeting;
-use App\Models\InPersonMeeting;
+use App\MeetingStatus;
 use App\Models\Meeting;
 use App\Models\MeetingType;
 use App\Models\Section;
-use App\Models\ZoomMeeting;
+use App\PermissionsEnum;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class MeetingsController extends Controller
 {
     public function list(Request $request) {
-        return Inertia::render('Meetings/ListMeetings');
+        if (Gate::none([PermissionsEnum::MEETINGS_READ_SELF, PermissionsEnum::MEETINGS_READ])) {
+            abort(403);
+        }
+
+        return Inertia::render('Meetings/ListMeetings', [
+            'activeMeetings' => Meeting::with(['organizer', 'format', 'type', 'section'])->orderBy('schedule')->get()->where('status', '!==', MeetingStatus::FINISHED)->values(),
+            'finishedMeetings' => Meeting::with(['organizer', 'format', 'type', 'section'])->orderBy('schedule', 'desc')->get()->where('status', '===', MeetingStatus::FINISHED)->values(),
+        ]);
     }
 
     public function new() {
+        Gate::authorize(PermissionsEnum::MEETINGS_CREATE);
+
         return Inertia::render('Meetings/NewMeeting', [
             'sections' => Section::all(),
             'types' => MeetingType::all(),
@@ -29,6 +37,8 @@ class MeetingsController extends Controller
     }
 
     public function create(NewMeetingRequest $request) {
+        Gate::authorize(PermissionsEnum::MEETINGS_CREATE);
+
         $validated = $request->validated();
 
         $newMeeting = new Meeting();
@@ -37,13 +47,14 @@ class MeetingsController extends Controller
             'title' => $validated['title'],
             'priority' => $validated['priority'],
             'description' => $validated['description'],
-            'schedule' => Date::parse($validated['dateTime'])->format('Y-m-d H:m:s'),
+            'schedule' => Date::createFromFormat('Y-m-d\TH:i:s.v\Z', $validated['dateTime']),
             'duration' => $validated['duration'],
         ]);
 
         $newMeeting->type()->associate(MeetingType::find($validated['type']));
         $newMeeting->section()->associate(Section::find($validated['section']));;
         $newMeeting->organizer()->associate($request->user());
+
         
         $formatClass = Relation::getMorphedModel($validated['meetingFormat']);
         $format = new $formatClass();

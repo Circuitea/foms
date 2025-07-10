@@ -23,6 +23,7 @@ class FirstTimeLoginController extends Controller
         ]);
 
         $request->user()->update([
+            'first_time_login' => 0,
             'password' => Hash::make($validated['password']),
         ]);
 

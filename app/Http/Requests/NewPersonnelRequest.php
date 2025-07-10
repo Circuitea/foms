@@ -10,7 +10,7 @@ use App\Rules\ValidSection;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
-
+use Illuminate\Validation\Rules\File;
 
 class NewPersonnelRequest extends FormRequest
 {
@@ -29,19 +29,27 @@ class NewPersonnelRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleIDs = Role::all(['id'])->pluck('id')->toArray();
-        $sectionIDs = Section::all(['id'])->pluck('id')->toArray();
-
         return [
-            'surname' => 'required|string|alpha|max:255',
-            'first_name' => 'required|string|alpha|max:255',
-            'middle_name' => 'nullable|string|alpha|max:255',
-            'name_extension' => 'nullable|string|alpha|max:255',
+            'surname' => 'required|string|regex:/^[A-Za-z\\s]+$/|max:255',
+            'first_name' => 'required|string|regex:/^[A-Za-z\\s]+$/|max:255',
+            'middle_name' => 'nullable|string|regex:/^[A-Za-z\\s]+$/|max:255',
+            'name_extension' => 'nullable|string|regex:/^[A-Za-z\\s]+$/|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.Personnel::class,
             'mobile_number' => 'nullable|string|size:10',
             'roles' => ['required', 'list', new ValidRole],
             'sections' => ['required', 'list', new ValidSection],
             'password' => ['required', Rules\Password::defaults()],
+            'profile_picture' => ['nullable', File::image()->max('100mb')],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'first_name.regex' => 'The :attribute must only contain alphabetic characters and/or a whitespace',
+            'middle_name.regex' => 'The :attribute must only contain alphabetic characters and/or a whitespace',
+            'surname.regex' => 'The :attribute must only contain alphabetic characters and/or a whitespace',
+            'name_extension.regex' => 'The :attribute must only contain alphabetic characters and/or a whitespace',
         ];
     }
 }

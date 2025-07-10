@@ -14,7 +14,7 @@ import {
   Eye,
   Edit,
   Trash2,
-  User,
+  Import,
 } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { Button } from "@/components/ui/button"
@@ -24,8 +24,11 @@ import { ColumnDef } from "@tanstack/react-table"
 import { PageProps, Personnel, Section, Status } from "@/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Select from 'react-select';
-import { toProperCase } from "@/lib/utils"
+import { toProperCase, userHasPermission } from "@/lib/utils"
+import Paginator from "@/types/paginator"
+import { useRealTimeClock } from "@/hooks/use-clock"
 
+type RoleLabels = { [key: string]: string };
 
 const getStatusColor = (status: Status | null) => {
     if (!status) {
@@ -40,133 +43,100 @@ const getStatusColor = (status: Status | null) => {
     return colors[status];
   }
 
-const columns: ColumnDef<Personnel>[] = [
-  {
-    id: 'employeeInfo',
-    header: 'EMPLOYEE INFO',
-    accessorFn: (row) => `${toProperCase(row.first_name)} ${row.middle_name && row.middle_name.toUpperCase().charAt(0) + "."} ${toProperCase(row.surname)} ${row.name_extension && row.name_extension.toUpperCase() + '.'}`,
-    cell: (({ row }) => (
-      <div>
-        <p className="font-medium text-gray-900">{row.getValue('employeeInfo')}</p>
-        <p className="text-sm text-gray-500">{row.original.email}</p>
-      </div>
-    ))
-  },
-  {
-    id: 'sections',
-    accessorKey: 'sections',
-    header: 'SECTIONS',
-    cell: (props) => props.row.original.sections?.map((section) => (
-      <span>{section.name}</span>
-    ))
-  },
-  {
-    accessorKey: 'roles',
-    header: 'ROLES',
-    cell: (props) => props.row.original.roles?.map((role) => (
-      <span>{role.name}</span>
-    )),
-  },
-  {
-    id: 'status',
-    header: 'STATUS',
-    accessorKey: 'status',
-    cell: ({ row }) => (
-      <div className="px-6 py-4 whitespace-nowrap">
-        <span className={getStatusColor(row.getValue('status')) + ' inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium'}>{row.getValue('status') ? toProperCase(row.getValue('status')) : 'Unavailable'}</span>
-      </div>
-    )
-  },
-  {
-    id: 'location',
-    header: 'LOCATION',
-    accessorFn: () => 'There',
-    cell: (props) => (
-      <div className="flex">
-        <MapPin className="w-4 h-4 mr-1" />
-        <span>{props.row.getValue('location')}</span>
-      </div>
-    )
-  },
-  {
-    id: 'actions',
-    header: 'ACTIONS',
-    cell: (props) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem>
-            <Eye className="h-4 w-4" />
-            View Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Clock className="h-4 w-4" />
-            View Schedule
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Edit className="h-4 w-4" />
-            Edit Details
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Trash2 className="h-4 w-4" />
-            Remove
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    )
-  }
-]
-
-// Real-time clock hook
-function useRealTimeClock() {
-  const [currentTime, setCurrentTime] = useState(new Date())
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    })
-  }
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
-  }
-
-  return `${formatDate(currentTime)}, ${formatTime(currentTime)}`
-}
-
-interface PersonnelPaginatorProps {
-  data: Personnel[],
-  
-  from: number,
-  to: number,
-  per_page: number,
-  
-  prev_page_url?: string,
-  next_page_url?: string,
-
-  current_page: number,
-  current_page_url: string,
-  first_page_url: string,
+function getColumnDef(roleLabels: RoleLabels): ColumnDef<Personnel>[] {
+  return [
+    {
+      id: 'employeeInfo',
+      header: 'EMPLOYEE INFO',
+      accessorFn: (row) => `${toProperCase(row.first_name)} ${(row.middle_name && row.middle_name !== null) ? row.middle_name.toUpperCase().charAt(0) + "." : ''} ${toProperCase(row.surname)} ${(row.name_extension && row.name_extension !== null) ? row.name_extension.toUpperCase() + '.' : ''}`,
+      cell: (({ row }) => (
+        <div>
+          <p className="font-medium text-gray-900">{row.getValue('employeeInfo')}</p>
+          <p className="text-sm text-gray-500">{row.original.email}</p>
+        </div>
+      ))
+    },
+    // {
+    //   id: 'sections',
+    //   accessorKey: 'sections',
+    //   header: 'SECTIONS',
+    //   cell: (props) => props.row.original.sections?.map((section) => (
+    //     <span key={section.id}>{section.name}</span>
+    //   ))
+    // },
+    {
+      accessorKey: 'roles',
+      header: 'ROLES',
+      cell: (props) => (
+        <div className="flex flex-col space-y-2 md:inline md:space-x-2">
+          {props.row.original.roles?.map((role) => (
+            <span
+              key={role.id}
+              className="text-center px-2 py-1 md:text-xs font-semibold rounded-xl bg-blue-200"
+            >
+              {roleLabels[role.name]}
+            </span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: 'status',
+      header: 'STATUS',
+      accessorKey: 'status',
+      cell: ({ row }) => (
+        <div className="whitespace-nowrap">
+          <span className={getStatusColor(row.getValue('status')) + ' inline-flex px-2 py-1 text-xs font-semibold rounded-full'}>{row.getValue('status') ? toProperCase(row.getValue('status')) : 'Unavailable'}</span>
+        </div>
+      )
+    },
+    {
+      id: 'location',
+      header: 'LOCATION',
+      accessorFn: () => 'There',
+      cell: (props) => (
+        <div className="flex">
+          <MapPin className="w-4 h-4 mr-1" />
+          <span>{props.row.getValue('location')}</span>
+        </div>
+      )
+    },
+    {
+      id: 'actions',
+      header: 'ACTIONS',
+      cell: () => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <Eye className="h-4 w-4" />
+              View Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Clock className="h-4 w-4" />
+              View Schedule
+            </DropdownMenuItem>
+            {userHasPermission(/personnel\.(?:update|\*)/) && (
+              <DropdownMenuItem>
+                <Edit className="h-4 w-4" />
+                Edit Details
+              </DropdownMenuItem>
+            )}
+            {userHasPermission(/personnel\.(?:delete|\*)/) && (
+              <DropdownMenuItem>
+                <Trash2 className="h-4 w-4" />
+                Remove
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    }
+  ]
 }
 
 interface Option {
@@ -174,7 +144,7 @@ interface Option {
   label: string,
 }
 
-export default function ListPersonnel({ personnel, total, sections }: PageProps<{ personnel: PersonnelPaginatorProps, total: number, sections: Section[] }>) {
+export default function ListPersonnel({ personnel, total, sections, roles }: PageProps<{ personnel: Paginator<Personnel>, total: number, sections: Section[], roles: RoleLabels }>) {
   const sectionOptions: Option[] = [
     {value: 0, label: 'All Departments'},
     ...sections.map((section) => {
@@ -190,21 +160,21 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
     {value: 4, label: 'On Site'},
   ]
   
-  const currentTime = useRealTimeClock()
+  const currentTime = useRealTimeClock  ()
   const [searchTerm, setSearchTerm] = useState("")
-  const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false)
-  const [showTrackEmployeesModal, setShowTrackEmployeesModal] = useState(false)
-  const [newEmployee, setNewEmployee] = useState({
-    first_name: "",
-    surname: "",
-    email: "",
-    department: "",
-    position: "",
-    status: "Active",
-    location: "On-site",
-  })
-  const [showPersonnelDetailModal, setShowPersonnelDetailModal] = useState(false)
-  const [selectedPersonnelForDetail, setSelectedPersonnelForDetail] = useState<Personnel | null>(null)
+  // const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false)
+  // const [showTrackEmployeesModal, setShowTrackEmployeesModal] = useState(false)
+  // const [newEmployee, setNewEmployee] = useState({
+  //   first_name: "",
+  //   surname: "",
+  //   email: "",
+  //   department: "",
+  //   position: "",
+  //   status: "Active",
+  //   location: "On-site",
+  // })
+  // const [showPersonnelDetailModal, setShowPersonnelDetailModal] = useState(false)
+  // const [selectedPersonnelForDetail, setSelectedPersonnelForDetail] = useState<Personnel | null>(null)
 
   const stats = {
     total: 15,
@@ -224,7 +194,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
     return colors[status] || colors["Active"]
   }
 
-  const getStatusDot = (status: string) => {
+  const getStatusDot = (status: string) => {  
     const colors: Record<string, string> = {
       Active: "bg-green-500",
       "On Duty": "bg-blue-500",
@@ -408,28 +378,51 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
 
               {/* Action Buttons */}
               <div className="flex gap-2 flex-shrink-0">
-                <Button
-                  onClick={() => setShowTrackEmployeesModal(true)}
-                  className="bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
-                >
-                  <MapPin className="w-4 h-4" />
-                  Track Employees
-                </Button>
-                <Link
-                  href='/personnel/new'
-                  className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Personnel
-                </Link>
+                
+
+                {userHasPermission(/locations\.(?:read|\*)/) && (
+                  <Button
+                    onClick={() => setShowTrackEmployeesModal(true)}
+                    className="bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    Track Employees
+                  </Button>
+                )}
+                
+                {userHasPermission(/personnel\.(?:create|\*)/) && (
+                  <div className="flex gap-2">
+                    <Link
+                      href='/personnel/new'
+                      className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Personnel
+                    </Link>
+                    <Link
+                      href='/personnel/import'
+                      className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
+                    >
+                      <Import className="w-4 h-4" />
+                      Import Personnel
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         <DataTable
-          columns={columns}
+          columns={getColumnDef(roles)}
           data={personnel.data}
+          noData={(
+            <div className="flex flex-col items-center justify-center text-gray-500">
+              <Users className="h-12 w-12 mb-4 text-gray-300" />
+              <p className="text-lg font-medium">No personnel found</p>
+              <p className="text-sm">Add your first team member to get started</p>
+            </div>  
+          )}
         ></DataTable>
 
         {/* Pagination */}
@@ -451,7 +444,8 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
           </div>
         </div>
       </div>
-      {/* Add Employee Modal */}
+
+      {/* Add Employee Modal *}
       {showAddEmployeeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
@@ -591,7 +585,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
         </div>
       )}
 
-      {/* Track Employees Modal */}
+      {/* Track Employees Modal *}
       {showTrackEmployeesModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
@@ -607,7 +601,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
 
             <div className="flex-1 overflow-y-auto p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Map Placeholder */}
+                {/* Map Placeholder *}
                 <div className="bg-gray-100 rounded-lg p-8 flex items-center justify-center min-h-[400px]">
                   <div className="text-center">
                     <MapPin className="mx-auto h-16 w-16 text-gray-400 mb-4" />
@@ -616,7 +610,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
                   </div>
                 </div>
 
-                {/* Employee List */}
+                {/* Employee List *}
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold text-gray-900">Active Personnel Locations</h4>
                   {filteredData
@@ -661,7 +655,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
                 </div>
               </div>
 
-              {/* Quick Stats */}
+              {/* Quick Stats *}
               <div className="mt-6 grid grid-cols-3 gap-4">
                 <div className="bg-green-50 rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-green-600">
@@ -699,7 +693,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
         </div>
       )}
 
-      {/* Personnel Detail Modal */}
+      {/* Personnel Detail Modal *}
       {showPersonnelDetailModal && selectedPersonnelForDetail && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
@@ -719,7 +713,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
-              {/* Current Status */}
+              {/* Current Status *}
               <div className="bg-blue-50 rounded-lg p-4 mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Current Status</h4>
                 <div className="grid grid-cols-2 gap-4">
@@ -744,7 +738,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
                 </div>
               </div>
 
-              {/* Location History */}
+              {/* Location History *}
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4">Recent Location History</h4>
                 <div className="space-y-3">
@@ -788,7 +782,7 @@ export default function ListPersonnel({ personnel, total, sections }: PageProps<
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

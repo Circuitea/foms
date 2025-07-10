@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import toast from "@/components/toast"
-import { Head, Link } from "@inertiajs/react"
+import { Head, Link, router } from "@inertiajs/react"
 import { useForm } from "laravel-precognition-react-inertia"
 import { ArrowLeft, User, Mail, Phone, Lock, Save, Briefcase, AlertCircle } from "lucide-react"
-import { useRef, useState, type FormEventHandler, type MouseEventHandler } from "react"
+import { ChangeEvent, useRef, useState, type FormEventHandler, type MouseEventHandler } from "react"
 import Select from "react-select"
 import type { PageProps, Role, Section } from "@/types"
 import {
@@ -20,6 +20,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import CropProfilePicture from "./Partials/CropProfilePicture"
+import Cropper, { Area, Point } from "react-easy-crop"
+import { Slider } from "@/components/ui/slider"
+import getCroppedImage from "@/lib/getCroppedImage"
+import generateRandomPassword from "@/lib/generateRandomPassword"
 
 interface Option {
   value: number
@@ -29,19 +34,18 @@ interface Option {
 export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Role[]; sections: Section[] }>) {
   const form = useForm<{
     first_name: string
-    middle_name: string
+    middle_name?: string
     surname: string
-    name_extension: string
+    name_extension?: string
     email: string
-    mobile_number: string
+    mobile_number?: string
     roles: number[]
     sections: number[]
     password: string
+    profile_picture?: File
   }>("post", "/personnel/new", {
     first_name: "",
-    middle_name: "",
     surname: "",
-    name_extension: "",
     email: "",
     mobile_number: "",
     roles: [],
@@ -52,6 +56,9 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
   form.setValidationTimeout(3000)
 
   const [isConfirmDialogOpen, setConfirmDialogOpen] = useState(false)
+  const [isCropDialogOpen, setCropDialogOpen] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string>('');
+  const imageFilename = useRef('');
   const formRef = useRef<HTMLFormElement>(null)
 
   const roleOptions: Option[] = roles.map((role) => {
@@ -68,26 +75,20 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
     }
   })
 
-  const generateRandomPassword: MouseEventHandler = (e) => {
+  const handleGeneratePassword: MouseEventHandler = (e) => {
     e.preventDefault()
 
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-    let newPassword = ""
-    const passwordLength = 8
-
-    for (let i = 0; i < passwordLength; i++) {
-      newPassword += charset.charAt(Math.floor(Math.random() * charset.length))
-    }
+    const newPassword = generateRandomPassword();
 
     form.setData("password", newPassword)
   }
 
   // Form submission with validation
-  const submit: FormEventHandler = (e) => {
-    e.preventDefault()
+  const submit: FormEventHandler = (e?) => {
+    if (e) e.preventDefault()
 
     form.submit({
-      onSuccess: () => {
+      onSuccess: (response) => {
         // addToast("success", "Success!", "Personnel has been created successfully")
         toast("success", "Success!", "Personnel has been created successfully")
       },
@@ -95,10 +96,42 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
         // addToast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
         toast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
       },
-      onFinish: () => {
+      onFinish: (visit) => {
         form.reset("password")
       },
     })
+  }
+
+  const onFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const imageDataURL = await readUploadedImageFile(file);
+      imageFilename.current = file.name;
+      setImageSrc(imageDataURL);
+      setCropDialogOpen(true);
+    }
+  }
+
+  const readUploadedImageFile = (file: File) => {
+    return new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {if(reader.result && typeof reader.result === 'string') resolve(reader.result)}, false);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const [crop, setCrop] = useState<Point>({ x: 0, y: 0});
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [croppedArea, setCroppedArea] = useState<Area>();
+
+  const getCroppedProfilePicture = async () => {
+    if (!croppedArea) return;
+    const cropped = await getCroppedImage(imageSrc, croppedArea, rotation);
+
+    if (!cropped) return;
+    form.setData('profile_picture', new File([cropped], imageFilename.current));
+    setCropDialogOpen(false);
   }
 
   return (
@@ -147,24 +180,82 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                 <div className="lg:col-span-3">
                   <div className="space-y-3">
                     <Label className="text-sm font-medium text-gray-700">Employee Photo</Label>
-                    <div className="flex flex-col items-center">
-                      <div className="w-40 h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-4 hover:border-blue-400 transition-colors cursor-pointer">
-                        <div className="text-center">
-                          <User className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-500 font-medium">Upload Photo</p>
-                          <p className="text-xs text-gray-400">Click to browse</p>
+                    <label htmlFor="profilePicture" className="flex flex-col items-center cursor-pointer">
+                      {form.data.profile_picture ? (
+                        <img src={URL.createObjectURL(form.data.profile_picture)} />
+                      ) : (
+                        <div className="w-40 h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-4 hover:border-blue-400 transition-colors">
+                          <div className="text-center">
+                            <User className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                            <p className="text-sm text-gray-500 font-medium">Upload Photo</p>
+                            <p className="text-xs text-gray-400">Click to browse</p>
+                          </div>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                  <input
+                    id="profilePicture"
+                    name="profilePicture"
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={onFileChange}
+                  />
+                  <div className="rounded-lg border border-input bg-background shadow-sm text-center w-full">
+                    {form.data.profile_picture ? form.data.profile_picture.name : 'No image uploaded'}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    JPG, PNG up to 2MB
+                    <br />
+                    Recommended: 400x400px
+                  </p>
+                  <Dialog open={isCropDialogOpen} onOpenChange={setCropDialogOpen}>
+                    <DialogContent className="max-w-xl">
+                      <DialogHeader>
+                        <DialogTitle>Crop Profile Picture</DialogTitle>
+                      </DialogHeader>
+                      <div>                        
+                        <div className="relative h-96 w-full">
+                          {imageSrc && <Cropper
+                            image={imageSrc}
+                            crop={crop}
+                            zoom={zoom}
+                            rotation={rotation}
+                            aspect={1}
+                            onCropChange={setCrop}
+                            onZoomChange={setZoom}
+                            onCropComplete={(_, croppedPixels) => setCroppedArea(croppedPixels)}
+                          />}
+                        </div>
+                        <div className="p-4 grid grid-cols-4 grid-rows-2 gap-2">
+                          <span>Zoom</span>
+                          <Slider
+                            defaultValue={[1]}
+                            min={1}
+                            max={3}
+                            step={0.1}
+                            value={[zoom]}
+                            onValueChange={(newZoom) => setZoom(newZoom[0])}
+                            className="col-span-3"
+                          />
+                          <span>Rotation</span>
+                          <Slider
+                            defaultValue={[0]}
+                            min={0}
+                            max={360}
+                            step={1}
+                            value={[rotation]}
+                            onValueChange={(newRotation) => setRotation(newRotation[0])}
+                            className="col-span-3"
+                          />
                         </div>
                       </div>
-                      <Button type="button" variant="outline" size="sm" className="w-full">
-                        Choose File
-                      </Button>
-                      <p className="text-xs text-gray-500 mt-2 text-center">
-                        JPG, PNG up to 2MB
-                        <br />
-                        Recommended: 400x400px
-                      </p>
-                    </div>
-                  </div>
+                      <DialogFooter>
+                        <Button onClick={getCroppedProfilePicture}>CROP</Button>
+                      </DialogFooter>
+                    </DialogContent> 
+                  </Dialog>
                 </div>
 
                 {/* Name Fields */}
@@ -416,7 +507,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                             readOnly
                           />
                         </div>
-                        <Button onClick={generateRandomPassword}>Generate Random Password</Button>
+                        <Button onClick={handleGeneratePassword}>Generate Random Password</Button>
                       </div>
                     </div>
                   </div>
@@ -572,7 +663,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                         type="submit"
                         className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white"
                         onClick={() => {
-                          formRef.current?.submit()
+                          submit()
                           setConfirmDialogOpen(false)
                         }}
                       >

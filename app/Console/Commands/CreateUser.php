@@ -3,11 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Models\Personnel;
-use App\Models\Role;
+use App\RolesEnum;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Role;
 
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\form;
@@ -46,21 +47,15 @@ class CreateUser extends Command implements PromptsForMissingInput
         // $newUser->roles()->attach($roleID);
         // $newUser->save();
 
-        
-        if (Role::doesntExist()) {
-            // error('No Roles found. Please create a Role before creating new Personnel.');
-            // return 1;
-
-            $this->fail('No Roles found. Please create a Role before creating new Personnel.');
-        }
-        
         info('Creating a new Personnel.');
 
-        $roles = Role::all()->keyBy('id')->map(function (Role $role) {
-            return $role->name;
-        });
-        
         note('Press CTRL+U to go back to the previous field.');
+
+        $roles = Role::all()->map(fn (Role $role) => [
+            'id' => $role->id,
+            'name' => RolesEnum::from($role->name)->label(),
+        ])
+            ->pluck('name', 'id');
 
         $responses = form()
             ->text('First name?', name: 'first_name', required: true)
@@ -68,7 +63,7 @@ class CreateUser extends Command implements PromptsForMissingInput
             ->text('Surname?', name: 'surname', required: true)
             ->text('Name extension?', name: 'name_extension')
             ->text('Email address?', name: 'email', required: true, validate: ['email' => 'unique:'.Personnel::class])
-            ->multiselect('Roles?', name: 'roles', required: true, options: $roles)
+            ->multiselect('Roles?', name: 'roles', options: $roles)
             ->password('Password?', name: 'password', required: true, validate: ['password' => Password::defaults()])
             ->submit();
 
@@ -81,8 +76,6 @@ class CreateUser extends Command implements PromptsForMissingInput
             'password' => Hash::make($responses['password']),
         ]);
 
-        $personnel->roles()->attach($responses['roles']);
-        
         $personnel->save();
         
         outro('User ' . $responses['first_name'] . '(ID:' . $personnel->id . ') created.');

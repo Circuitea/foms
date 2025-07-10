@@ -5,18 +5,14 @@ import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { toProperCase } from "@/lib/utils"
 import { PageProps } from "@/types"
 import { Meeting } from "@/types/meetings"
-import { Link } from "@inertiajs/react"
+import { Link, usePage } from "@inertiajs/react"
+import dayjs from "dayjs"
 import { ArrowLeft, Copy, ExternalLink, MapPin, Video } from "lucide-react"
 
 export default function ShowMeeting({ meeting }: PageProps<{ meeting: Meeting }>) {
     const currentDateTime = useRealTimeClock()
 
-    const meetingDate = new Date(meeting.schedule);
-
-    const organizerName = toProperCase(meeting.organizer.first_name) + ' ' +
-      (meeting.organizer.middle_name && meeting.organizer.middle_name.charAt(0).toUpperCase() + '. ') +
-      toProperCase(meeting.organizer.surname) + ' ' +
-      (meeting.organizer.name_extension && toProperCase(meeting.organizer.name_extension) + '.');
+    const meetingDate = dayjs(meeting.schedule);
     
     return (
       <div className="min-h-screen bg-gray-50">
@@ -45,20 +41,17 @@ export default function ShowMeeting({ meeting }: PageProps<{ meeting: Meeting }>
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span
-                  className={`px-3 py-1 text-xs font-bold text-white rounded ${meeting.priority === "urgent" ? "bg-red-600 animate-pulse" : "bg-[#1B2560]/95"}`}
+                  className={`px-3 py-1 text-xs font-bold rounded ${meeting.priority === "urgent" ? "bg-red-600 animate-pulse text-white" : "bg-white/95 text-black"}`}
                 >
                   {meeting.priority.toUpperCase()}
                 </span>
                 <span className="bg-[#1B2560]/90 text-white px-3 py-1 text-xs font-bold rounded">
                   {meeting.type.name}
                 </span>
-                <span className="bg-[#1B2560]/80 text-white px-3 py-1 text-xs rounded">
-                  ID: {meeting.id}
-                </span>
               </div>
               <div className="text-right text-sm">
-                <div>{meetingDate.toDateString()}</div>
-                <div>{meetingDate.toTimeString()}</div>
+                <div>{meetingDate.format('MMMM DD, YYYY')}</div>
+                <div>{meetingDate.format('hh:mm A')} ({meetingDate.fromNow()})</div>
               </div>
             </div>
             <h2 className="text-xl font-bold">{meeting.title}</h2>
@@ -75,7 +68,7 @@ export default function ShowMeeting({ meeting }: PageProps<{ meeting: Meeting }>
                       {meeting.format_type === "in_person_meeting" ? (
                         <>
                           <MapPin className="w-4 h-4 text-[#1B2560]" />
-                          <span className="text-lg">In-Person Meeting</span>
+                          <span className="text-lg">{meeting.format.meeting_location}</span>
                         </>
                       ) : meeting.format_type === "zoom_meeting" ? (
                         <>
@@ -149,16 +142,14 @@ export default function ShowMeeting({ meeting }: PageProps<{ meeting: Meeting }>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">Organized By</label>
-                    <p className="text-lg">{organizerName}</p>
+                    <p className="text-lg">{meeting.organizer.first_name} {meeting.organizer.middle_name && meeting.organizer.middle_name.charAt(1) + "."} {meeting.organizer.surname}</p>
                   </div>
-                  {/* <div>
-                    <label className="text-sm font-medium text-gray-500">Assigned To</label>
-                    <p className="text-lg text-[#1B2560]">WAITING</p>
-                  </div> */}
                   <div>
                     <label className="text-sm font-medium text-gray-500">Status</label>
-                    <span className="ml-2 px-2 py-1 text-xs bg-[#1B2560]/10 text-[#1B2560] rounded">
-                      WAITING
+                    <span className={`mx-2 px-2 py-1 text-xs rounded ${meeting.status === "Active" ? "bg-[#1B2560] text-white"
+                      : meeting.status === 'Ongoing' ? "bg-green-400 text-white" : "bg-gray-200 text-gray-700"}`
+                    }>
+                      {meeting.status}
                     </span>
                   </div>
                 </div>
