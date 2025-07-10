@@ -7,6 +7,7 @@ import { useState, useEffect } from "react"
 import { Users } from "lucide-react"
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm"
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm"
+import ListPersonalAccessTokens from "./Partials/ListPersonalAccessTokens"
 
 export default function Edit({ mustVerifyEmail, status }: PageProps<{ mustVerifyEmail: boolean; status?: string }>) {
   const [currentTime, setCurrentTime] = useState("")
@@ -65,6 +66,10 @@ export default function Edit({ mustVerifyEmail, status }: PageProps<{ mustVerify
 
           <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
             <UpdatePasswordForm />
+          </div>
+
+          <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
+            <ListPersonalAccessTokens />
           </div>
         </div>
       </div>

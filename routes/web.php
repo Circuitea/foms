@@ -5,7 +5,6 @@ use App\Http\Controllers\MapController;
 use App\Http\Controllers\MeetingsController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonnelController;
-use App\Http\Controllers\PersonnelLocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TasksController;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
@@ -15,13 +14,13 @@ use Inertia\Inertia;
 Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
-    })->middleware(['auth', 'verified'])->name('dashboard');
+    })->name('dashboard');
 
     Route::get('/map', function () {
         return Inertia::render('Mapping/Map');
-    })->middleware(['auth', 'verified'])->name('map');
+    })->name('map');
 
-    Route::prefix('map')->middleware(['auth', 'verified'])->group(function() {
+    Route::prefix('map')->group(function() {
         Route::get('/', [MapController::class, 'index']);
 
         Route::get('/report', function () {
@@ -32,9 +31,8 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
             return Inertia::render('Mapping/Presentation');
         });
     });
-    Route::post('location', [PersonnelLocationController::class, 'store']);
 
-    Route::prefix('personnel')->middleware(['auth', 'verified'])->group(function () {
+    Route::prefix('personnel')->group(function () {
         Route::get('/', [PersonnelController::class, 'list']);
         Route::get('/new', [PersonnelController::class, 'new']);
         Route::post('/new', [PersonnelController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
@@ -42,32 +40,32 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::post('/import', [PersonnelController::class, 'add']);
     });
 
-    Route::prefix('meetings')->middleware(['auth', 'verified'])->name('meetings.')->group(function () {
+    Route::prefix('meetings')->name('meetings.')->group(function () {
         Route::get('/', [MeetingsController::class, 'list'])->name('list');
         Route::get('/new', [MeetingsController::class, 'new'])->name('new');
         Route::post('/new', [MeetingsController::class, 'create'])->name('create')->middleware([HandlePrecognitiveRequests::class]);
         Route::get('/{id}', [MeetingsController::class, 'show'])->name('show');
     });
 
-    Route::prefix('notifications')->middleware(['auth', 'verified'])->group(function() {
+    Route::prefix('notifications')->group(function() {
         Route::get('/', [NotificationsController::class, 'list']);
         Route::get('/{id}', [NotificationsController::class, 'show']);
     });
 
-    Route::prefix('inventory')->middleware(['auth', 'verified'])->group(function() {
+    Route::prefix('inventory')->group(function() {
         Route::get('/', [InventoryController::class, 'index']);
         Route::get('/item/ID');
         Route::get('/{typeID}', [InventoryController::class, 'list']);
     });
 
-    Route::prefix('tasks')->middleware(['auth', 'verified'])->group(function () {
+    Route::prefix('tasks')->group(function () {
         Route::get('/', [TasksController::class, 'new']);
     });
 
     Route::middleware('auth')->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::delete('/profile/token/{id}', [ProfileController::class, 'revokeToken']);
     });
 });
 

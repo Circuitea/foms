@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Personnel;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,5 +32,7 @@ class AppServiceProvider extends ServiceProvider
             'google_meeting' => 'App\Models\GoogleMeeting',
             'personnel' => 'App\Models\Personnel',
         ]);
+
+        Gate::define('revoke-token', fn (Personnel $user, PersonalAccessToken $token) => $token->tokenable()->is($user));
     }
 }
