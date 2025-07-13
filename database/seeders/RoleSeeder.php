@@ -81,30 +81,35 @@ class RoleSeeder extends Seeder
       'surname' => 'Account',
       'email' => 'personnel@example.com',
       'password' => Hash::make('password'),
+      'first_time_login' => false,
     ]);
     $itStaff = Personnel::create([
       'first_name' => 'IT Staff',
       'surname' => 'Account',
       'email' => 'itstaff@example.com',
       'password' => Hash::make('password'),
+      'first_time_login' => false,
     ]);
     $logisticStaff = Personnel::create([
       'first_name' => 'Logistic Staff',
       'surname' => 'Account',
       'email' => 'logisticstaff@example.com',
       'password' => Hash::make('password'),
+      'first_time_login' => false,
     ]);
     $operator = Personnel::create([
       'first_name' => 'Field Operators',
       'surname' => 'Account',
       'email' => 'operator@example.com',
       'password' => Hash::make('password'),
+      'first_time_login' => false,
     ]);
     $admin = Personnel::create([
       'first_name' => 'Administrative Staff',
       'surname' => 'Account',
       'email' => 'admin@example.com',
       'password' => Hash::make('password'),
+      'first_time_login' => false,
     ]);
 
     $personnel->syncRoles([RolesEnum::PERSONNEL]);

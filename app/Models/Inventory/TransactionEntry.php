@@ -2,6 +2,7 @@
 
 namespace App\Models\Inventory;
 
+use App\Models\Task\Task;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -23,5 +24,10 @@ class TransactionEntry extends Model
     public function condition(): BelongsTo
     {
         return $this->belongsTo(ItemCondition::class, 'condition_id');
+    }
+
+    public function task(): BelongsTo
+    {
+        return $this->belongsTo(Task::class, 'task_id');
     }
 }

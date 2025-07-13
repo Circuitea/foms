@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Models\Inventory\Transaction;
+use App\Models\Task\Task;
 use App\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -36,7 +37,6 @@ class Personnel extends Authenticatable
         'password',
         'profile_picture_filename',
         'first_time_login',
-
     ];
 
     /**
@@ -87,5 +87,10 @@ class Personnel extends Authenticatable
     public function inventoryTransactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'personnel_id');
+    }
+
+    public function assignedTasks(): BelongsToMany
+    {
+        return $this->belongsToMany(Task::class, 'personnel_task');
     }
 }
