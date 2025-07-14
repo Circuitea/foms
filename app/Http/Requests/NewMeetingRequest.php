@@ -39,7 +39,7 @@ class NewMeetingRequest extends FormRequest
             'meetingPasscode' => 'exclude_unless:meetingFormat,zoom_meeting|nullable|string',
 
             'dateTime' => ['required', 'date', Rule::date()->afterToday()],
-            'duration' => 'required|numeric|:0',
+            'duration' => 'required|numeric|gte:0',
 
             'sendNotification' => 'required|boolean',
 
