@@ -471,14 +471,12 @@ export default function ListMeetings({ activeMeetings, finishedMeetings }: PageP
       </div> */}
 
       <Tabs defaultValue="active">
-        <TabsList className="bg-white border-b w-full">
-              {[{name: 'Active Meetings', value: 'active', count: activeMeetings.length}, {name: 'Finished Meetings', value: 'finished', count: finishedMeetings.length}].map((tab)=> (
-                <div className="py-10 px-2 text-[#1B2560] font-medium whitespace-nowrap">
-                  <TabsTrigger value={tab.value}>
-                    {tab.name} ({tab.count})
-                  </TabsTrigger>
-                </div>
-              ))}
+        <TabsList className="border-b w-full">
+          {[{name: 'Active Meetings', value: 'active', count: activeMeetings.length}, {name: 'Finished Meetings', value: 'finished', count: finishedMeetings.length}].map((tab)=> (
+            <TabsTrigger value={tab.value}>
+              {tab.name} ({tab.count})
+            </TabsTrigger>
+          ))}
         </TabsList>
         <TabsContent value="active">
           <div className="container mx-auto px-4 md:px-6 py-6 space-y-4">
@@ -608,6 +606,11 @@ export default function ListMeetings({ activeMeetings, finishedMeetings }: PageP
               </Card>
             </Link>
             ))}
+            {activeMeetings.length === 0 && (
+              <>
+                TEST
+              </>
+            )}
           </div>
         </TabsContent>
         <TabsContent value="finished">
