@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { configureEcho } from '@laravel/echo-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import duration from 'dayjs/plugin/duration';
 
 configureEcho({
     broadcaster: 'reverb',
@@ -15,6 +16,7 @@ configureEcho({
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 dayjs.extend(relativeTime);
+dayjs.extend(duration)
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
