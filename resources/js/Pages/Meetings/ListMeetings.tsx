@@ -607,9 +607,9 @@ export default function ListMeetings({ activeMeetings, finishedMeetings }: PageP
             </Link>
             ))}
             {activeMeetings.length === 0 && (
-              <>
-                TEST
-              </>
+              <div className="w-full flex justify-center items-center">
+                No Active Meetings found.
+              </div>
             )}
           </div>
         </TabsContent>
@@ -741,6 +741,11 @@ export default function ListMeetings({ activeMeetings, finishedMeetings }: PageP
               </Card>
             </Link>
             ))}
+            {finishedMeetings.length === 0 && (
+              <div className="w-full flex justify-center items-center">
+                No Finished Meetings found.
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>
