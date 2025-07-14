@@ -11,6 +11,8 @@ class TaskPriority extends Model
 
     protected $fillable = ['name'];
 
+    public $timestamps = false;
+
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class, 'priority_id');
