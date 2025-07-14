@@ -13,12 +13,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('task_priorities', function (Blueprint $table) {
-            $table->unsignedTinyInteger('id')->primary();
+            $table->tinyIncrements('id');
             $table->string('name');
         });
 
         Schema::create('task_types', function (Blueprint $table) {
-            $table->unsignedTinyInteger('id')->primary();
+            $table->tinyIncrements('id');
             $table->string('name');
         });
 
