@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             MeetingTypeSeeder::class,
             InventoryItemTypeSeeder::class,
             RoleSeeder::class,
+            TaskRelatedSeeder::class,
         ]);
     }
 }
