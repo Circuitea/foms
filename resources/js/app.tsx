@@ -8,6 +8,8 @@ import { configureEcho } from '@laravel/echo-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import duration from 'dayjs/plugin/duration';
+import toObject from 'dayjs/plugin/toObject';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 configureEcho({
     broadcaster: 'reverb',
@@ -17,6 +19,8 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration)
+dayjs.extend(toObject);
+dayjs.extend(customParseFormat);
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

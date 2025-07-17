@@ -59,7 +59,9 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
     });
 
     Route::prefix('tasks')->group(function () {
-        Route::get('/', [TasksController::class, 'new']);
+        Route::get('/', [TasksController::class, 'list']);
+        Route::get('/new', [TasksController::class, 'create']);
+        Route::post('/new', [])->middleware([HandlePrecognitiveRequests::class]);
     });
 
     Route::middleware('auth')->group(function () {
