@@ -27,6 +27,7 @@ import Item, { ItemType } from "@/types/inventory"
 import Paginator from "@/types/paginator"
 import { userHasPermission } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import AddItemForm from "./Partials/AddItemForm"
 
 interface EquipmentItem {
   id: string
@@ -3304,10 +3305,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
         onClose={() => setShowSuccessNotification(false)}
       />
 
-      {showCategoryDetail ? (
-        renderCategoryDetailView()
-      ) : (
-        <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
           <div className="sticky top-0 z-40 bg-[#1B2560] border-b border-gray-300 shadow-sm">
             <div className="max-w-7xl mx-auto px-6 py-4">
               <div className="flex items-center justify-between">
@@ -3322,29 +3320,6 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
           </div>
 
           <div className="max-w-7xl mx-auto px-6 py-8">
-            {/* Categories grid */}
-            {/* <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-              {categories.map((category) => {
-                const categoryCount = equipmentList.filter((item) => item.category === category.id).length
-
-                return (
-                  <div
-                    key={category.id}
-                    onClick={() => handleCategoryClick(category.id)}
-                    className={`bg-[#E8F4FD] border-2 border-gray-300 rounded-xl p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-[#1B2560] hover:scale-105 ${
-                      selectedCategory === category.id ? "ring-2 ring-[#1B2560] border-[#1B2560] shadow-md" : ""
-                    }`}
-                  >
-                    <div className="flex flex-col items-center text-center space-y-3">
-                      <div className="text-[#1B2560] mb-2">{renderIcon(category.id)}</div>
-                      <h3 className="text-lg font-bold text-[#1B2560]">{category.name}</h3>
-                      <p className="text-sm text-gray-600 font-medium">{categoryCount} items</p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div> */}
-
             <div className={`grid grid-cols-2 md:grid-cols-${types.length/2} gap-6 mb-8`}>
               {types.map((type) => (
                 <Link
@@ -3437,13 +3412,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
                   </Button>
                 )}
                 {userHasPermission(/inventory\.(?:create|\*)/) && (
-                  <Button
-                    onClick={() => setShowAddItemModal(true)}
-                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Item
-                  </Button>
+                  <AddItemForm />
                 )}
               </div>
             </div>
@@ -3467,77 +3436,6 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
               </div>
 
               <div className="overflow-x-auto">
-                {/* <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Equipment
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Quantity
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Condition
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Location
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Notes
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredEquipment.map((item) => (
-                      <tr
-                        key={item.id}
-                        className="hover:bg-gray-50 cursor-pointer"
-                        onClick={() => handleItemClick(item)}
-                      >
-                        <td className="px-6 py-4">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                            <div className="text-sm text-gray-500">{item.description}</div>
-                            {item.serialNumber && (
-                              <div className="text-xs text-gray-400 mt-1">S/N: {item.serialNumber}</div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center">
-                            {getStatusIcon(item.available, item.quantity)}
-                            <span className="ml-2 text-sm text-gray-900">
-                              {item.available}/{item.quantity} Available
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900">
-                            <div>Total: {item.quantity}</div>
-                            <div className="text-xs text-gray-500">
-                              Available: {item.available} | Deployed: {item.inUse}
-                              {item.maintenance > 0 && ` | Maintenance: ${item.maintenance}`}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getConditionColor(
-                              item.condition,
-                            )}`}
-                          >
-                            {item.condition}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{item.location}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{item.notes ? item.notes : "-"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table> */}
                 <DataTable
                   columns={columns}
                   data={items.data}
@@ -3554,16 +3452,6 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
             </div>
           </div>
         </div>
-      )}
-      {renderDetailModal()}
-      {renderEditModal()}
-      {renderMaintenanceHistoryModal()}
-      {renderDeploymentHistoryModal()}
-      {renderAddMaintenanceForm()}
-      {renderAddDeploymentForm()}
-      {renderBulkDeploymentModal()}
-      {renderBulkMaintenanceModal()}
-      {renderAddItemModal()}
     </>
   )
 }
