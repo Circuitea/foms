@@ -14,14 +14,14 @@ class TasksController extends Controller
         return Inertia::render('Tasks/ListTasks');
     }
 
-    public function create() {
+    public function new() {
         return Inertia::render('Tasks/NewTask', [
             'types' => TaskType::all(),
             'priorities' => TaskPriority::all(),
         ]);
     }
 
-    public function new(NewTaskRequest $request) {
+    public function create(NewTaskRequest $request) {
         return redirect('/tasks');
     }
 }

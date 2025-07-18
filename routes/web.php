@@ -54,14 +54,16 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
 
     Route::prefix('inventory')->group(function() {
         Route::get('/', [InventoryController::class, 'index']);
-        Route::get('/item/ID');
+        Route::get('/item/new', [InventoryController::class, 'new']);
+        Route::post('/item/new', [InventoryController::class, 'create']);
+        Route::get('/item/{ID}');
         Route::get('/{typeID}', [InventoryController::class, 'list']);
     });
 
     Route::prefix('tasks')->group(function () {
         Route::get('/', [TasksController::class, 'list']);
-        Route::get('/new', [TasksController::class, 'create']);
-        Route::post('/new', [])->middleware([HandlePrecognitiveRequests::class]);
+        Route::get('/new', [TasksController::class, 'new']);
+        Route::post('/new', [TasksController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
     });
 
     Route::middleware('auth')->group(function () {
