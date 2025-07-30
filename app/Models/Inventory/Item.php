@@ -11,7 +11,7 @@ class Item extends Model
     protected $table = 'inventory_items';
     public $timestamps = false;
     
-    protected $fillable = ['name', 'description', 'imagePath'];
+    protected $fillable = ['name', 'description', 'location', 'image_path'];
 
     public function type(): BelongsTo
     {

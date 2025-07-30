@@ -23,9 +23,9 @@ import { PageProps } from "@/types"
 import { Link } from "@inertiajs/react"
 import { DataTable } from "@/components/data-table"
 import { ColumnDef } from "@tanstack/react-table"
-import Item, { ItemType } from "@/types/inventory"
+import Item, { ItemEntry, ItemType } from "@/types/inventory"
 import Paginator from "@/types/paginator"
-import { userHasPermission } from "@/lib/utils"
+import { cn, userHasPermission } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import AddItemForm from "./Partials/AddItemForm"
 
@@ -1407,7 +1407,7 @@ const getConditionColor = (condition: string) => {
     }
 }
 
-const columns: ColumnDef<Item>[] = [
+const columns: ColumnDef<ItemEntry>[] = [
   {
     accessorKey: 'name',
     header: 'EQUIPMENT',
@@ -1419,15 +1419,6 @@ const columns: ColumnDef<Item>[] = [
     ))
   },
   {
-    id: 'type',
-    accessorFn: (row) => row.type.name,
-    cell: (({ row }) => (
-      <span className="ml-2 text-sm text-gray-900">
-        {row.original.type.icon} {row.getValue('type')}
-      </span>
-    )),
-  },
-  {
     id: 'status',
     header: 'STATUS',
     accessorFn: () => 10,
@@ -1435,21 +1426,19 @@ const columns: ColumnDef<Item>[] = [
       <div className="flex items-center">
         <CheckCircle className="w-4 h-4 text-green-600" />
         <span className="ml-2 text-sm text-gray-900">
-          {row.getValue('status')}/10 Available
+          {row.original.conditions.find(condition => condition.name === 'available')?.amount}/{row.original.conditions.reduce((total, condition) => total + condition.amount, 0)} Available
         </span>
       </div>
     ))
   },
   {
-    id: 'quantity',
+    id: 'conditions',
     header: 'QUANTITY',
-    accessorFn: () => 10,
     cell: (({ row }) => (
       <div className="text-sm text-gray-900">
-        <div>Total: {row.getValue('quantity')}</div>
-        <div className="text-xs text-gray-500">
-          Available: 10 | In Use: 0
-          {/* {item.maintenance > 0 && ` | Maintenance: ${item.maintenance}`} */}
+        <div>Total: {row.original.conditions.reduce((total, condition) => total + condition.amount, 0)}</div>
+        <div className="text-xs text-gray-500 flex gap-2">
+          {row.original.conditions.map(condition => `${condition.label}: ${condition.amount}`).join(' | ')}
         </div>
       </div>
     ))
@@ -1457,11 +1446,14 @@ const columns: ColumnDef<Item>[] = [
   {
     id: 'condition',
     header: 'CONDITION',
-    cell: (() => (
+    cell: (({ row }) => (
       <div className="space-x-1">
-        {['Good', 'Fair', 'Unserviceable'].map((condition) => (
-          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getConditionColor(condition)}`}>
-            {condition}
+        {row.original.conditions.filter(condition => condition.amount > 0).map((condition) => (
+          <span className={cn(
+            'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
+            getConditionColor(condition.name)
+          )}>
+            {condition.label}
           </span>
         ))}
       </div>
@@ -1473,21 +1465,20 @@ const columns: ColumnDef<Item>[] = [
     accessorFn: () => 'Storage Room A',
   },
   {
-    id: 'inspectionDate',
-    header: 'NEXT INSPECTION',
-    accessorFn: () => new Date('1/1/2025'),
-    cell: (({ row }) => {
-      const date = row.getValue('inspectionDate') as Date;
-      return (
-        <span>{date.toDateString()}</span>
-      );
-    }),
+    id: 'details',
+    cell: ({ row }) => (
+      <Button variant="outline" asChild>
+        <Link href={`/inventory/item/${row.original.id}`}>
+          Details
+        </Link>
+      </Button>
+    )
   },
-]
+];
 
 type IndexItemType = ItemType & {items_count: number};
 
-export default function InventoryIndex({ types, items, totalCount }: PageProps<{ types: IndexItemType[], items: Paginator<Item>, totalCount: number }>) {
+export default function InventoryIndex({ types, items, totalCount }: PageProps<{ types: IndexItemType[], items: ItemEntry[], totalCount: number }>) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterCondition, setFilterCondition] = useState<string>("all")
@@ -3430,7 +3421,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
                     )}
                   </h2>
                   <span className="text-sm text-gray-600">
-                    {items.data.length} of {totalCount} items
+                    {items.length} of {totalCount} items
                   </span>
                 </div>
               </div>
@@ -3438,7 +3429,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
               <div className="overflow-x-auto">
                 <DataTable
                   columns={columns}
-                  data={items.data}
+                  data={items}
                   noData={(
                     <div className="text-center py-12">
                       <Package className="mx-auto h-12 w-12 text-gray-400" />

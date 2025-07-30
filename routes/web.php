@@ -54,8 +54,7 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
 
     Route::prefix('inventory')->group(function() {
         Route::get('/', [InventoryController::class, 'index']);
-        Route::get('/item/new', [InventoryController::class, 'new']);
-        Route::post('/item/new', [InventoryController::class, 'create']);
+        Route::post('/item/new', [InventoryController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
         Route::get('/item/{ID}');
         Route::get('/{typeID}', [InventoryController::class, 'list']);
     });

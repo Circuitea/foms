@@ -51,15 +51,11 @@ export function DataTable<TData, TValue>({ columns, data, className, noData, get
         </TableHeader>
         <TableBody>
           {rows.length > 0 ? (
-            rows.map((row) =>  {
-              const href = getRowHref?.(row.original);
-              const rowContent = (
-                <TableRow
+            rows.map((row) =>  (
+              <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={"even:bg-blue-50 border-b border-gray-100 hover:bg-gray-50 " + (href && 'cursor-pointer')}
-                  tabIndex={href ? 0 : undefined}
-                  role={href ? 'link' : undefined}
+                  className="even:bg-blue-50 border-b border-gray-100 hover:bg-gray-50 "  
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="px-6 py-4">
@@ -67,14 +63,7 @@ export function DataTable<TData, TValue>({ columns, data, className, noData, get
                     </TableCell>
                   ))}
                 </TableRow>
-              );
-
-              return href ? (
-                <Link href={href} key={row.id} tabIndex={-1} className="contents">
-                  {rowContent}
-                </Link>
-              ) : rowContent;
-            })
+            ))
           ) : (
             <TableRow className="">
               <TableCell colSpan={safeColumns.length} className="h-32 text-center">

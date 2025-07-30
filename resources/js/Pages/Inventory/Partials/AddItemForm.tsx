@@ -1,3 +1,4 @@
+import InputError from "@/components/InputError";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -9,13 +10,13 @@ import { ItemType } from "@/types/inventory";
 import { usePage } from "@inertiajs/react";
 import { useForm } from "laravel-precognition-react-inertia";
 import { Package, Plus } from "lucide-react";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import Select from 'react-select';
 
 export default function AddItemForm() {
   const { types } = usePage<PageProps<{ types: ItemType[] }>>().props;
   const [isOpen, setOpen] = useState(false);
-  const { data, setData, submit } = useForm<{
+  const { data, setData, submit, processing, errors, invalid, reset, validate } = useForm<{
     name: string
     description: string
     type_id?: number
@@ -39,7 +40,12 @@ export default function AddItemForm() {
   const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();
 
-    console.log(data);
+    submit({
+      onSuccess: () => {
+        reset();
+        setOpen(false);
+      },
+    });
   }
 
   return (
@@ -64,7 +70,7 @@ export default function AddItemForm() {
         <form onSubmit={handleSubmit} id="addInventoryItem">
           <div className="overflow-y-auto p-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className=" flex flex-col items-center justify-center">
+              <div className="row-span-2 flex flex-col items-center justify-center">
                 <p className="block text-sm font-medium text-gray-700 mb-2">Item Photo</p>
                 <Label htmlFor="image" className="cursor-pointer">
                   <div className="w-40 h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-4 hover:border-blue-400 transition-colors">
@@ -83,43 +89,42 @@ export default function AddItemForm() {
                   id="image"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setData('image', e.target.files?.[0])}
+                  onChange={(e) => {
+                    setData('image', e.target.files?.[0]);
+                    validate('image');
+                  }}
                   hidden
-                  required
                 />
+                <InputError invalid={invalid('image')} message={errors.image} />
               </div>
               <div>
-                <div>
-                  <Label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Equipment Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="name"
-                    value={data.name}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Chainsaw"
-                    onChange={(e) => setData('name', e.target.value)}
-                    required
+                <Label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Equipment Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="name"
+                  value={data.name}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Chainsaw"
+                  onChange={(e) => setData('name', e.target.value)}
+                  onBlur={() => validate('name')}
                   />
-                </div>
-                <div>
-                  <Label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-                    Equipment Type <span className="text-red-500">*</span>
-                  </Label>
-                  {/* <Input
-                    id="type"
-                    value={data.name}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Chainsaw"
-                    onChange={(e) => setData('name', e.target.value)}
-                    /> */}
-                  <Select
-                    options={typeOptions}
-                    value={typeOptions.find(option => option.value === data.type_id)}
-                    onChange={(newType) => setData('type_id', newType?.value)}
-                    isClearable
-                  />
-                </div>
+                <InputError invalid={invalid('name')} message={errors.name} />
+              </div>
+              <div>
+                <Label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+                  Equipment Type <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  options={typeOptions}
+                  value={typeOptions.find(option => option.value === data.type_id)}
+                  onChange={(newType) => {
+                    setData('type_id', newType?.value)
+                    validate('type_id')
+                  }}
+                  isClearable
+                />
+                <InputError invalid={invalid('type_id')} message={errors.type_id} />
               </div>
 
               <div>
@@ -130,10 +135,13 @@ export default function AddItemForm() {
                   id="initial_quantity"
                   type="number"
                   value={data.initial_quantity}
+                  min={0}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="1"
                   onChange={(e) => setData('initial_quantity', parseInt(e.target.value))}
+                  onBlur={() => validate('initial_quantity')}
                 />
+                <InputError invalid={invalid('initial_quantity')} message={errors.initial_quantity} />
               </div>
               <div>
                 <Label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
@@ -145,7 +153,9 @@ export default function AddItemForm() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Storage Area A"
                   onChange={(e) => setData('location', e.target.value)}
+                  onBlur={() => validate('location')}
                 />
+                <InputError invalid={invalid('location')} message={errors.location} />
               </div>
               <div className="col-span-2">
                 <Label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
@@ -156,8 +166,10 @@ export default function AddItemForm() {
                   rows={3}
                   value={data.description}
                   onChange={(e) => setData('description', e.target.value)}
+                  onBlur={() => validate('description')}
                   placeholder="Example description"
-                  />
+                />
+                <InputError invalid={invalid('description')} message={errors.description} />
               </div>
             </div>
           </div>
@@ -166,6 +178,7 @@ export default function AddItemForm() {
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
           <Button
+            disabled={processing}
             type="submit"
             form="addInventoryItem"
             className="px-6 py-3 bg-[#1B2560] text-white rounded-md hover:bg-[#2A3B70] transition-colors font-medium"

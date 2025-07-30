@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             MeetingTypeSeeder::class,
             InventoryItemTypeSeeder::class,
+            InventoryItemConditionSeeder::class,
             RoleSeeder::class,
             TaskRelatedSeeder::class,
         ]);
