@@ -22,4 +22,5 @@ class Item extends Model
     {
         return $this->hasMany(TransactionEntry::class, 'item_id');
     }
+    
 }

@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { useRealTimeClock } from "@/hooks/use-clock";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { cn } from "@/lib/utils";
-import { PageProps } from "@/types";
+import { PageProps, Personnel } from "@/types";
 import { Task, TaskPriority, TaskType } from "@/types/tasks";
 import { Link } from "@inertiajs/react";
 import dayjs from "dayjs";
@@ -22,18 +22,27 @@ type NewTaskEntry = Pick<Task, 'title' | 'description' | 'location' | 'due_date'
   type_id?: number,
   priority_id?: number,
   equipment_items: {
-    id: number,
+    id?: number,
     quantity: number,
   }[]
   personnel?: number[],
 };
 
+interface ItemEntry {
+  id: number;
+  name: string;
+  description: string;
+  amount: number;
+}
+
 type CreateTaskProps = PageProps<{
   types: TaskType[],
   priorities: TaskPriority[],
+  items: ItemEntry[],
+  personnel: Personnel[],
 }>;
 
-export default function NewTask({ types, priorities }: CreateTaskProps) {
+export default function NewTask({ types, priorities, items, personnel }: CreateTaskProps) {
   const currentDateTime = useRealTimeClock();
   const [isDatePickerOpen, setDatePickerOpen] = useState(false);
   const { data, setData, submit, invalid, validate, errors, processing } = useForm<NewTaskEntry>('post', '/tasks/new', {
@@ -44,7 +53,7 @@ export default function NewTask({ types, priorities }: CreateTaskProps) {
     due_date: dayjs().second(0).millisecond(0).toJSON(),
     duration: 120,
 
-    equipment_items: [{id: 0, quantity: 0}],
+    equipment_items: [{quantity: 0}],
   });
 
   const typeOptions = types.map((type) => {
@@ -61,12 +70,15 @@ export default function NewTask({ types, priorities }: CreateTaskProps) {
     };
   });
 
-  const itemOptions = [
-    { value: 1, label: 'Dildo' },
-    { value: 2, label: 'Fleshlight' },
-    { value: 3, label: 'Vibrator' },
-    { value: 4, label: 'Cockring' },
-  ]
+  const itemOptions = items.map(item => ({
+    value: item.id,
+    label: `${item.name} (Available: ${item.amount})`,
+  }));
+
+  const personnelOptions = personnel.map(person => ({
+    value: person.id,
+    label: `${person.first_name} ${person.surname.charAt(0)}.`,
+  }))
 
   const submitForm: FormEventHandler = (e) => {
     e.preventDefault();
@@ -282,7 +294,7 @@ export default function NewTask({ types, priorities }: CreateTaskProps) {
                     <Label htmlFor={`equipment_item_${i+1}`}>Equipment Item</Label>
                     <Select
                       inputId={`equipment_item_${i+1}`}
-                      options={itemOptions}
+                      options={itemOptions.filter(option => !data.equipment_items.some(item => item.id === option.value && data.equipment_items.indexOf(item) !== i))}
                       value={itemOptions.find(option => option.value === data.equipment_items[i].id)}
                       onChange={(newItem) => {
                         const equipment_items = data.equipment_items;
@@ -298,12 +310,14 @@ export default function NewTask({ types, priorities }: CreateTaskProps) {
                       id={`equipment_item_quantity_${i+1}`}
                       type="number"
                       value={item.quantity}
+                      max={data.equipment_items[i].id ? items.find(item => item.id === data.equipment_items[i].id)?.amount : 0}
                       min={0}
                       onChange={(e) => {
                         const equipment_items = data.equipment_items;
                         equipment_items[i] = {...equipment_items[i], quantity: parseInt(e.target.value) };
                         setData('equipment_items', equipment_items);
                       }}
+                      disabled={!data.equipment_items[i].id}
                     />
                   </div>
                   {data.equipment_items.length > 1 && (
@@ -335,11 +349,9 @@ export default function NewTask({ types, priorities }: CreateTaskProps) {
             <CardContent className="space-y-4">
               <Select
                 isMulti
-                options={[
-                  { value: 1, label: 'John' },
-                  { value: 2, label: 'Jack' },
-                  { value: 3, label: 'Grisham' },
-                ]}
+                options={personnelOptions}
+                closeMenuOnSelect={false}
+                menuPlacement="top"
               />
             </CardContent>
           </Card>
