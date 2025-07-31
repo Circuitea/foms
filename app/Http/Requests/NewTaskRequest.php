@@ -33,7 +33,7 @@ class NewTaskRequest extends FormRequest
             'duration' => 'required|numeric|gte:0',
             'type_id' => 'required|exists:' . TaskType::class . ',id',
             'priority_id' => 'required|exists:' . TaskPriority::class . ',id',
-            'creator_id' => 'required|exists:' . Personnel::class . ',id',
+            'equipment_items' => 'required|list',
             'personnel' => 'required|list',
         ];
     }
