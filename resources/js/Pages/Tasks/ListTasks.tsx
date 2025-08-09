@@ -3,6 +3,7 @@ import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { AlertTriangle, ClipboardList, FileText, Plus, Users } from "lucide-react";
 import Overview from "./ListTasksPartials/Overview";
 import { Link } from "@inertiajs/react";
+import AllTasks from "./ListTasksPartials/AllTasks";
 
 export default function ListTasks() {
   return (
@@ -99,7 +100,7 @@ export default function ListTasks() {
             Overview
           </TabsContent>
           <TabsContent value="all">
-            all
+            <AllTasks />
           </TabsContent>
           <TabsContent value="personnel">
             personnel

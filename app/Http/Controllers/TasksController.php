@@ -23,7 +23,9 @@ use Inertia\Inertia;
 class TasksController extends Controller
 {
   public function list() {
-    return Inertia::render('Tasks/ListTasks');
+    return Inertia::render('Tasks/ListTasks', [
+      'all_tasks' => fn () => Task::with(['priority', 'type'])->get(),
+    ]);
   }
 
   public function new() {
