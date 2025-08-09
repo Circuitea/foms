@@ -41,11 +41,18 @@ export default function AllTasks() {
   const { tasks } = usePage<PageProps<{ tasks: Task[] }>>().props;
 
   return (
-    <>
-      <DataTable
-        columns={columns}
-        data={tasks}
-      />
-    </>
+    <div className="bg-white rounded-lg shadow border border-gray-200">
+      <div className="px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-medium text-gray-900">Tasks List</h3>
+        </div>
+      </div>
+      <div className="overflow-x-auto">
+        <DataTable
+          columns={columns}
+          data={tasks}
+        />
+      </div>
+    </div>
   );
 }
