@@ -4,6 +4,7 @@ import { AlertTriangle, ClipboardList, FileText, Plus, Users } from "lucide-reac
 import Overview from "./ListTasksPartials/Overview";
 import { Link } from "@inertiajs/react";
 import AllTasks from "./ListTasksPartials/AllTasks";
+import PersonnelTab from "./ListTasksPartials/Personnel";
 
 export default function ListTasks() {
   return (
@@ -53,7 +54,7 @@ export default function ListTasks() {
               { id: "overview", label: "Overview", icon: ClipboardList },
               { id: "all", label: "All Tasks", icon: FileText },
               { id: "personnel", label: "Personnel", icon: Users },
-              { id: "templates", label: "Templates", icon: FileText },
+              // { id: "templates", label: "Templates", icon: FileText },
             ].map((tab) => (
               <TabsTrigger key={tab.id} value={tab.id}><tab.icon className="w-4 h-4" /> {tab.label}</TabsTrigger>
             ))}
@@ -103,7 +104,7 @@ export default function ListTasks() {
             <AllTasks />
           </TabsContent>
           <TabsContent value="personnel">
-            personnel
+            <PersonnelTab />
           </TabsContent>
           <TabsContent value="templates">
             templates

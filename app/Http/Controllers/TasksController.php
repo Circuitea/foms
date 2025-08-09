@@ -12,6 +12,7 @@ use App\Models\Personnel;
 use App\Models\Task\Task;
 use App\Models\Task\TaskPriority;
 use App\Models\Task\TaskType;
+use App\RolesEnum;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,16 @@ class TasksController extends Controller
 {
   public function list() {
     return Inertia::render('Tasks/ListTasks', [
-      'tasks' => fn () => Task::with(['priority', 'type', 'personnel'])->get(),
+      'tasks' => Task::with(['priority', 'type', 'personnel'])->get(),
+      'personnel' => Personnel::with(['assignedTasks', 'roles'])
+        ->get()
+        ->map(fn ($person) => [
+          ... $person->toArray(),
+          'roles' => $person->roles->map(fn ($role) => [
+            ... $role->toArray(),
+            'label' => RolesEnum::from($role->name)->label(),
+          ]),
+        ]),
     ]);
   }
 

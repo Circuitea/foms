@@ -18,6 +18,7 @@ export type Status = 'active' | 'on site' | 'on duty' | 'on leave';
 export interface Role {
     id: number;
     name: string;
+    label: string;
 }
 
 export interface PersonnelMarkerDetails {
