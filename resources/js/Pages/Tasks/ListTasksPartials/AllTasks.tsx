@@ -38,7 +38,7 @@ const columns: ColumnDef<Task>[] = [
 ];
 
 export default function AllTasks() {
-  const { all_tasks: tasks } = usePage<PageProps<{ all_tasks: Task[] }>>().props;
+  const { tasks } = usePage<PageProps<{ tasks: Task[] }>>().props;
 
   return (
     <>

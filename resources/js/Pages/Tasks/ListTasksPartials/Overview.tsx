@@ -1,12 +1,61 @@
 import { PageProps } from "@/types";
 import { Task } from "@/types/tasks";
 import { usePage } from "@inertiajs/react";
-import { AlertTriangle, CheckCircle, ClipboardList, Clock } from "lucide-react";
+import { AlertTriangle, CheckCircle, ClipboardList, Clock, XCircle } from "lucide-react";
 
 export default function Overview() {
   const { tasks: allTasks } = usePage<PageProps<{ tasks: Task[] }>>().props;
 
   const tasks = allTasks.filter((task) => task.status !== 'finished');
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "pending":
+        return <Clock className="w-4 h-4 text-yellow-600" />
+      case "in-progress":
+        return <Clock className="w-4 h-4 text-blue-600" />
+      case "on-hold":
+        return <XCircle className="w-4 h-4 text-orange-600" />
+      case "completed":
+        return <CheckCircle className="w-4 h-4 text-green-600" />
+      case "cancelled":
+        return <XCircle className="w-4 h-4 text-red-600" />
+      default:
+        return <Clock className="w-4 h-4 text-gray-400" />
+    }
+  }
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "urgent":
+        return "bg-red-700 text-white animate-pulse rounded-md"
+      case "high":
+        return "bg-red-600 text-white rounded-md"
+      case "normal":
+        return "bg-[#1B2560] text-white rounded-md"
+      case "low":
+        return "bg-gray-500 text-white rounded-md"
+      default:
+        return "bg-gray-500 text-white rounded-md"
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800"
+      case "in-progress":
+        return "bg-blue-100 text-blue-800"
+      case "on-hold":
+        return "bg-orange-100 text-orange-800"
+      case "completed":
+        return "bg-green-100 text-green-800"
+      case "cancelled":
+        return "bg-red-100 text-red-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -19,7 +68,7 @@ export default function Overview() {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Tasks</p>
-              <p className="text-2xl font-semibold text-gray-900">{tasks.length}</p>
+              <p className="text-2xl font-semibold text-gray-900">{allTasks.length}</p>
             </div>
           </div>
         </div>
@@ -46,7 +95,7 @@ export default function Overview() {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Urgent</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {tasks.filter((t) => t.priority === "urgent").length}
+                {tasks.filter((t) => t.priority.name === "urgent").length}
               </p>
             </div>
           </div>
@@ -60,7 +109,7 @@ export default function Overview() {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Completed</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {tasks.filter((t) => t.status === "completed").length}
+                {allTasks.length - tasks.length}
               </p>
             </div>
           </div>
@@ -74,7 +123,7 @@ export default function Overview() {
         </div>
         <div className="divide-y divide-gray-200">
           {tasks
-            .filter((task) => task.status === "in-progress" || task.status === "pending")
+            .filter((task) => task.status === "ongoing" || task.status === "pending")
             .slice(0, 5)
             .map((task) => (
               <div
@@ -85,10 +134,10 @@ export default function Overview() {
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className={`px-3 py-1.5 rounded-md text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                      {task.priority.toUpperCase()}
+                    <span className={`px-3 py-1.5 rounded-md text-xs font-medium ${getPriorityColor(task.priority.name)}`}>
+                      {task.priority.name.toUpperCase()}
                     </span>
-                    <span className="text-sm text-gray-500">{task.type}</span>
+                    <span className="text-sm text-gray-500">{task.type.name}</span>
                     {getStatusIcon(task.status)}
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
                       {task.status.replace("-", " ").toUpperCase()}
@@ -98,9 +147,9 @@ export default function Overview() {
                   <p className="text-sm text-gray-600 mt-1">{task.description.substring(0, 100)}...</p>
                   <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                     <span>📍 {task.location}</span>
-                    <span>⏱️ {task.estimatedDuration}</span>
-                    <span>👥 {task.assignedTo.length} assigned</span>
-                    <span>📅 Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                    <span>⏱️ {task.duration}</span>
+                    <span>👥 {task.personnel.length} assigned</span>
+                    <span>📅 Due: {new Date(task.due_date).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
