@@ -41,13 +41,12 @@ const navItems: NavItem[] = [
     permissions: /map\.(?:read|\*)/,
   },
   {
-    title: "Notification",
-    url: "/notifications",
+    title: "My Tasks",
+    url: "/my-tasks",
     icon: Bell,
-    permissions: /notifications\.(?:read|\*)/,
   },
   {
-    title: "Tasks",
+    title: "All Tasks",
     url: "/tasks",
     icon: CheckCheck,
     permissions: /tasks\.(?:read|\*)/,
