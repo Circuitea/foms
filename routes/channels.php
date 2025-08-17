@@ -11,3 +11,8 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('location', function (Personnel $user) {
     return true;
 });
+
+Broadcast::channel('notifications.{userID}', function (Personnel $user, int $userID) {
+    return $user->id === $userID;
+});
+

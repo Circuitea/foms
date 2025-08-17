@@ -3,10 +3,27 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { PropsWithChildren } from 'react';
 import ApplicationLogo from '@/components/ApplicationLogo';
 import { Toaster } from '@/components/ui/sonner';
+import { useEcho } from '@laravel/echo-react';
+import { usePage } from '@inertiajs/react';
+import toast from '@/components/toast';
+
+interface Notification {
+    title: string;
+    message: string;
+}
 
 export default function Authenticated({
     children,
 }: PropsWithChildren) {
+    const { user } = usePage().props.auth;
+    useEcho<Notification>(
+        `notifications.${user.id}`,
+        `NotificationSent`,
+        (e) => {
+            toast('success', e.title, e.message);
+        }
+    )
+
     return (
         <SidebarProvider>
             <AppSidebar />
