@@ -3,7 +3,8 @@ export default interface Item {
     name: string;
     description: string;
     imagePath: string;
-    type: ItemType,
+    type: ItemType;
+    location: string;
 }
 
 export interface ItemType {

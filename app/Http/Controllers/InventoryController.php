@@ -94,4 +94,25 @@ class InventoryController extends Controller
 
         return redirect('/inventory');
     }
+
+    public function show(Request $request, int $id) {
+        $item = Item::with(['type'])->findOrFail($id);
+
+        return Inertia::render('Inventory/ShowInventoryItem', [
+            'item' => [
+                ... $item->toArray(),
+                'conditions' => ItemCondition::with([
+                    'transactionEntries' => function ($query) use ($item) {
+                        $query->where('item_id', $item->id);
+                    },
+                ])
+                    ->get()
+                    ->map(fn (ItemCondition $condition) => [
+                        ... $condition->toArray(),
+                        'label' => $condition->name->label(),
+                        'amount' => (int) $condition->transactionEntries()->sum('amount'),
+                    ]),
+            ],
+        ]);
+    }
 }
