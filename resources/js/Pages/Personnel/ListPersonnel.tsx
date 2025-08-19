@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { memo, useState } from "react"
 import {
   Search,
   Filter,
@@ -18,7 +18,7 @@ import {
 } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { Button } from "@/components/ui/button"
-import { Link } from "@inertiajs/react"
+import { Link, usePage } from "@inertiajs/react"
 import { DataTable } from "@/components/data-table"
 import { ColumnDef } from "@tanstack/react-table"
 import { PageProps, Personnel, Section, Status } from "@/types"
@@ -42,93 +42,84 @@ const getStatusColor = (status: Status | null) => {
     return colors[status];
   }
 
-function getColumnDef(roleLabels: RoleLabels): ColumnDef<Personnel>[] {
-  return [
-    {
-      id: 'employeeInfo',
-      header: 'EMPLOYEE INFO',
-      accessorFn: (row) => `${toProperCase(row.first_name)} ${(row.middle_name && row.middle_name !== null) ? row.middle_name.toUpperCase().charAt(0) + "." : ''} ${toProperCase(row.surname)} ${(row.name_extension && row.name_extension !== null) ? row.name_extension.toUpperCase() + '.' : ''}`,
-      cell: (({ row }) => (
-        <div>
-          <p className="font-medium text-gray-900">{row.getValue('employeeInfo')}</p>
-          <p className="text-sm text-gray-500">{row.original.email}</p>
-        </div>
-      ))
-    },
-    {
-      accessorKey: 'roles',
-      header: 'ROLES',
-      cell: (props) => (
+const columns:ColumnDef<Personnel>[] = [
+  {
+    id: 'employeeInfo',
+    header: 'EMPLOYEE INFO',
+    accessorFn: (row) => `${toProperCase(row.first_name)} ${(row.middle_name && row.middle_name !== null) ? row.middle_name.toUpperCase().charAt(0) + "." : ''} ${toProperCase(row.surname)} ${(row.name_extension && row.name_extension !== null) ? row.name_extension.toUpperCase() + '.' : ''}`,
+    cell: (({ row }) => (
+      <div>
+        <p className="font-medium text-gray-900">{row.getValue('employeeInfo')}</p>
+        <p className="text-sm text-gray-500">{row.original.email}</p>
+      </div>
+    ))
+  },
+  {
+    accessorKey: 'roles',
+    header: 'ROLES',
+    cell: (props) => {
+      const { roles } = usePage<PageProps<{ roles: RoleLabels }>>().props;
+
+      return (
         <div className="flex flex-col space-y-2 md:inline md:space-x-2">
           {props.row.original.roles?.map((role) => (
             <span
               key={role.id}
               className="text-center px-2 py-1 md:text-xs font-semibold rounded-xl bg-blue-200"
             >
-              {roleLabels[role.name]}
+              {roles[role.name]}
             </span>
           ))}
         </div>
-      ),
-    },
-    {
-      id: 'status',
-      header: 'STATUS',
-      accessorKey: 'status',
-      cell: ({ row }) => (
-        <div className="whitespace-nowrap">
-          <span className={getStatusColor(row.getValue('status')) + ' inline-flex px-2 py-1 text-xs font-semibold rounded-full'}>{row.getValue('status') ? toProperCase(row.getValue('status')) : 'Unavailable'}</span>
-        </div>
       )
     },
-    {
-      id: 'location',
-      header: 'LOCATION',
-      accessorFn: () => 'There',
-      cell: (props) => (
-        <div className="flex">
-          <MapPin className="w-4 h-4 mr-1" />
-          <span>{props.row.getValue('location')}</span>
-        </div>
-      )
-    },
-    {
-      id: 'actions',
-      header: 'ACTIONS',
-      cell: () => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
+  },
+  {
+    id: 'status',
+    header: 'STATUS',
+    accessorKey: 'status',
+    cell: ({ row }) => (
+      <div className="whitespace-nowrap">
+        <span className={getStatusColor(row.getValue('status')) + ' inline-flex px-2 py-1 text-xs font-semibold rounded-full'}>{row.getValue('status') ? toProperCase(row.getValue('status')) : 'Unavailable'}</span>
+      </div>
+    )
+  },
+  {
+    id: 'actions',
+    header: 'ACTIONS',
+    cell: () => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem>
+            <Eye className="h-4 w-4" />
+            View Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Clock className="h-4 w-4" />
+            View Schedule
+          </DropdownMenuItem>
+          {userHasPermission(/personnel\.(?:update|\*)/) && (
             <DropdownMenuItem>
-              <Eye className="h-4 w-4" />
-              View Profile
+              <Edit className="h-4 w-4" />
+              Edit Details
             </DropdownMenuItem>
+          )}
+          {userHasPermission(/personnel\.(?:delete|\*)/) && (
             <DropdownMenuItem>
-              <Clock className="h-4 w-4" />
-              View Schedule
+              <Trash2 className="h-4 w-4" />
+              Remove
             </DropdownMenuItem>
-            {userHasPermission(/personnel\.(?:update|\*)/) && (
-              <DropdownMenuItem>
-                <Edit className="h-4 w-4" />
-                Edit Details
-              </DropdownMenuItem>
-            )}
-            {userHasPermission(/personnel\.(?:delete|\*)/) && (
-              <DropdownMenuItem>
-                <Trash2 className="h-4 w-4" />
-                Remove
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    }
-  ]
-}
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+  },
+]
 
 interface Option {
   value: number,
@@ -151,7 +142,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
     {value: 4, label: 'On Site'},
   ]
   
-  const currentTime = useRealTimeClock  ()
+  const currentTime = useRealTimeClock()
   const [searchTerm, setSearchTerm] = useState("")
 
   const stats = {
@@ -282,17 +273,6 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
 
               {/* Action Buttons */}
               <div className="flex gap-2 flex-shrink-0">
-                
-
-                {userHasPermission(/locations\.(?:read|\*)/) && (
-                  <Button
-                    className="bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
-                  >
-                    <MapPin className="w-4 h-4" />
-                    Track Employees
-                  </Button>
-                )}
-                
                 {userHasPermission(/personnel\.(?:create|\*)/) && (
                   <div className="flex gap-2">
                     <Link
@@ -317,7 +297,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
         </div>
 
         <DataTable
-          columns={getColumnDef(roles)}
+          columns={columns}
           data={personnel.data}
           noData={(
             <div className="flex flex-col items-center justify-center text-gray-500">
