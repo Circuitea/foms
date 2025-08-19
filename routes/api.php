@@ -71,6 +71,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::delete('/logout', function (Request $request) {
+        /** @disregard */
         $request->user()->currentAccessToken()->delete();
     });
 });
