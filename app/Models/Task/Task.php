@@ -12,6 +12,44 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Date;
 
+/**
+ * @property int $id
+ * @property string $title
+ * @property string $description
+ * @property string $location
+ * @property int $priority_id
+ * @property int $type_id
+ * @property int $creator_id
+ * @property int $section_id
+ * @property \Illuminate\Support\Carbon $due_date
+ * @property int $duration
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read Personnel $creator
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, TransactionEntry> $items
+ * @property-read int|null $items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Personnel> $personnel
+ * @property-read int|null $personnel_count
+ * @property-read \App\Models\Task\TaskPriority $priority
+ * @property-read mixed $status
+ * @property-read \App\Models\Task\TaskType $type
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereCreatorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereDueDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereDuration($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereLocation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task wherePriorityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereSectionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereTypeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Task extends Model
 {
     protected $table = 'tasks';
