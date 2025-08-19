@@ -32,6 +32,28 @@ Route::middleware(['auth:sanctum'])->group(function () {
         LocationUpdated::dispatch(PersonnelLocationResource::collection(PersonnelLocation::all()));
 
     });
+
+    Route::post('/expo-push-token', function (Request $request) {
+        Log::info('Received token from mobile application');
+        $user = $request->user();
+
+        $data = $request->validate([
+            'token' => ['required', 'string', 'regex:/^ExponentPushToken\[.+\]$/'],
+        ]);
+
+        $user->expoTokens()->firstOrCreate([
+            'value' => $data['token'],
+        ]);
+
+        return response([
+            'status' => 'ok',
+        ]);
+
+    });
+
+    Route::delete('/logout', function (Request $request) {
+        $request->user()->currentAccessToken()->delete();
+    });
 });
 
 Route::post('/login', function (Request $request) {

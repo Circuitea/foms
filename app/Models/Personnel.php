@@ -11,10 +11,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use YieldStudio\LaravelExpoNotifier\Models\ExpoToken;
 
 class Personnel extends Authenticatable
 {
@@ -92,5 +94,10 @@ class Personnel extends Authenticatable
     public function assignedTasks(): BelongsToMany
     {
         return $this->belongsToMany(Task::class, 'personnel_task');
+    }
+
+    public function expoTokens(): MorphMany
+    {
+        return $this->morphMany(ExpoToken::class, 'owner');
     }
 }
