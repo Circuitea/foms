@@ -17,6 +17,11 @@ export function StatusSelector() {
       label: 'Available',
     },
     {
+      value: 'assigned',
+      label: 'Assigned to Task',
+      disabled: true
+    },
+    {
       value: 'on leave',
       label: 'On Leave',
     },
@@ -44,6 +49,7 @@ export function StatusSelector() {
             <SelectItem
               key={option.value}
               value={option.value}
+              disabled={option.disabled}
             >{option.label}</SelectItem>
           ))}        
         </SelectContent>
