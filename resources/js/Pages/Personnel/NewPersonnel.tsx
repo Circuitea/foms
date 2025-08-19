@@ -83,8 +83,8 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
   }
 
   // Form submission with validation
-  const submit: FormEventHandler = (e?) => {
-    if (e) e.preventDefault()
+  const submit: FormEventHandler = (e) => {
+    e.preventDefault();
 
     form.submit({
       onSuccess: (response) => {
@@ -98,7 +98,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
       onFinish: (visit) => {
         form.reset("password")
       },
-    })
+    });
   }
 
   const onFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -662,7 +662,19 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                         type="submit"
                         className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white"
                         onClick={() => {
-                          submit()
+                          form.submit({
+                            onSuccess: () => {
+                              // addToast("success", "Success!", "Personnel has been created successfully")
+                              toast("success", "Success!", "Personnel has been created successfully")
+                            },
+                            onError: () => {
+                              // addToast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
+                              toast("error", "Submission Failed", "There was an error creating the personnel. Please try again.")
+                            },
+                            onFinish: () => {
+                              form.reset("password")
+                            },
+                          });
                           setConfirmDialogOpen(false)
                         }}
                       >
