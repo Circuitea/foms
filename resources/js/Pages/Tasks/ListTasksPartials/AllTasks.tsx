@@ -5,7 +5,9 @@ import { PageProps } from "@/types";
 import { Task } from "@/types/tasks";
 import { usePage } from "@inertiajs/react";
 import { ColumnDef } from "@tanstack/react-table";
+import axios from "axios";
 import dayjs from "dayjs";
+import { useEffect } from "react";
 
 const columns: ColumnDef<Task>[] = [
   {

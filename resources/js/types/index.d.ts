@@ -13,7 +13,7 @@ export interface Personnel {
     status: Status | null,
 }
 
-export type Status = 'active' | 'on site' | 'on duty' | 'on leave';
+export type Status = 'available' | 'assigned' | 'on_leave';
 
 export interface Role {
     id: number;

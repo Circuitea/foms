@@ -4,16 +4,35 @@ use App\Events\LocationUpdated;
 use App\Http\Resources\PersonnelLocationResource;
 use App\Models\Personnel;
 use App\Models\PersonnelLocation;
+use App\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\PersonalAccessToken;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
+    });
+
+    Route::post('/status', function (Request $request) {
+        $validated = $request->validate([
+            'status' => ['nullable', 'string', Rule::enum(Status::class)],
+        ]);
+        
+        $user = $request->user();
+
+        $user->status = Status::from($validated['status']);
+
+        $user->save();
+
+        return response([
+            'status' => $user->status,
+        ]);
+        
     });
 
     Route::post('/location', function (Request $request) {

@@ -1,0 +1,53 @@
+import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Label } from "./ui/label";
+import { useSidebar } from "./ui/sidebar";
+import axios, { AxiosResponse } from "axios";
+import { Status } from "@/types";
+import { usePage } from "@inertiajs/react";
+
+export function StatusSelector() {
+  const { status: userStatus } = usePage().props.auth.user;
+  const [status, setStatus] = useState<Status |  null>(userStatus);
+  const { open } = useSidebar();
+
+  const statusOptions = [
+    {
+      value: 'available',
+      label: 'Available',
+    },
+    {
+      value: 'on leave',
+      label: 'On Leave',
+    },
+  ];
+
+  const handleStatusChange = async (newStatus: string) => {
+    const response: AxiosResponse<{ status: Status | null }> = await axios.post('/api/status', {
+      status: newStatus
+    });
+
+    if (response.status === 200) {
+      setStatus(response.data.status);
+    }
+  }
+
+  return open ? (
+    <div className="flex gap-2 items-baseline">
+      <Label htmlFor="status">Status</Label>
+      <Select disabled={status === 'assigned'} value={status ?? ''} onValueChange={handleStatusChange}>
+        <SelectTrigger className="bg-white text-black">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          {statusOptions.map(option => (
+            <SelectItem
+              key={option.value}
+              value={option.value}
+            >{option.label}</SelectItem>
+          ))}        
+        </SelectContent>
+      </Select>
+    </div>
+  ) : null;
+}

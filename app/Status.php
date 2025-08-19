@@ -4,8 +4,16 @@ namespace App;
 
 enum Status: string
 {
-    case ACTIVE = 'active';
-    case ON_DUTY = 'on duty';
-    case ON_SITE = 'on site';
+    case AVAILABLE = 'available';
+    case ASSIGNED = 'assigned';
     case ON_LEAVE = 'on leave';
+
+    public function label(): string
+    {
+        return match($this) {
+            static::AVAILABLE => 'Available',
+            static::ASSIGNED => 'Assigned Task',
+            static::ON_LEAVE => 'On Leave',
+        };
+    }
 }

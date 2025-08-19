@@ -20,6 +20,7 @@ import { Dialog, DialogContent, DialogFooter, DialogTrigger } from "./ui/dialog"
 import { Button } from "./ui/button"
 import { useState } from "react"
 import { userHasPermission } from "@/lib/utils"
+import { StatusSelector } from "./status-selector"
 
 interface NavItem {
   title: string,
@@ -104,6 +105,9 @@ export function AppSidebar() {
                 <p className="text-white/70 text-sm">Admin</p>
               </div>
             </div>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <StatusSelector />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
