@@ -23,7 +23,7 @@ interface NewPersonnel {
   email: string,
   mobile_number?: string,
   roles: string[],
-  sections: string[],
+  sections: number[],
   password?: string,
 };
 
@@ -70,7 +70,7 @@ export default function ImportPersonnel({ roles, sections }: PageProps<{
           email: results.data.email_address,
           mobile_number: results.data.mobile_number || undefined,
           roles: results.data.roles.split(','),
-          sections: results.data.sections.split(','),
+          sections: results.data.sections.split(',').map(section => +section),
         });
       },
       complete: () => {
@@ -90,30 +90,9 @@ export default function ImportPersonnel({ roles, sections }: PageProps<{
         console.log(res);
       })
       .catch((err) => {
-        // toast('error', 'Personnel Import Error', err);
-        // console.error(err);
         const {message} = err.response.data;
         
         toast('error', 'Import Error', replaceErrorMessage(message));
-
-        // let errorsArray: Errors<NewPersonnel>[] = [];
-        
-        // for (const [key, errMessage] of Object.entries<string[]>(errors)) {
-        //   interface RegexResult {
-        //     index: string,
-        //     field: string,
-        //   }
-          
-        //   const regex = /^personnel\.(?<index>\d+)\.(?<field>[A-Za-z\-_]+)$/;
-        //   const test = regex.exec(key);
-
-        //   const groups: Partial<RegexResult> | undefined = test?.groups;
-
-        //   if (!groups) return;
-
-        //   // console.log(`Index ${groups && groups['index']}, property ${groups && groups['field']}: ${replaceErrorMessage(errMessage[0])}`);
-
-        // }
 
       });
   }
@@ -177,7 +156,7 @@ export default function ImportPersonnel({ roles, sections }: PageProps<{
       header: 'Sections',
       cell: ({ row }) => (
         <div className='flex flex-col'>
-          {row.getValue<string[]>('sections').map((section) => (
+          {row.getValue<number[]>('sections').map((section) => (
             <span key={section}>{sections[section]}</span>
           ))}
         </div>
