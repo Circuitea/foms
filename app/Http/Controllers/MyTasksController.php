@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class NotificationsController extends Controller
+class MyTasksController extends Controller
 {
     public function list() {
-        return Inertia::render('Notifications/ListNotifications');
+        return Inertia::render('MyTasks/ListMyTasks');
     }
 
     public function show(Request $request, string $id) {

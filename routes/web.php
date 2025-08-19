@@ -3,7 +3,7 @@
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\MeetingsController;
-use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\MyTasksController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TasksController;
@@ -47,9 +47,9 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::get('/{id}', [MeetingsController::class, 'show'])->name('show');
     });
 
-    Route::prefix('notifications')->group(function() {
-        Route::get('/', [NotificationsController::class, 'list']);
-        Route::get('/{id}', [NotificationsController::class, 'show']);
+    Route::prefix('my-tasks')->group(function() {
+        Route::get('/', [MyTasksController::class, 'list']);
+        Route::get('/{id}', [MyTasksController::class, 'show']);
     });
 
     Route::prefix('inventory')->group(function() {
