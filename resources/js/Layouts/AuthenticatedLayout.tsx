@@ -50,7 +50,7 @@ export default function Authenticated({
           </p>
         </div>
         
-        <div className="sticky top-0 bg-[#1B2560] border-b border-gray-300 shadow-sm">
+        <div className="sticky top-0 bg-[#1B2560]/95 border-b border-gray-300 shadow-sm z-50">
           <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

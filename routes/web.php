@@ -38,6 +38,7 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::post('/new', [PersonnelController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
         Route::get('/import', [PersonnelController::class, 'import']);
         Route::post('/import', [PersonnelController::class, 'add']);
+        Route::get('/{id}/activity', [PersonnelController::class, 'listActivity']);
     });
 
     Route::prefix('meetings')->name('meetings.')->group(function () {

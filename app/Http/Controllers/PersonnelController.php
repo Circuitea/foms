@@ -114,4 +114,14 @@ class PersonnelController extends Controller
     });
 
   }
+
+  public function listActivity(Request $request, int $id) {
+    $personnel = Personnel::findOr($id, ['id', 'first_name', 'middle_name', 'surname', 'name_extension'], function () {
+      abort(404);
+    });
+    
+    return Inertia::render('Personnel/ListPersonnelActivity', [
+      'personnel' => $personnel,
+    ]);
+  }
 }

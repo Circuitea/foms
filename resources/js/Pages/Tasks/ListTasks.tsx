@@ -98,7 +98,6 @@ export default function ListTasks() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <TabsContent value="overview">
             <Overview />
-            {/* Overview */}
           </TabsContent>
           <TabsContent value="all">
             <AllTasks />
@@ -115,4 +114,4 @@ export default function ListTasks() {
   );
 }
 
-ListTasks.layout = (e: JSX.Element) => <Authenticated children={e} />
+ListTasks.layout = (e: JSX.Element) => <Authenticated pageTitle="Tasks Management" children={e} />
