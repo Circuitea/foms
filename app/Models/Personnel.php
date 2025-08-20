@@ -160,4 +160,9 @@ class Personnel extends Authenticatable
     {
         return $this->morphMany(ExpoToken::class, 'owner');
     }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(ActivityDetail::class, 'personnel_id');
+    }
 }
