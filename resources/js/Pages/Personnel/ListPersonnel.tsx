@@ -307,6 +307,6 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
   )
 }
 
-ListPersonnel.layout = (e: JSX.Element) => <Authenticated children={e} />
+ListPersonnel.layout = (e: JSX.Element) => <Authenticated pageTitle="Personnel Management" children={e} />
 
 

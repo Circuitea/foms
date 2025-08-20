@@ -22,8 +22,10 @@ interface BreadcrumbEntry {
 
 export default function Authenticated({
   children,
+  pageTitle,
   breadcrumbEntries,
 }: PropsWithChildren<{
+  pageTitle: string,
   breadcrumbEntries?: BreadcrumbEntry[],
 }>) {
   const { user } = usePage().props.auth;
@@ -53,7 +55,7 @@ export default function Authenticated({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Users className="w-6 h-6 text-white" />
-                <h1 className="text-xl font-semibold text-white">Staff Management</h1>
+                <h1 className="text-xl font-semibold text-white">{pageTitle}</h1>
               </div>
               <div className="text-sm font-mono text-white">{currentTime}</div>
             </div>
