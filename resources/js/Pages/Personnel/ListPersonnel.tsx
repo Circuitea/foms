@@ -144,20 +144,6 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#1B2560] border-b border-gray-300 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Users className="w-6 h-6 text-white" />
-              <h1 className="text-xl font-semibold text-white">Staff Management</h1>
-            </div>
-            <div className="text-sm font-mono text-white">{currentTime}</div>
-          </div>
-          <div className="mt-2 text-sm text-gray-300">CDRRMO Staff Portal › Personnel Directory</div>
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
