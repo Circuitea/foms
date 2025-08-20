@@ -10,6 +10,8 @@ class StartTaskActivity extends Model
 {
     public $timestamps = false;
 
+    protected $with = ['task'];
+
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class, 'task_id');
