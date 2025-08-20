@@ -4,7 +4,7 @@ import { PropsWithChildren } from 'react';
 import ApplicationLogo from '@/components/ApplicationLogo';
 import { Toaster } from '@/components/ui/sonner';
 import { useEcho } from '@laravel/echo-react';
-import { Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import toast from '@/components/toast';
 import { useRealTimeClock } from '@/hooks/use-clock';
 import { Users } from 'lucide-react';
@@ -41,6 +41,7 @@ export default function Authenticated({
 
   return (
     <SidebarProvider>
+      <Head title={pageTitle} />
       <AppSidebar />
       <main className='w-full'>
         <div className='bg-[#1B2560] text-white w-full flex items-center gap-2 p-4 border-b-4 border-red-500'>
