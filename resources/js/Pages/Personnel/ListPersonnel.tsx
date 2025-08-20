@@ -87,7 +87,7 @@ const columns:ColumnDef<Personnel>[] = [
   {
     id: 'actions',
     header: 'ACTIONS',
-    cell: () => (
+    cell: ({ row }) => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
@@ -99,9 +99,11 @@ const columns:ColumnDef<Personnel>[] = [
             <Eye className="h-4 w-4" />
             View Profile
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Clock className="h-4 w-4" />
-            View Activity
+          <DropdownMenuItem asChild>
+            <Link href={`/personnel/${row.original.id}/activity`}>
+              <Clock className="h-4 w-4" />
+              View Activity
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
