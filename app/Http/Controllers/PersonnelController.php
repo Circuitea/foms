@@ -9,6 +9,7 @@ use App\PermissionsEnum;
 use App\RolesEnum;
 use App\Rules\ValidRole;
 use App\Rules\ValidSection;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
@@ -116,7 +117,9 @@ class PersonnelController extends Controller
   }
 
   public function listActivity(Request $request, int $id) {
-    $personnel = Personnel::with(['activities.activity'])->findOr($id, ['id', 'first_name', 'middle_name', 'surname', 'name_extension'], function () {
+    $personnel = Personnel::with(['activities' => function (Builder $query) {
+      $query->orderBy('created_at', 'desc');
+    }])->findOr($id, ['id', 'first_name', 'middle_name', 'surname', 'name_extension'], function () {
       abort(404); 
     });
     

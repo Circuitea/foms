@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ActivityDetail extends Model
 {
+
+    protected $with = ['activity'];
+
     public function personnel(): BelongsTo
     {
         return $this->belongsTo(Personnel::class, 'personnel_id');
