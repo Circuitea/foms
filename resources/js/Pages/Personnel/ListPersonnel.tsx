@@ -101,20 +101,8 @@ const columns:ColumnDef<Personnel>[] = [
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Clock className="h-4 w-4" />
-            View Schedule
+            View Activity
           </DropdownMenuItem>
-          {userHasPermission(/personnel\.(?:update|\*)/) && (
-            <DropdownMenuItem>
-              <Edit className="h-4 w-4" />
-              Edit Details
-            </DropdownMenuItem>
-          )}
-          {userHasPermission(/personnel\.(?:delete|\*)/) && (
-            <DropdownMenuItem>
-              <Trash2 className="h-4 w-4" />
-              Remove
-            </DropdownMenuItem>
-          )}
         </DropdownMenuContent>
       </DropdownMenu>
     ),
