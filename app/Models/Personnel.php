@@ -165,4 +165,9 @@ class Personnel extends Authenticatable
     {
         return $this->hasMany(ActivityDetail::class, 'personnel_id');
     }
+
+    public function locationHistory(): HasMany
+    {
+        return $this->hasMany(LocationHistory::class, 'personnel_id');
+    }
 }
