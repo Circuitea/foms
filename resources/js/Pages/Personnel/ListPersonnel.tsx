@@ -105,6 +105,12 @@ const columns:ColumnDef<Personnel>[] = [
               View Activity
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href={`/personnel/${row.original.id}/location-history`}>
+              <Clock className="h-4 w-4" />
+              View Location History
+            </Link>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),

@@ -127,4 +127,8 @@ class PersonnelController extends Controller
       'personnel' => $personnel,
     ]);
   }
+
+  public function listLocationHistory(Request $request, int $id) {
+    return Inertia::render('Personnel/ListLocationHistory');
+  }
 }
