@@ -32,6 +32,10 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         });
     });
 
+    Route::get('/test', function () {
+        return Inertia::render('TestPage');
+    });
+
     Route::prefix('personnel')->group(function () {
         Route::get('/', [PersonnelController::class, 'list']);
         Route::get('/new', [PersonnelController::class, 'new']);
