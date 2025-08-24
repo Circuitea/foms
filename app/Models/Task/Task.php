@@ -88,7 +88,7 @@ class Task extends Model
 
     public function personnel(): BelongsToMany
     {
-        return $this->belongsToMany(Personnel::class, 'personnel_task');
+        return $this->belongsToMany(Personnel::class, 'personnel_task')->using(PersonnelTask::class);
     }
 
     public function items(): HasMany
