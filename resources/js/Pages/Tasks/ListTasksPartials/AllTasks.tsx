@@ -23,8 +23,9 @@ const columns: ColumnDef<Task>[] = [
     header: 'Priority'
   },
   {
-    accessorFn: task => toProperCase(task.status),
+    id: 'status',
     header: 'Status',
+    accessorFn: (task) => !!task.finished_at ? `Finished ${dayjs(task.finished_at).format("YYYY/MM/DD HH:mm")}` : `Ongoing`,
   },
   {
     accessorFn: (task) => dayjs(task.due_date).format('MMM DD, YYYY HH:mm'),
@@ -33,7 +34,7 @@ const columns: ColumnDef<Task>[] = [
   {
     id: 'details',
     header: '',
-    cell: ({ row }) => (
+    cell: () => (
       <Button variant="outline">Details</Button>
     ),
   },

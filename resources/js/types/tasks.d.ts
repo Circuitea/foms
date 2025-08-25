@@ -10,8 +10,8 @@ export interface Task {
   
   due_date: string
   duration: number
-  status: TaskStatus
-  
+  finished_at: string;
+
   type_id: number
   priority_id: number
   creator_id: number
@@ -39,5 +39,3 @@ export interface TaskPriority {
   id: number,
   name: string,
 }
-
-export type TaskStatus = 'ongoing' | 'pending' | 'finished';

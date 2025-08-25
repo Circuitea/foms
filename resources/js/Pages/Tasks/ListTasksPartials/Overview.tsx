@@ -6,24 +6,7 @@ import { AlertTriangle, CheckCircle, ClipboardList, Clock, XCircle } from "lucid
 export default function Overview() {
   const { tasks: allTasks } = usePage<PageProps<{ tasks: Task[] }>>().props;
 
-  const tasks = allTasks.filter((task) => task.status !== 'finished');
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "pending":
-        return <Clock className="w-4 h-4 text-yellow-600" />
-      case "in-progress":
-        return <Clock className="w-4 h-4 text-blue-600" />
-      case "on-hold":
-        return <XCircle className="w-4 h-4 text-orange-600" />
-      case "completed":
-        return <CheckCircle className="w-4 h-4 text-green-600" />
-      case "cancelled":
-        return <XCircle className="w-4 h-4 text-red-600" />
-      default:
-        return <Clock className="w-4 h-4 text-gray-400" />
-    }
-  }
+  const tasks = allTasks.filter(task => !task.finished_at);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -81,7 +64,7 @@ export default function Overview() {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">In Progress</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {tasks.filter((t) => t.status === "ongoing").length}
+                {tasks.length}
               </p>
             </div>
           </div>
@@ -119,12 +102,10 @@ export default function Overview() {
       {/* Active Tasks */}
       <div className="bg-white rounded-lg shadow border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Active Tasks</h3>
+          <h3 className="text-lg font-medium text-gray-900">Ongoing Tasks</h3>
         </div>
         <div className="divide-y divide-gray-200">
           {tasks
-            .filter((task) => task.status === "ongoing" || task.status === "pending")
-            .slice(0, 5)
             .map((task) => (
               <div
                 key={task.id}
@@ -138,9 +119,13 @@ export default function Overview() {
                       {task.priority.name.toUpperCase()}
                     </span>
                     <span className="text-sm text-gray-500">{task.type.name}</span>
-                    {getStatusIcon(task.status)}
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                      {task.status.replace("-", " ").toUpperCase()}
+                    {!task.finished_at ? (
+                      <Clock className="w-4 h-4 text-blue-600" />
+                    ) : (
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                    )}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${!task.finished_at ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                      {!task.finished_at ? "Ongoing" : "Finished"}
                     </span>
                   </div>
                   <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
