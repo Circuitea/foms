@@ -62,12 +62,11 @@ class Task extends Model
         'duration',
     ];
 
-    protected $appends = ['status'];
-
     protected function casts(): array
     {
         return [
             'due_date' => 'datetime',
+            'finished_at' => 'datetime',
         ];
     }
 
@@ -95,15 +94,4 @@ class Task extends Model
     {
         return $this->hasMany(TransactionEntry::class, 'task_id');
     }
-
-    public function status(): Attribute
-    {
-        return Attribute::make(
-            get: fn($_, mixed $attributes) => match(true) {
-                Date::parse($attributes['due_date']) > Date::now() => TaskStatus::ONGOING,
-                Date::parse($attributes['due_date']) < Date::now() => TaskStatus::FINISHED,
-            },
-        );
-    }
-
 }
