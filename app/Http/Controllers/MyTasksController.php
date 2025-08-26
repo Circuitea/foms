@@ -14,7 +14,12 @@ class MyTasksController extends Controller
     public function list(Request $request) {
         $user = $request->user();
         return Inertia::render('MyTasks/ListMyTasks', [
-            'tasks' => $user->assignedTasks->load(['priority', 'type', 'creator']),
+            'tasks' => $user->assignedTasks->load([
+                'priority',
+                'type',
+                'creator',
+                'items.item',
+            ]),
         ]);
     }
 

@@ -1,6 +1,11 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { HeadingOne, HeadingTwo } from "./components/Heading";
 import { Table, TD, TH, TR } from '@ag-media/react-pdf-table';
+import { PropsWithChildren } from 'react';
+import { Task } from '@/types/tasks';
+import { formatName } from '@/lib/utils';
+import { Personnel } from '@/types';
+import dayjs from 'dayjs';
 
 const styles = StyleSheet.create({
   page: {
@@ -28,7 +33,7 @@ const styles = StyleSheet.create({
 
 const BlankLine = () => <Text style={styles.text}>{"\n"}</Text>
 
-export function TaskReport() {
+export function TaskReport({ task, user }: { task: Task, user: Personnel }) {
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
@@ -37,19 +42,19 @@ export function TaskReport() {
         </View>
         <View>
           <HeadingOne>RECEIVER INFORMATION</HeadingOne>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Name: </Text>{"{ASSIGNED BY (NAME)}"}</Text>
+          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Name: </Text>{formatName(task.creator)}</Text>
           <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Position: </Text>{"{ASSIGNED BY (POSITION)}"}</Text>
           <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Section: </Text>{"{ASSIGNED BY (SECTION)}"}</Text>
           <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Date: </Text>{"{DATE NOW}"}</Text>
         </View>
         <BlankLine />
-        <Text style={[styles.text, styles.title]}>{"{TITLE}"}</Text>
+        <Text style={[styles.text, styles.title]}>{task.title}</Text>
         <BlankLine />
         <View>
           <HeadingOne>SENDER INFORMATION</HeadingOne>
           <View style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
             <View>
-              <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Name: </Text>{"{SENDER (NAME)}"}</Text>
+              <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Name: </Text>{formatName(user)}</Text>
               <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Position: </Text>{"{SENDER (POSITION)}"}</Text>
               <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Section: </Text>{"{SENDER (SECTION)}"}</Text>
             </View>
@@ -64,13 +69,13 @@ export function TaskReport() {
           <HeadingOne>TASK INFORMATION</HeadingOne>
           <HeadingTwo>INCIDENT INFORMATION</HeadingTwo>
           <Text style={[styles.text, { textAlign: 'justify' }]}>
-            This task (ID: {"{ID}"}) is an {"{NORMAL/URGENT}"} team deployment. The operation is located in {"{LOCATION}"},
-            at coordinates {"{COORDINATES}"}. {"{ASSIGNED BY}"} reported it from the {"{SECTION NAME}"}. The task was
-            officially issued at {"{TIME}"}.
+            This task (ID: {task.id}) is an {task.priority.name} team deployment. The operation is located in {task.location},
+            at coordinates {"{COORDINATES}"}. {formatName(task.creator)} reported it from the {"{SECTION NAME}"}. The task was
+            officially issued at {dayjs(task.created_at).format("MMMM DD, YYYY hh:mm A")}.
           </Text>
           <HeadingTwo>DESCRIPTION</HeadingTwo>
           <Text style={[styles.text, { textAlign: 'justify' }]}>
-            {"{DESCRIPTION}"}
+            {task.description}
           </Text>
           <HeadingTwo>REQUIRED RESOURCES</HeadingTwo>
           <Table tdStyle={{ padding: 5 }} weightings={[0.8, 0.2]}>
@@ -78,18 +83,12 @@ export function TaskReport() {
               <TD>Resource</TD>
               <TD>Quantity</TD>
             </TH>
-            <TR>
-              <TD>Item 1</TD>
-              <TD>3</TD>
-            </TR>
-            <TR>
-              <TD>Item 2</TD>
-              <TD>5</TD>
-            </TR>
-            <TR>
-              <TD>Item 3</TD>
-              <TD>1</TD>
-            </TR>
+            {task.items.map((item, i) => (
+              <TR key={i}>
+                <TD>{item.item.name}</TD>
+                <TD>{item.amount}</TD>
+              </TR>
+            ))}
           </Table>
         </View>
         <View>

@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Label } from "./ui/label";
 import { useSidebar } from "./ui/sidebar";
 import axios, { AxiosResponse } from "axios";
 import { Status } from "@/types";
 import { usePage } from "@inertiajs/react";
+import { StatusContext, StatusDispatchContext, useStatus, useStatusDispatch } from "@/context/status-context";
 
 export function StatusSelector() {
-  const { status: userStatus } = usePage().props.auth.user;
-  const [status, setStatus] = useState<Status |  null>(userStatus);
+  const status = useStatus();
+  const dispatch = useStatusDispatch();
+  
   const { open } = useSidebar();
+
 
   const statusOptions = [
     {
@@ -32,8 +35,11 @@ export function StatusSelector() {
       status: newStatus
     });
 
-    if (response.status === 200) {
-      setStatus(response.data.status);
+    if (response.status === 200 && response.data) {
+      dispatch({
+        type: 'set',
+        status: response.data.status ?? 'on leave',
+      });
     }
   }
 

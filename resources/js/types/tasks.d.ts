@@ -21,9 +21,9 @@ export interface Task {
   creator: Personnel
 
   personnel: Personnel[]
-  equipments: {
+  items: {
     item: Item,
-    quantity: number,
+    amount: number,
   }[],
 
   pivot: {

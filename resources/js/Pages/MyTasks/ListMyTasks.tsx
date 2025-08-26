@@ -1,17 +1,21 @@
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useRealTimeClock } from "@/hooks/use-clock";
+import { useStatusDispatch } from "@/context/status-context";
+import { TaskReport } from "@/Documents/TaskReport";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { cn, formatName } from "@/lib/utils";
 import { PageProps } from "@/types";
 import { Task } from "@/types/tasks";
-import { Link, router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
+import { PDFViewer } from "@react-pdf/renderer";
 import dayjs from "dayjs";
 import { Clipboard } from "lucide-react";
 import { ReactElement } from "react";
 
 export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
+
   const tabs = [
     { value: 'active', label: 'Active Tasks', tasks: tasks.filter(task => !task.pivot.finished_at) },
     { value: 'finished', label: 'Finished Tasks', tasks: tasks.filter(task => !!task.pivot.finished_at) },
@@ -36,6 +40,8 @@ export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
 }
 
 function TaskList({ tasks }: { tasks: Task[] }) {
+  const { user } = usePage().props.auth;
+  const dispatch = useStatusDispatch();
   const getPriorityBadgeStyle = (priority: string) => {
     switch (priority) {
       case "urgent":
@@ -52,8 +58,10 @@ function TaskList({ tasks }: { tasks: Task[] }) {
   }
 
   const changeTaskStatus = (id: number, status: 'started' | 'finished' | 'canceled') => {
-    router.post(`/my-tasks/${id}/status`, { status }, {
-      onFinish: () => router.reload(),
+    router.post(`/my-tasks/${id}/status`, { status });
+    dispatch({
+      type: 'set',
+      status: status === 'finished' || status === 'canceled' ? 'available' : 'assigned',
     });
   }
 
@@ -145,12 +153,28 @@ function TaskList({ tasks }: { tasks: Task[] }) {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    className="flex items-center justify-center rounded bg-[#1B2560]"
-                    onClick={() => changeTaskStatus(task.id, 'finished')}
-                  >
-                    Finish
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button
+                        className="flex items-center justify-center rounded bg-[#1B2560]"
+                      >
+                        Finish
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-7xl h-full grid-rows-12">
+                      <DialogHeader className="">
+                        <DialogTitle>Finish Task?</DialogTitle>
+                        <DialogDescription>The following report will be generated for the completion of this task.</DialogDescription>
+                      </DialogHeader>
+                      <div className="row-span-11 grid grid-cols-[60%_40%] h-full relative top-0">
+                        <div>
+                          <PDFViewer className="h-full w-full">
+                            <TaskReport task={task} user={user} />
+                          </PDFViewer>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </>
               ) : null}
             </div>
