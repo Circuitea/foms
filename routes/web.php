@@ -34,6 +34,7 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
 
     Route::get('/test', function () {
         return Inertia::render('TestPage');
+        // return Inertia::render('MyTasks/OldListMyTasks');
     });
 
     Route::prefix('personnel')->group(function () {
@@ -56,6 +57,7 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
     Route::prefix('my-tasks')->group(function() {
         Route::get('/', [MyTasksController::class, 'list']);
         Route::get('/{id}', [MyTasksController::class, 'show']);
+        Route::post('/{id}/status', [MyTasksController::class, 'updateStatus']);
     });
 
     Route::prefix('inventory')->group(function() {

@@ -24,7 +24,13 @@ export interface Task {
   equipments: {
     item: Item,
     quantity: number,
-  }[]
+  }[],
+
+  pivot: {
+    personnel_id: number
+    started_at?: number
+    finished_at?: number
+  }
   
   created_at: string
   updated_at: string

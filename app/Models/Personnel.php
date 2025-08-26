@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Models\Inventory\Transaction;
+use App\Models\Task\PersonnelTask;
 use App\Models\Task\Task;
 use App\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -153,7 +154,9 @@ class Personnel extends Authenticatable
 
     public function assignedTasks(): BelongsToMany
     {
-        return $this->belongsToMany(Task::class, 'personnel_task');
+        return $this->belongsToMany(Task::class, 'personnel_task')
+            ->using(PersonnelTask::class)
+            ->withPivot(['started_at', 'finished_at']);
     }
 
     public function expoTokens(): MorphMany
