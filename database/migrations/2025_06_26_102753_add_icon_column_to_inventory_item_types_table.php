@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('inventory_item_types', function (Blueprint $table) {
-            $table->string('icon')->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
+            $table->string('icon');
         });
     }
 
