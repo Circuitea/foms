@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task\Task;
+use App\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rule;
@@ -34,14 +35,20 @@ class MyTasksController extends Controller
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => Date::now(),
             ]);
+            $user->status = Status::ASSIGNED;
+            $user->save();
         } else if ($request->input('status') === 'canceled') {
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => null,
             ]);
+            $user->status = Status::AVAILABLE;
+            $user->save();
         } else {
             $task->personnel()->updateExistingPivot($user->id, [
                 'finished_at' => Date::now(),
             ]);
+            $user->status = Status::AVAILABLE;
+            $user->save();
         }
 
         return back();

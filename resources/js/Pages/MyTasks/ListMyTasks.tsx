@@ -6,7 +6,7 @@ import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { cn, formatName } from "@/lib/utils";
 import { PageProps } from "@/types";
 import { Task } from "@/types/tasks";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import dayjs from "dayjs";
 import { Clipboard } from "lucide-react";
 import { ReactElement } from "react";
@@ -49,6 +49,12 @@ function TaskList({ tasks }: { tasks: Task[] }) {
       default:
         return "bg-gray-600 text-white"
     }
+  }
+
+  const changeTaskStatus = (id: number, status: 'started' | 'finished' | 'canceled') => {
+    router.post(`/my-tasks/${id}/status`, { status }, {
+      onFinish: () => router.reload(),
+    });
   }
 
   return (
@@ -115,16 +121,6 @@ function TaskList({ tasks }: { tasks: Task[] }) {
                 </div>
               </div>
 
-              {/* Assignment Info
-              {task.assignedTo && (
-                <div className="mb-3">
-                  <span className="text-sm font-medium text-gray-600">Assigned to: </span>
-                  <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    {task.assignedTo}
-                  </span>
-                </div>
-              )} */}
-
               {/* Bottom Row - Time and Status */}
               <div className="flex items-center gap-3">
                 <span className="text-sm text-gray-500">{dayjs(task.created_at).format("MMM DD, YYYY hh:mm A")}</span>
@@ -135,43 +131,25 @@ function TaskList({ tasks }: { tasks: Task[] }) {
             <div className="relative flex-shrink-0 flex gap-2">
               {!task.pivot.started_at ? (
                 <Button
-                className="flex items-center justify-center rounded bg-[#1B2560]"
-                asChild
+                  className="flex items-center justify-center rounded bg-[#1B2560]"
+                  onClick={() => changeTaskStatus(task.id, 'started')}
                 >
-                  <Link
-                    href={`/my-tasks/${task.id}/status`}
-                    method="post"
-                    data={{ status: 'started' }}
-                  >
-                    Start
-                  </Link>
+                  Start
                 </Button>
               ) : !task.pivot.finished_at ? (
                 <>
                   <Button
                     variant="destructive"
                     className="flex items-center justify-center rounded "
-                    asChild
+                    onClick={() => changeTaskStatus(task.id, 'canceled')}
                   >
-                    <Link
-                      href={`/my-tasks/${task.id}/status`}
-                      method="post"
-                      data={{ status: 'canceled' }}
-                    >
-                      Cancel
-                    </Link>
+                    Cancel
                   </Button>
                   <Button
                     className="flex items-center justify-center rounded bg-[#1B2560]"
-                    asChild
+                    onClick={() => changeTaskStatus(task.id, 'finished')}
                   >
-                    <Link
-                      href={`/my-tasks/${task.id}/status`}
-                      method="post"
-                      data={{ status: 'finished' }}
-                    >
-                      Finish
-                    </Link>
+                    Finish
                   </Button>
                 </>
               ) : null}
