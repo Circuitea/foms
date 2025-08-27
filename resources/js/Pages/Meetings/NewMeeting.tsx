@@ -78,27 +78,9 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header - Sticky */}
-      <div className="sticky top-0 z-50 bg-[#1B2560] px-4 md:px-6 py-4 shadow-lg">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10" asChild>
-              <Link href='/meetings'>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Meetings
-              </Link>
-            </Button>
-          </div>
-          <div className="text-right">
-            <div className="text-sm font-mono text-white">{currentDateTime} </div>
-          </div>
-        </div>
-        <div className="mt-2 text-sm text-gray-300">CDRRMO Staff Portal › Meetings › Create New Meeting</div>
-      </div>
-
+    <>
       {/* Main Content */}
-      <div className="container mx-auto px-4 md:px-6 py-6 max-w-4xl">
+      <div className="container mx-auto px-4 md:px-6 py-6 max-w-7xl">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold text-[#1B2560] flex items-center gap-2">
             <CalendarIcon className="w-6 h-6 text-[#1B2560]" />
@@ -510,8 +492,8 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
           </div>
         </form>
       </div>
-    </div>
+    </>
   )
 }
 
-NewMeeting.layout = (e: JSX.Element) => <Authenticated children={e} />
+NewMeeting.layout = (e: JSX.Element) => <Authenticated PageIcon={CalendarIcon} pageTitle="New Meeting" children={e} />

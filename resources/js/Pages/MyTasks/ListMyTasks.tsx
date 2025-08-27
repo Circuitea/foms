@@ -1,17 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useStatusDispatch } from "@/context/status-context";
-import { TaskReport } from "@/Documents/TaskReport";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { cn, formatName } from "@/lib/utils";
 import { PageProps } from "@/types";
 import { Task } from "@/types/tasks";
-import { Link, router, usePage } from "@inertiajs/react";
-import { PDFViewer } from "@react-pdf/renderer";
+import { router } from "@inertiajs/react";
 import dayjs from "dayjs";
-import { Clipboard } from "lucide-react";
+import { Bell, Clipboard } from "lucide-react";
 import { ReactElement } from "react";
 import { FinishTaskDialog } from "./FinishTaskDialog";
 
@@ -23,19 +20,23 @@ export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
   ]
 
   return (
-    <div className="px-4 py-6">
-      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <Tabs defaultValue="active">
+    <div>
+      <Tabs defaultValue="active">
+        <div className="sticky top-16 border-b border-gray-200 bg-[#1B2560]">
           <TabsList>
             {tabs.map(({ value, label }, i) => <TabsTrigger key={i} value={value}>{label}</TabsTrigger>)}
           </TabsList>
-          {tabs.map(({ value, tasks }, i) => (
-            <TabsContent key={i} value={value}>
-              <TaskList tasks={tasks} />
-            </TabsContent>
-          ))}          
-        </Tabs>
-      </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            
+            {tabs.map(({ value, tasks }, i) => (
+              <TabsContent key={i} value={value}>
+                <TaskList tasks={tasks} />
+              </TabsContent>
+            ))}          
+        </div>
+      </Tabs>
     </div>
   );
 }
@@ -184,4 +185,4 @@ function TaskList({ tasks }: { tasks: Task[] }) {
   );
 }
 
-ListMyTasks.layout = (e: ReactElement) => <Authenticated children={e} pageTitle="My Tasks" />
+ListMyTasks.layout = (e: ReactElement) => <Authenticated PageIcon={Bell} children={e} pageTitle="My Tasks" />

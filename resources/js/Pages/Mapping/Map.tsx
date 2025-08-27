@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, LegacyRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Users, Eye, EyeOff, ChevronUp, ChevronDown, Monitor } from "lucide-react"
+import { Users, Eye, EyeOff, ChevronUp, ChevronDown, Monitor, MapIcon } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
 import TrackingMap from "./TrackingMap"
@@ -122,47 +122,6 @@ export default function MapPage() {
   return (
     <div className="h-screen w-full bg-gray-50 flex flex-col">
       {/* Header - Navy Blue Theme */}
-      <div className="bg-[#1B2560] px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 text-white hover:text-gray-200 transition-colors duration-200 group"
-          >
-            <svg
-              className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span className="text-sm font-medium">Back to Dashboard</span>
-          </Link>
-          <div className="w-px h-6 bg-white/20"></div>
-          <h1 className="text-2xl font-bold text-white">PERSONNEL TRACKING</h1>
-          <Badge className="bg-red-500 hover:bg-red-600 text-white border-0">LIVE</Badge>
-        </div>
-
-        {/* Right side - Presentation View Button */}
-        <div className="flex items-center">
-          <Link
-            href="/map/presentation"
-            className="flex items-center gap-3 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-lg transition-all duration-200 group border border-white/20 hover:border-white/30 shadow-sm"
-          >
-            <Monitor className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
-            <span className="text-sm font-medium">Presentation View</span>
-            <svg
-              className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </div>
-      </div>
-
       <div className="flex-1 flex min-h-0">
         {/* Map Area - Flexible Width */}
         <div className="flex-1 min-w-0">
@@ -295,7 +254,7 @@ export default function MapPage() {
                   <div className="h-full flex flex-col">
                     {/* Sticky Category Header */}
                     <div
-                      className="sticky top-0 z-20 bg-white flex items-center gap-4 p-4 rounded-lg cursor-pointer transition-all hover:bg-gray-50 shadow-sm border-2 border-blue-200 bg-blue-50 mb-4"
+                      className="sticky top-0 z-20 flex items-center gap-4 p-4 rounded-lg cursor-pointer transition-all hover:bg-gray-50 shadow-sm border-2 border-blue-200 bg-blue-50 mb-4"
                       onClick={() => handleCategoryClick(selectedCategory)}
                     >
                       <div className="w-12 h-12 bg-[#1B2560] rounded-full flex items-center justify-center flex-shrink-0">
@@ -404,5 +363,5 @@ export default function MapPage() {
   )
 }
 
-MapPage.layout = (e: JSX.Element) => <Authenticated children={e} />
+MapPage.layout = (e: JSX.Element) => <Authenticated PageIcon={MapIcon} pageTitle="Tracking Map" children={e} />
 

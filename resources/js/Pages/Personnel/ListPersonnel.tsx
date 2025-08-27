@@ -15,6 +15,7 @@ import {
   Edit,
   Trash2,
   Import,
+  UserPen,
 } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { Button } from "@/components/ui/button"
@@ -313,6 +314,6 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
   )
 }
 
-ListPersonnel.layout = (e: JSX.Element) => <Authenticated pageTitle="Personnel Management" children={e} />
+ListPersonnel.layout = (e: JSX.Element) => <Authenticated PageIcon={UserPen} pageTitle="Personnel Management" children={e} />
 
 

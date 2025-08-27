@@ -1,7 +1,7 @@
 import { PageProps } from "@/types";
 import { Task } from "@/types/tasks";
-import { usePage } from "@inertiajs/react";
-import { AlertTriangle, CheckCircle, ClipboardList, Clock, XCircle } from "lucide-react";
+import { Link, usePage } from "@inertiajs/react";
+import { AlertTriangle, CheckCircle, ClipboardList, Clock, Plus, XCircle } from "lucide-react";
 
 export default function Overview() {
   const { tasks: allTasks } = usePage<PageProps<{ tasks: Task[] }>>().props;
@@ -101,8 +101,23 @@ export default function Overview() {
 
       {/* Active Tasks */}
       <div className="bg-white rounded-lg shadow border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-medium text-gray-900">Ongoing Tasks</h3>
+          <div className="flex gap-2">
+            <button
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center gap-2"
+            >
+              <AlertTriangle className="w-4 h-4" />
+              Emergency Task
+            </button>
+            <Link
+              href="/tasks/new"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Create Task
+            </Link>
+          </div>
         </div>
         <div className="divide-y divide-gray-200">
           {tasks

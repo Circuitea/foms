@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell, CheckCheck, ClipboardCheck, LayoutDashboard, LogOut, LucideIcon, Map, Phone, Settings, PenIcon as UserPen } from "lucide-react"
+import { Bell, CheckCheck, ClipboardCheck, LayoutDashboard, LogOut, LucideIcon, Map, Phone, Settings, UserPen } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +13,6 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
   SidebarTrigger,
-  useSidebar,
 } from "./ui/sidebar"
 import { Link, router, usePage } from "@inertiajs/react"
 import { Dialog, DialogContent, DialogFooter, DialogTrigger } from "./ui/dialog"

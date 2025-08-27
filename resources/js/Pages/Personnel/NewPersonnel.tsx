@@ -134,10 +134,10 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
   }
 
   return (
-    <div>
+    <div className="container mx-auto px-4 md:px-6 py-6 max-w-7xl">
       <Head title="Add New Personnel" />
 
-      <div className="px-6 py-6 bg-gray-50 min-h-screen">
+      <div className="px-6 py-6">
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex items-center gap-4 mb-4">
@@ -692,4 +692,4 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
   )
 }
 
-NewPersonnel.layout = (e: JSX.Element) => <Authenticated children={e} />
+NewPersonnel.layout = (e: JSX.Element) => <Authenticated PageIcon={User} pageTitle="New Personnel" children={e} />

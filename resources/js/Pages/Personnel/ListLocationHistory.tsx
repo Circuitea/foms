@@ -89,25 +89,25 @@ export default function ListLocationHistory() {
 
 
 ListLocationHistory.layout = (e: ReactElement) => {
-  // const { id } = e.props.personnel;
+  const { id } = e.props.personnel;
 
   return (
     <Authenticated
       children={e}
       pageTitle="Location History"
-      // breadcrumbEntries={[
-      //   {
-      //     value: 'Personnel Management',
-      //     url: '/personnel',
-      //   },
-      //   {
-      //     value: `Personnel (ID:${id})`,
-      //     url: `/personnel/${id}`,
-      //   },
-      //   {
-      //     value: 'Location History',
-      //   },
-      // ]}
+      breadcrumbEntries={[
+        {
+          value: 'Personnel Management',
+          url: '/personnel',
+        },
+        {
+          value: `Personnel (ID:${id})`,
+          url: `/personnel/${id}`,
+        },
+        {
+          value: 'Location History',
+        },
+      ]}
     />
   )
 }

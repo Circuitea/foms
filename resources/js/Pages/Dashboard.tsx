@@ -4,7 +4,7 @@ import React from "react"
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
 import { Head, Link } from "@inertiajs/react"
 import { useState, useEffect } from "react"
-import { Users, MapPin, Calendar, Maximize2, AlertTriangle, CheckCircle, X, ChevronLeft, RefreshCw } from "lucide-react"
+import { Users, MapPin, Calendar, Maximize2, AlertTriangle, CheckCircle, X, ChevronLeft, RefreshCw, LayoutDashboard } from "lucide-react"
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet"
 import PersonnelMarkersLayer from "./Mapping/Partials/PersonnelMarkersLayer"
 import SanJuanBoundary from './Mapping/sanjuan-boundary.json';
@@ -146,27 +146,6 @@ export default function Dashboard() {
     alert(`Event Details: ${event.title} at ${event.time}`)
   }
 
-  // Update time
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date()
-      const options: Intl.DateTimeFormatOptions = {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-      }
-      setCurrentTime(now.toLocaleDateString("en-US", options))
-    }
-
-    updateTime()
-    const timer = setInterval(updateTime, 1000)
-    return () => clearInterval(timer)
-  }, [])
 
   const personnelCategories = [
     { name: "Management", count: 12, color: "bg-blue-500" },
@@ -718,21 +697,9 @@ export default function Dashboard() {
 
   return (
     <div>
-      <Head title="CDRRMO Dashboard" />
 
       <div className="min-h-screen bg-gray-50">
-        {/* Sticky Header */}
-        <div className="sticky top-0 z-40 bg-[#1B2560] text-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Users className="w-6 h-6 text-white" />
-                <h1 className="text-xl font-semibold text-white">Dashboard</h1>
-              </div>
-              <div className="text-sm font-mono text-white">{currentTime}</div>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Dashboard Content */}
         <div className="max-w-7xl mx-auto px-6 py-6">
@@ -1184,4 +1151,4 @@ export default function Dashboard() {
   )
 }
 
-Dashboard.layout = (e: React.ReactElement) => <AuthenticatedLayout children={e} />
+Dashboard.layout = (e: React.ReactElement) => <AuthenticatedLayout PageIcon={LayoutDashboard} pageTitle="Dashboard" children={e} />
