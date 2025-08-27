@@ -58,6 +58,8 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::get('/', [MyTasksController::class, 'list']);
         Route::get('/{id}', [MyTasksController::class, 'show']);
         Route::post('/{id}/status', [MyTasksController::class, 'updateStatus']);
+        Route::get('/{id}/report', [MyTasksController::class, 'showReport']);
+        Route::post('/{id}/report', [MyTasksController::class, 'storeReport']);
     });
 
     Route::prefix('inventory')->group(function() {

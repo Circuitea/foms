@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { TaskReport } from "@/Documents/TaskReport";
 import { Task } from "@/types/tasks";
 import { usePage } from "@inertiajs/react";
-import { PDFDownloadLink, PDFViewer, usePDF } from "@react-pdf/renderer";
+import { pdf, PDFDownloadLink, PDFViewer, usePDF } from "@react-pdf/renderer";
+import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 
 export function FinishTaskDialog({ task, onSubmit }: { task: Task, onSubmit: () => void }) {
@@ -64,12 +65,17 @@ export function FinishTaskDialog({ task, onSubmit }: { task: Task, onSubmit: () 
               </Button>
               <Button
                 className="bg-[#1B2560]"
-                onClick={() => onSubmit()}
-                asChild
+                onClick={() => {
+                  pdf(document).toBlob().then((blob) => {
+                    return axios.postForm(`/my-tasks/${task.id}/report`, {
+                      report: blob,
+                    });
+                  }).then(() => {
+                    onSubmit()
+                  });
+                }}
               >
-                <PDFDownloadLink document={document}>
-                  Submit Report and Finish Task
-                </PDFDownloadLink>
+                Submit Report and Finish Task
               </Button>
             </div>
           </div>

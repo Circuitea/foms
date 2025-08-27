@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task\Task;
+use App\Models\Task\TaskReport;
 use App\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File;
 use Inertia\Inertia;
 
 class MyTasksController extends Controller
@@ -57,5 +61,43 @@ class MyTasksController extends Controller
         }
 
         return back();
+    }
+
+    public function showReport(Request $request, int $id) {
+        $user = $request->user();
+        $task = Task::findOr($id, function () {
+            abort(404);
+        });
+
+        $report = $task->personnel()->where('id', $user->id)->first()->pivot->report;
+
+        Log::info('Download requested', [
+            'report' => $report,
+        ]);
+
+        return Storage::download($report->file_name, 'task' . $task->id . '_report');
+    }
+
+    public function storeReport(Request $request, int $id) {
+        $request->validate([
+            'report' => [
+                'required',
+                File::types(['pdf']),
+            ],
+        ]);
+
+        $user = $request->user();
+        $task = Task::findOr($id, function () {
+            abort(404);
+        });
+
+        $file = $request->file('report');
+        $path = $file->store('reports');
+
+        $pivot = $task->personnel()->where('id', $user->id)->first()->pivot;
+        $pivot->report()->associate(TaskReport::create(['file_name' => $path]));
+        $pivot->save();
+
+        return response('ok');
     }
 }

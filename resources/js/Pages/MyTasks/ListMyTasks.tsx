@@ -8,7 +8,7 @@ import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { cn, formatName } from "@/lib/utils";
 import { PageProps } from "@/types";
 import { Task } from "@/types/tasks";
-import { router, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import { PDFViewer } from "@react-pdf/renderer";
 import dayjs from "dayjs";
 import { Clipboard } from "lucide-react";
@@ -155,7 +155,21 @@ function TaskList({ tasks }: { tasks: Task[] }) {
                   </Button>
                   <FinishTaskDialog task={task} onSubmit={() => changeTaskStatus(task.id, 'finished')} />
                 </>
-              ) : null}
+              ) : (
+                <Button
+                  className="bg-[#1B2560]"
+                  asChild
+                >
+                  <a
+                    href={`/my-tasks/${task.id}/report`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                  >
+                    Download Report
+                  </a>
+                </Button>
+              )}
             </div>
           </div>
         </div>
