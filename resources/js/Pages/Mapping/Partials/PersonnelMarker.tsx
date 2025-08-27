@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toProperCase } from "@/lib/utils";
 import { PersonnelLocation, PersonnelMarkerDetails } from "@/types";
 import { Clock, MapPin, User, X } from "lucide-react";
 import { useState } from "react";
@@ -42,14 +43,14 @@ export default function PersonnelMarker({ marker, isClickable }: { marker: Perso
                 <div
                 className={`w-2 h-2 rounded-full mr-1`}
                 ></div>
-                {"Active"}
+                {toProperCase(marker.personnel.status ?? '')}
               </div>
               </div>
               <div>
               <p className="text-sm text-gray-600">Current Location</p>
               <div className="flex items-center text-sm font-medium text-gray-900">
                 <MapPin className="w-4 h-4 mr-1" />
-                {"On-site"}
+                {marker.name}
               </div>
               </div>
             </div>

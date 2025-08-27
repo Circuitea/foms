@@ -1,8 +1,9 @@
-import { Personnel, PersonnelLocation, PersonnelMarkerDetails } from "@/types"
+import { PageProps, Personnel, PersonnelLocation, PersonnelMarkerDetails } from "@/types"
 import { LayerGroup, Marker } from "react-leaflet"
 import PersonnelMarker from "./PersonnelMarker"
 import { useEcho } from "@laravel/echo-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePage } from "@inertiajs/react";
 
 // const personnelMarkers: PersonnelLocation[] = [
 //     {
@@ -35,15 +36,16 @@ import { useState } from "react";
 
 
 export default function PersonnelMarkersLayer({ isClickable = true }: { isClickable?: boolean }) {
+    const { data } = usePage<PageProps<{ locations: { data: PersonnelLocation[] } }>>().props.locations;
     const [locations, setLocations] = useState<PersonnelLocation[]>([]);
     useEcho<{ personnelLocations: PersonnelLocation[] }>('location', 'LocationUpdated', ({ personnelLocations }) => {
         setLocations(personnelLocations);
-    }); 
+    });
 
   return (
     <LayerGroup>
         {/* {personnelMarkers.map((personnelMarker) => <PersonnelMarker isClickable={isClickable} marker={personnelMarker} />)} */}
-        {locations.map((location) => <PersonnelMarker isClickable={isClickable} marker={location} />)}
+        {[...data, ...locations].map((location) => <PersonnelMarker isClickable={isClickable} marker={location} />)}
     </LayerGroup>
   )
 }

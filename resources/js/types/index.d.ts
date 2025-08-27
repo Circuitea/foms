@@ -46,6 +46,7 @@ export interface PersonnelLocation {
     longitude: number,
     created_at: string,
     updated_at: string,
+    name: string;
 };
 
 export interface Section {
