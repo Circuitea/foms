@@ -13,6 +13,7 @@ import { PDFViewer } from "@react-pdf/renderer";
 import dayjs from "dayjs";
 import { Clipboard } from "lucide-react";
 import { ReactElement } from "react";
+import { FinishTaskDialog } from "./FinishTaskDialog";
 
 export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
 
@@ -40,7 +41,6 @@ export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
 }
 
 function TaskList({ tasks }: { tasks: Task[] }) {
-  const { user } = usePage().props.auth;
   const dispatch = useStatusDispatch();
   const getPriorityBadgeStyle = (priority: string) => {
     switch (priority) {
@@ -153,28 +153,7 @@ function TaskList({ tasks }: { tasks: Task[] }) {
                   >
                     Cancel
                   </Button>
-                  <Dialog>
-                    <DialogTrigger>
-                      <Button
-                        className="flex items-center justify-center rounded bg-[#1B2560]"
-                      >
-                        Finish
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-7xl h-full grid-rows-12">
-                      <DialogHeader className="">
-                        <DialogTitle>Finish Task?</DialogTitle>
-                        <DialogDescription>The following report will be generated for the completion of this task.</DialogDescription>
-                      </DialogHeader>
-                      <div className="row-span-11 grid grid-cols-[60%_40%] h-full relative top-0">
-                        <div>
-                          <PDFViewer className="h-full w-full">
-                            <TaskReport task={task} user={user} />
-                          </PDFViewer>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                  <FinishTaskDialog task={task} onSubmit={() => changeTaskStatus(task.id, 'finished')} />
                 </>
               ) : null}
             </div>

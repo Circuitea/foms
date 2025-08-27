@@ -1,7 +1,7 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { HeadingOne, HeadingTwo } from "./components/Heading";
 import { Table, TD, TH, TR } from '@ag-media/react-pdf-table';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useEffect } from 'react';
 import { Task } from '@/types/tasks';
 import { formatName } from '@/lib/utils';
 import { Personnel } from '@/types';
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
 
 const BlankLine = () => <Text style={styles.text}>{"\n"}</Text>
 
-export function TaskReport({ task, user }: { task: Task, user: Personnel }) {
+export function TaskReport({ task, user, notes }: { task: Task, user: Personnel, notes: string }) {
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
@@ -65,6 +65,9 @@ export function TaskReport({ task, user }: { task: Task, user: Personnel }) {
             </View>
           </View>
         </View>
+
+        
+
         <View>
           <HeadingOne>TASK INFORMATION</HeadingOne>
           <HeadingTwo>INCIDENT INFORMATION</HeadingTwo>
@@ -77,6 +80,7 @@ export function TaskReport({ task, user }: { task: Task, user: Personnel }) {
           <Text style={[styles.text, { textAlign: 'justify' }]}>
             {task.description}
           </Text>
+
           <HeadingTwo>REQUIRED RESOURCES</HeadingTwo>
           <Table tdStyle={{ padding: 5 }} weightings={[0.8, 0.2]}>
             <TH>
@@ -91,6 +95,20 @@ export function TaskReport({ task, user }: { task: Task, user: Personnel }) {
             ))}
           </Table>
         </View>
+
+        <View>
+          <HeadingOne>ADDITIONAL NOTES</HeadingOne>
+            {notes.trim() === '' 
+              ? (
+                <Text style={[{fontStyle: 'italic'}]}>No additional notes provided.</Text>
+              ) : (
+                <Text style={[styles.text, {textAlign: 'justify'}]}>
+                  {notes}
+                </Text>
+              )
+            }
+        </View>
+        
         <View>
           <HeadingOne>LOCATION LIST</HeadingOne>
           <Table tdStyle={{ padding: 5 }} weightings={[0.8, 0.2]}>
