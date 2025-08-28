@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Personnel;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\Task\TaskType;
+use Illuminate\Container\Attributes\Tag;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +16,33 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Personnel::factory(10)->create();
-
-        Personnel::factory()->create([
-            'first_name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            MeetingTypeSeeder::class,
+            InventoryItemTypeSeeder::class,
+            InventoryItemConditionSeeder::class,
+            RoleSeeder::class,
+            TaskRelatedSeeder::class,
         ]);
+
+        // $allDiagnosis = ['141j231', '123'];
+
+        // collect($allDiagnosis)->each(function ($diagnosis) {
+        //     Diagnosis::create([
+        //         'diagnosis_name' = > $diagnosis,
+        //         'visible_to_roles' => ['physician', 'dentist', 'obstetrician-gynecologist'],
+        //     ]);
+        // });
+        // collect($dentistDiagnosis)->each(function ($diagnosis) {
+        //     Diagnosis::create([
+        //         'diagnosis_name' = > $diagnosis,
+        //         'visible_to_roles' => ['physician', 'dentist', 'obstetrician-gynecologist'],
+        //     ]);
+        // });
+        // collect($midwifeDiagnosis)->each(function ($diagnosis) {
+        //     Diagnosis::create([
+        //         'diagnosis_name' = > $diagnosis,
+        //         'visible_to_roles' => ['physician', 'dentist', 'obstetrician-gynecologist'],
+        //     ]);
+        // });
     }
 }

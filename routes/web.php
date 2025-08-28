@@ -1,33 +1,85 @@
 <?php
 
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\MapController;
+use App\Http\Controllers\MeetingsController;
+use App\Http\Controllers\MyTasksController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TasksController;
+use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Route::get('/', function () {
-//     return Inertia::render('Welcome', [
-//         'canLogin' => Route::has('login'),
-//         'canRegister' => Route::has('register'),
-//         'laravelVersion' => Application::VERSION,
-//         'phpVersion' => PHP_VERSION,
-//     ]);
-// });
+Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    Route::get('/map', function () {
+        return Inertia::render('Mapping/Map');
+    })->name('map');
 
-Route::prefix('personnel')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('', [PersonnelController::class, 'list']);
-    Route::get('new', [PersonnelController::class, 'new']);
-    Route::post('new', [PersonnelController::class, 'create']);
-});
+    Route::prefix('map')->group(function() {
+        Route::get('/', [MapController::class, 'index']);
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::get('/report', function () {
+            return Inertia::render('Mapping/Report');
+        });
+
+        Route::get('/presentation', function () {
+            return Inertia::render('Mapping/Presentation');
+        });
+    });
+
+    Route::get('/test', function () {
+        return Inertia::render('TestPage');
+        // return Inertia::render('MyTasks/OldListMyTasks');
+    });
+
+    Route::prefix('personnel')->group(function () {
+        Route::get('/', [PersonnelController::class, 'list']);
+        Route::get('/new', [PersonnelController::class, 'new']);
+        Route::post('/new', [PersonnelController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
+        Route::get('/import', [PersonnelController::class, 'import']);
+        Route::post('/import', [PersonnelController::class, 'add']);
+        Route::get('/{id}/activity', [PersonnelController::class, 'listActivity']);
+        Route::get('/{id}/location-history', [PersonnelController::class, 'listLocationHistory']);
+    });
+
+    Route::prefix('meetings')->name('meetings.')->group(function () {
+        Route::get('/', [MeetingsController::class, 'list'])->name('list');
+        Route::get('/new', [MeetingsController::class, 'new'])->name('new');
+        Route::post('/new', [MeetingsController::class, 'create'])->name('create')->middleware([HandlePrecognitiveRequests::class]);
+        Route::get('/{id}', [MeetingsController::class, 'show'])->name('show');
+    });
+
+    Route::prefix('my-tasks')->group(function() {
+        Route::get('/', [MyTasksController::class, 'list']);
+        Route::get('/{id}', [MyTasksController::class, 'show']);
+        Route::post('/{id}/status', [MyTasksController::class, 'updateStatus']);
+        Route::get('/{id}/report', [MyTasksController::class, 'showReport']);
+        Route::post('/{id}/report', [MyTasksController::class, 'storeReport']);
+    });
+
+    Route::prefix('inventory')->group(function() {
+        Route::get('/', [InventoryController::class, 'index']);
+        Route::post('/item/new', [InventoryController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
+        Route::get('/item/{ID}', [InventoryController::class, 'show']);
+        Route::get('/{typeID}', [InventoryController::class, 'list']);
+    });
+
+    Route::prefix('tasks')->group(function () {
+        Route::get('/', [TasksController::class, 'list']);
+        Route::get('/new', [TasksController::class, 'new']);
+        Route::post('/new', [TasksController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
+    });
+
+    Route::middleware('auth')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile/token/{id}', [ProfileController::class, 'revokeToken']);
+    });
 });
 
 require __DIR__.'/auth.php';

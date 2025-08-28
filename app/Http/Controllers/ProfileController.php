@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -18,8 +19,10 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
         return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'tokens' => $user->tokens()->orderBy('created_at')->get()->select(['id', 'name', 'last_used_at', 'created_at']),
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => session('status'),
         ]);
     }
@@ -59,5 +62,16 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function revokeToken(Request $request, string $id) {
+        $user = $request->user();
+        $token = $user->tokens()->firstWhere('id', $id);
+
+        Gate::authorize('revoke-token', $token);
+
+        $token->delete();
+
+        return back();
     }
 }

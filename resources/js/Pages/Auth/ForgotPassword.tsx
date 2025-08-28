@@ -1,6 +1,4 @@
 import InputError from '@/components/InputError';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import GuestLayout from '@/Layouts/GuestLayout';
@@ -42,7 +40,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     onChange={(e) => setData('email', e.target.value)}
                 />
 
-                <InputError message={errors.email} className="mt-2" />
+                <InputError message={errors.email} />
 
                 <div className="mt-4 flex items-center justify-end">
                     {/* <PrimaryButton className="ms-4" disabled={processing}>
