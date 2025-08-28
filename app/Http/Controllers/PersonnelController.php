@@ -23,7 +23,7 @@ class PersonnelController extends Controller
     Gate::authorize(PermissionsEnum::PERSONNEL_READ);
 
     return Inertia::render('Personnel/ListPersonnel', [
-      'personnel' => fn () => Personnel::with(['sections', 'roles'])->simplePaginate(15),
+      'personnel' => fn () => Personnel::with(['sections', 'roles'])->get(),
       'roles' => Role::all()->keyBy('name')->map(fn (Role $role) => RolesEnum::from($role->name)->label()),
       'sections' => Section::all(['id', 'name']),
       'total' => Personnel::count(),

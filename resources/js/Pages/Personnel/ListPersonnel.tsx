@@ -123,7 +123,7 @@ interface Option {
   label: string,
 }
 
-export default function ListPersonnel({ personnel, total, sections, roles }: PageProps<{ personnel: Paginator<Personnel>, total: number, sections: Section[], roles: RoleLabels }>) {
+export default function ListPersonnel({ personnel, total, sections, roles }: PageProps<{ personnel: Personnel[], total: number, sections: Section[], roles: RoleLabels }>) {
   const sectionOptions: Option[] = [
     {value: 0, label: 'All Departments'},
     ...sections.map((section) => {
@@ -143,10 +143,10 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
   const [searchTerm, setSearchTerm] = useState("")
 
   const stats = {
-    total: 15,
-    active: 15,
-    onDuty: 15,
-    onSite: 15,
+    total: personnel.length,
+    available: personnel.filter(person => person.status === 'available').length,
+    assigned: personnel.filter(person => person.status === 'assigned').length,
+    'on leave': personnel.filter(person => person.status === 'on leave' || !person.status).length,
   }
 
   return (
@@ -173,8 +173,8 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
                 <UserCheck className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Active</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
+                <p className="text-sm font-medium text-gray-600">Available</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.available}</p>
               </div>
             </div>
           </div>
@@ -185,8 +185,8 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
                 <Clock className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">On Duty</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.onDuty}</p>
+                <p className="text-sm font-medium text-gray-600">Assigned to Task</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.assigned}</p>
               </div>
             </div>
           </div>
@@ -197,8 +197,8 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
                 <MapPin className="h-6 w-6 text-purple-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">On-site</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.onSite}</p>
+                <p className="text-sm font-medium text-gray-600">On Leave / Unavailable</p>
+                <p className="text-2xl font-bold text-gray-900">{stats['on leave']}</p>
               </div>
             </div>
           </div>
@@ -281,7 +281,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
 
         <DataTable
           columns={columns}
-          data={personnel.data}
+          data={personnel}
           noData={(
             <div className="flex flex-col items-center justify-center text-gray-500">
               <Users className="h-12 w-12 mb-4 text-gray-300" />
@@ -292,7 +292,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
         ></DataTable>
 
         {/* Pagination */}
-        <div className="mt-6 flex justify-between items-center">
+        {/* <div className="mt-6 flex justify-between items-center">
           <p className="text-sm text-gray-600">
             Showing {personnel.from} to {personnel.to} of {total} results
           </p>
@@ -308,7 +308,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
               </Link>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   )
