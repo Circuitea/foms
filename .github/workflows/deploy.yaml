@@ -80,8 +80,8 @@ jobs:
           port: ${{ env.SSH_PORT }}
           username: ${{ env.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          envs: APP_DIR
           script: |
-            echo $APP_DIR
             cd $APP_DIR
 
             sudo find storage -type d -exec chmod 775 {} \;
