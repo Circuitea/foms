@@ -1,0 +1,109 @@
+name: Deploy Main to Droplet
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_DIR: ${{ secrets.APP_DIR }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      PHP_FPM_SERVICE: ${{ secrets.PHP_FPM_SERVICE }}
+      NODE_VERSION: ${{ secrets.NODE_VERSION }}
+      PHP_VERSION: ${{ secrets.PHP_VERSION }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: composer:v2
+          coverage: none
+      
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+      
+      - name: Install PHP dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install Javascript dependencies
+        run: npm ci
+
+      - name: Build Vite assets
+        run: npm run build
+
+      - name: Create deployment archive directory
+        run: |
+          mkdir deploy_bundle
+          rsync -a \
+            --exclude ".git" \
+            --exclude ".github" \
+            --exclude ".node_modules" \
+            --exclude "tests" \
+            --exclude "storage/logs" \
+            --exclude ".env" \
+            ./ deploy_bundle/
+      
+      - name: Copy files via rsync
+        uses: burnett01/rsync-deployments@v7.0.1
+        with:
+          switches: -avzr --delete
+          path: deploy_bundle/
+          remote_path: ${{ env.APP_DIR }}
+          remote_host: ${{ env.SSH_HOST }}
+          remote_user: ${{ env.SSH_USER }}
+          remote_port: ${{ env.SSH_PORT }}
+          remote_key: ${{ env.SSH_KEY }}
+        
+      - name: Post-deploy commands
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd $APP_DIR
+
+            sudo chown -R ${USER}:www-data $APP_DIR
+            sudo find storage -type d -evec chmod 775 {} \;
+            sudo find storage -type d -evec chmod 664 {} \;
+            sudo chmod -R 775 bootstrap/cache
+
+            if [ ! -f ".env" ]; then
+              echo ".env not found at $APP_DIR.env"; exit 1
+            fi
+
+            php artisan down || true
+
+            php artisan optimize:clear
+
+            php artisan optimize
+
+            php artisan migrate --force
+
+            php artisan queue:restart || true
+
+            php artisan up
+
+            if command -v systemctl >/dev/null 2>&1; then
+              sudo systemctl reload ${PHP_FPM_SERVICE}
+            fi
