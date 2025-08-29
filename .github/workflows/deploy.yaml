@@ -49,24 +49,11 @@ jobs:
 
       - name: Build Vite assets
         run: npm run build
-
-      - name: Create deployment archive directory
-        run: |
-          mkdir deploy_bundle
-          rsync -a \
-            --exclude ".git" \
-            --exclude ".github" \
-            --exclude "node_modules" \
-            --exclude "tests" \
-            --exclude "storage/logs" \
-            --exclude ".env" \
-            ./ deploy_bundle/
       
       - name: Copy files via rsync
         uses: burnett01/rsync-deployments@7.0.2
         with:
-          switches: -avzr --delete
-          path: deploy_bundle/
+          switches: -avzr --delete --exclude ".git" --exclude ".github" --exclude "node_modules" --exclude "tests" --exclude "storage/logs" --exclude ".env"
           remote_path: ${{ env.APP_DIR }}
           remote_host: ${{ env.SSH_HOST }}
           remote_user: ${{ env.SSH_USER }}
