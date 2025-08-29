@@ -67,7 +67,7 @@ jobs:
           port: ${{ env.SSH_PORT }}
           username: ${{ env.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          envs: APP_DIR
+          envs: APP_DIR, PHP_FPM_SERVICE
           script: |
             cd $APP_DIR
 
