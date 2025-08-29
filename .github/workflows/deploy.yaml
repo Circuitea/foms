@@ -63,7 +63,7 @@ jobs:
             ./ deploy_bundle/
       
       - name: Copy files via rsync
-        uses: burnett01/rsync-deployments@v7.0.1
+        uses: burnett01/rsync-deployments@7.0.2
         with:
           switches: -avzr --delete
           path: deploy_bundle/
