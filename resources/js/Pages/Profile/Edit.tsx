@@ -77,4 +77,4 @@ export default function Edit({ mustVerifyEmail, status }: PageProps<{ mustVerify
   )
 }
 
-Edit.layout = (e: JSX.Element) => <AuthenticatedLayout children={e} />
+Edit.layout = (e: JSX.Element) => <AuthenticatedLayout pageTitle="Profile Settings" children={e} />

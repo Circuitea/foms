@@ -286,4 +286,4 @@ export default function ImportPersonnel({ roles, sections }: PageProps<{
   );
 }
 
-ImportPersonnel.layout = (e: JSX.Element) => <Authenticated children={e} />
+ImportPersonnel.layout = (e: JSX.Element) => <Authenticated pageTitle="Personnel Import (CSV)" children={e} />

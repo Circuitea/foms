@@ -247,4 +247,4 @@ export default function ListInventory({ items, type }: PageProps<{ items: ItemEn
   )
 }
 
-ListInventory.layout = (e: React.JSX.Element) => <Authenticated children={e} />
+ListInventory.layout = (e: React.JSX.Element) => <Authenticated pageTitle="ListInventory" children={e} />

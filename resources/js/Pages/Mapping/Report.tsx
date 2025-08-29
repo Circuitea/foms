@@ -730,6 +730,6 @@ function Report() {
   )
 }
 
-Report.layout = (e: JSX.Element) => <Authenticated children={e} />
+Report.layout = (e: JSX.Element) => <Authenticated pageTitle="Report" children={e} />
 
 export default Report

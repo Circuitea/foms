@@ -1062,4 +1062,4 @@ export default function ShowNotifications() {
   )
 }
 
-ShowNotifications.layout = (e: JSX.Element) => <Authenticated children={e} />
+ShowNotifications.layout = (e: JSX.Element) => <Authenticated pageTitle="Notification Information" children={e} />

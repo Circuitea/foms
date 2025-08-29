@@ -210,4 +210,4 @@ export default function ShowInventoryItem({
   );
 }
 
-ShowInventoryItem.layout = (e: JSX.Element) => <Authenticated children={e} />
+ShowInventoryItem.layout = (e: JSX.Element) => <Authenticated pageTitle="Inventory Item" children={e} />

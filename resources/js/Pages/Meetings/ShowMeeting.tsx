@@ -188,4 +188,4 @@ export default function ShowMeeting({ meeting }: PageProps<{ meeting: Meeting }>
     )
 }
 
-ShowMeeting.layout = (e: JSX.Element) => <Authenticated children={e} />
+ShowMeeting.layout = (e: JSX.Element) => <Authenticated pageTitle="Meeting Information" children={e} />
