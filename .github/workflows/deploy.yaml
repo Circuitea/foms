@@ -92,5 +92,5 @@ jobs:
             php artisan up
 
             if command -v systemctl >/dev/null 2>&1; then
-              systemctl reload ${PHP_FPM_SERVICE}
+              sudo systemctl reload ${PHP_FPM_SERVICE}
             fi
