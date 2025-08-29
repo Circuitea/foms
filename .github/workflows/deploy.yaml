@@ -71,7 +71,7 @@ jobs:
           remote_host: ${{ env.SSH_HOST }}
           remote_user: ${{ env.SSH_USER }}
           remote_port: ${{ env.SSH_PORT }}
-          remote_key: ${{ env.SSH_KEY }}
+          remote_key: ${{ secrets.SSH_KEY }}
         
       - name: Post-deploy commands
         uses: appleboy/ssh-action@v1.2.0
