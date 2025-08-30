@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LocationHistory extends Model
 {
-  protected $fillable = ['latitude', 'longitude'];
+  protected $fillable = ['latitude', 'longitude', 'personnel_id'];
 
 
   protected function casts() {
