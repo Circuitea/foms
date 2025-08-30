@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\LocationUpdated;
+use App\Http\Controllers\PersonnelLocationController;
 use App\Http\Resources\PersonnelLocationResource;
 use App\Models\Personnel;
 use App\Models\PersonnelLocation;
@@ -35,22 +36,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
     });
 
-    Route::post('/location', function (Request $request) {
-        $user = $request->user();
-
-        Log::info('New location update', [
-            'user' => $user->id,
-            'lat' => $request['latitude'],
-            'lng' => $request['longitude'],
-        ]);
-
-        PersonnelLocation::upsert([
-            ['latitude' => $request['latitude'], 'longitude' => $request['longitude'], 'id' => $user->id],
-        ], uniqueBy: ['id'], update: ['latitude', 'longitude']);
-
-        LocationUpdated::dispatch(PersonnelLocationResource::collection(PersonnelLocation::all()));
-
-    });
+    Route::post('/location', [PersonnelLocationController::class, 'store']);
 
     Route::post('/expo-push-token', function (Request $request) {
         Log::info('Received token from mobile application');
