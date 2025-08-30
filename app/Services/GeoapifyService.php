@@ -23,7 +23,7 @@ class GeoapifyService
       $response = Http::retry(3, 100)
         ->withQueryParameters([
           'apiKey' => $this->apiKey,
-          'type' => 'street',
+          'type' => 'amenity',
           'limit' => 1,
           'lang' => 'en',
           'lat' => $lat,
