@@ -44,7 +44,7 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::get('/import', [PersonnelController::class, 'import']);
         Route::post('/import', [PersonnelController::class, 'add']);
         Route::get('/{id}/activity', [PersonnelController::class, 'listActivity']);
-        Route::get('/{id}/location-history', [PersonnelController::class, 'listLocationHistory']);
+        Route::get('/{id}/location-history/{date?}', [PersonnelController::class, 'listLocationHistory']);
     });
 
     Route::prefix('meetings')->name('meetings.')->group(function () {

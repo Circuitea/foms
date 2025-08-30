@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Geoapify;
 use App\Http\Requests\NewPersonnelRequest;
+use App\Models\LocationHistory;
 use App\Models\Personnel;
 use App\Models\Section;
 use App\PermissionsEnum;
@@ -128,11 +130,22 @@ class PersonnelController extends Controller
     ]);
   }
 
-  public function listLocationHistory(Request $request, int $id) {
-    $user = $request->user();
+  public function listLocationHistory(Request $request, int $id, string $date = null) {
+    $user = Personnel::findOr($id, function () {
+      abort(404);
+    });
+
+    $targetDate = $date ?? now()->toDateString();
 
     return Inertia::render('Personnel/ListLocationHistory', [
       'personnel' => $user,
+      'location_history' => $user->locationHistory()
+        ->whereDate('created_at', $targetDate)
+        ->get()
+        ->map(fn (LocationHistory $location) => [
+          ... $location->toArray(),
+          'location_name' => Geoapify::reverseGeocode($location->latitude, $location->longitude),
+        ]),
     ]);
   }
 }

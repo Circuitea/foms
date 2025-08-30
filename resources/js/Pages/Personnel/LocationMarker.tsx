@@ -8,7 +8,7 @@ export function LocationMarker({
   location,
   visible = false,
 } : {
-  location: { latitude: number, longitude: number, created_at: string },
+  location: { location_name: string, latitude: number, longitude: number, created_at: string },
   visible: boolean
 }) {
   const ref = useRef<LeafletMarker>(null);
@@ -35,10 +35,10 @@ export function LocationMarker({
     <Marker
       ref={ref}
       position={[location.latitude, location.longitude]}
-      icon={visible || ref.current?.isTooltipOpen() ? hoveredMarkerIcon : markerIcon}
+      icon={ref.current?.isTooltipOpen() ? hoveredMarkerIcon : markerIcon}
     >
       <Tooltip>
-        Location - {dayjs(location.created_at).format("hh:mm A")}
+        {location.location_name} - {dayjs(location.created_at).format("hh:mm A")}
       </Tooltip>
     </Marker>
   )
