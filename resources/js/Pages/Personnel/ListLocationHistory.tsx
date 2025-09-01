@@ -1,16 +1,19 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { latLngBounds } from "leaflet";
 import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 import ZoomControl from "../Mapping/Partials/ZoomControl";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import dayjs from "dayjs";
 import { ChevronDown } from "lucide-react";
 import { LocationMarker } from "./LocationMarker";
 
 import 'leaflet/dist/leaflet.css';
-import { PageProps } from "@/types";
+import { PageProps, Personnel } from "@/types";
+import { router } from "@inertiajs/react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {  DayButton, DayButtonProps } from "react-day-picker";
 
 interface Location {
   latitude: number;
@@ -19,11 +22,22 @@ interface Location {
   created_at: string;
 }
 
-export default function Listlocation_history({ location_history }: PageProps<{
+interface AvailableDate {
+  date: string;
+  count: number;
+}
+
+export default function Listlocation_history({ location_history, personnel, selected_date, available_dates }: PageProps<{
   location_history: Location[],
+  personnel: Personnel,
+  selected_date: string,
+  available_dates: AvailableDate[],
 }>) {
+  const [date, setDate] = useState<Date>(dayjs(selected_date, "YYYY-M-D").toDate());
   const [openTooltips, setOpenTooltips] = useState<Record<number, boolean>>({});
-  const bounds = latLngBounds(location_history.map(location => [location.latitude, location.longitude]));
+  const bounds = location_history.length > 0
+    ? latLngBounds(location_history.map(location => [location.latitude, location.longitude]))
+    : latLngBounds([[14.6049536202617, 121.02954192937848]]);
 
   const changeTooltipState = (index: number, state: boolean) => {
     setOpenTooltips((prev) => ({
@@ -63,12 +77,54 @@ export default function Listlocation_history({ location_history }: PageProps<{
           <h3 className="text-lg font-medium text-gray-900">History</h3>
           <Popover>
             <PopoverTrigger className="rounded-lg py-1 px-2 border border-gray-200 flex gap-2 items-center justify-between">
-              {dayjs().format("MMM DD, YYYY")}
+              {dayjs(date).format("MMM DD, YYYY")}
               <ChevronDown className="w-4 h-4" />
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent align="end">
               <Calendar
+                required
+                disabled={(dateToDisable) => {
+                  const checkDate = dayjs(dateToDisable).format('YYYY-MM-DD');
+                  if (available_dates.find(available_date => available_date.date !== checkDate)) {
+                    console.log(true);
+                    return true;
+                  } else return false;
+                }}
                 className="w-full"
+                selected={date}
+                defaultMonth={date}
+                onSelect={(newDate) => {
+                  const {years, months, date} = dayjs(newDate).toObject();
+
+                  console.log(`years: ${years} | months: ${months+1} | $date: ${date}`);
+
+                  router.visit(`/personnel/${personnel.id}/location-history/${years}-${months+1}-${date}`);
+                }}
+                mode="single"
+                components={{
+                  DayButton: ({ day, modifiers, ...buttonProps }: DayButtonProps) => {
+                    const dayCount = available_dates.find(available_date => available_date.date === dayjs(day.date).format('YYYY-MM-DD'))?.count;
+
+                    return dayCount ? (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <CalendarDayButton
+                            day={day}
+                            modifiers={modifiers}
+                            {...buttonProps}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Recorded Locations: {dayCount}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : <CalendarDayButton
+                          day={day}
+                          modifiers={modifiers}
+                          {...buttonProps}
+                        />;
+                  },
+                }}
               />
             </PopoverContent>
           </Popover>

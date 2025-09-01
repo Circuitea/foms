@@ -13,6 +13,7 @@ use App\Rules\ValidRole;
 use App\Rules\ValidSection;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -130,7 +131,7 @@ class PersonnelController extends Controller
     ]);
   }
 
-  public function listLocationHistory(Request $request, int $id, string $date = null) {
+  public function listLocationHistory(Request $request, int $id, ?string $date = null) {
     $user = Personnel::findOr($id, function () {
       abort(404);
     });
@@ -139,13 +140,21 @@ class PersonnelController extends Controller
 
     return Inertia::render('Personnel/ListLocationHistory', [
       'personnel' => $user,
-      'location_history' => $user->locationHistory()
+      'location_history' => $user
+        ->locationHistory()
         ->whereDate('created_at', $targetDate)
         ->get()
         ->map(fn (LocationHistory $location) => [
           ... $location->toArray(),
           'location_name' => Geoapify::reverseGeocode($location->latitude, $location->longitude),
         ]),
-    ]);
+      'selected_date' => $targetDate,
+      'available_dates' => $user
+        ->locationHistory()
+        ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+        ->groupBy('date')
+        ->orderByDesc('date')
+        ->get(),
+      ]);
   }
 }
