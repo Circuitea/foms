@@ -20,6 +20,7 @@ return new class extends Migration
         Schema::create('departments_personnel', function (Blueprint $table) {
             $table->foreignId('department_id')->constrained(table: 'departments');
             $table->foreignId('personnel_id')->constrained(table: 'personnel');
+            $table->primary(['department_id', 'personnel_id']);
         });
     }
 
