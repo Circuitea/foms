@@ -46,6 +46,7 @@ return new class extends Migration
         Schema::create('personnel_task', function (Blueprint $table) {
             $table->foreignId('personnel_id')->constrained(table: 'personnel', indexName: 'personnel_task_personnel_id');
             $table->foreignId('task_id')->constrained(table: 'tasks', indexName: 'personnel_task_task_id');
+            $table->primary(['personnel_id', 'task_id']);
         });
     }
 
