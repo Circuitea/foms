@@ -106,7 +106,7 @@ export function GenerateLocationHistoryReportDialog() {
                 asChild
               >
                 <PDFDownloadLink document={<LocationHistoryReport date={selectedDate} personnel={personnelList.filter(person => selectedPersonnel.includes(person.id))} />} fileName={
-                  `location-history-${dayjs(selectedDate).format('YYYY-MM-DD')}-ids-${selectedPersonnel.join('_')}`
+                  `location-history-${dayjs(selectedDate).format('YYYY-MM-DD')}-ids-${[...selectedPersonnel].sort((a, b) => a - b).join('_')}`
                 }>
                   {({ loading }) => loading 
                     ? 'Generating Report...'
