@@ -144,16 +144,14 @@ class PersonnelController extends Controller
         ->locationHistory()
         ->whereDate('created_at', $targetDate)
         ->get()
-        ->map(fn (LocationHistory $location) => [
-          ... $location->toArray(),
-          'location_name' => Geoapify::reverseGeocode($location->latitude, $location->longitude),
-        ]),
+        ->map(fn (LocationHistory $location) => $location->append('location_name')),
       'selected_date' => $targetDate,
       'available_dates' => $user
         ->locationHistory()
         ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
         ->groupBy('date')
         ->orderByDesc('date')
+        ->getQuery()
         ->get(),
       ]);
   }

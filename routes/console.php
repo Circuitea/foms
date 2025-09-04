@@ -23,4 +23,4 @@ Schedule::call(function () {
             ]);
         });
     });
-})->everyFifteenMinutes();
+});

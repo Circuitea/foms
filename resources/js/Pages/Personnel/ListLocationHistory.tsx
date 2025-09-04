@@ -10,17 +10,10 @@ import { ChevronDown } from "lucide-react";
 import { LocationMarker } from "./LocationMarker";
 
 import 'leaflet/dist/leaflet.css';
-import { PageProps, Personnel } from "@/types";
+import { Location, PageProps, Personnel } from "@/types";
 import { router } from "@inertiajs/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import {  DayButton, DayButtonProps } from "react-day-picker";
-
-interface Location {
-  latitude: number;
-  longitude: number;
-  location_name: string;
-  created_at: string;
-}
+import { DayButtonProps } from "react-day-picker";
 
 interface AvailableDate {
   date: string;

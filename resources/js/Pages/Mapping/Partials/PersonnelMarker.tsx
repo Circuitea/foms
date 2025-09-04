@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toProperCase } from "@/lib/utils";
 import { PersonnelLocation, PersonnelMarkerDetails } from "@/types";
+import dayjs from "dayjs";
 import { Clock, MapPin, User, X } from "lucide-react";
 import { useState } from "react";
 import { Marker, Popup } from "react-leaflet";
@@ -50,7 +51,7 @@ export default function PersonnelMarker({ marker, isClickable }: { marker: Perso
               <p className="text-sm text-gray-600">Current Location</p>
               <div className="flex items-center text-sm font-medium text-gray-900">
                 <MapPin className="w-4 h-4 mr-1" />
-                {marker.name}
+                {marker.location_name}
               </div>
               </div>
             </div>
@@ -60,24 +61,19 @@ export default function PersonnelMarker({ marker, isClickable }: { marker: Perso
             <div>
             <h4 className="font-semibold text-gray-900 mb-4">Recent Location History</h4>
             <div className="space-y-3">
-              {(['Location 1', 'Location 2', 'Location 3']).map((location, index) => (
-              <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="flex-shrink-0 mt-1">
-                <div className={`w-3 h-3 rounded-full ${index === 0 ? "bg-green-500" : "bg-gray-400"}`}></div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h5 className="font-medium text-gray-900">1</h5>
-                    <span className="text-xs text-gray-500">2</span>
+              {marker.personnel.location_history.map((location, index) => (
+                <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="flex-shrink-0 mt-1">
+                    <div className={`w-3 h-3 rounded-full bg-gray-400`}></div>
+                    </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h5 className="font-medium text-gray-900">{location.location_name}</h5>
+                      <span className="text-xs text-gray-600">{dayjs(location.created_at).format('hh:mm A')}</span>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">{location.latitude} | {location.longitude}</p>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">Location: {location}</p>
-                  {index === 0 && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">
-                    Current Location
-                    </span>
-                  )}
                 </div>
-              </div>
               ))}
               {/* {(!mockLocationHistory[selectedPersonnelForDetail.id] ||}
               mockLocationHistory[selectedPersonnelForDetail.id].length === 0) && (

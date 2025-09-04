@@ -1,6 +1,9 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { HeadingOne } from "./components/Heading";
 import { Table, TD, TH, TR } from "@ag-media/react-pdf-table";
+import { PersonnelWithLocationHistory } from "@/Pages/Mapping/Partials/GenerateLocationHistoryReportDialog";
+import dayjs from "dayjs";
+import { formatName } from "@/lib/utils";
 
 const styles = StyleSheet.create({
   page: {
@@ -31,7 +34,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export function LocationHistoryReport() {
+export function LocationHistoryReport({ personnel, date }: { personnel: PersonnelWithLocationHistory[], date: Date }) {
+  const sorted = [...personnel].sort((a, b) => a.id - b.id).map(person => ({
+    ... person,
+    'location_history': [...person.location_history].sort((a, b) => dayjs(a.created_at).diff(dayjs(b.created_at))),
+  }));
+  
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
@@ -40,7 +48,7 @@ export function LocationHistoryReport() {
         </View>
         <View style={styles.title}>
           <Text style={{ fontWeight: 'bold', fontSize: 14 }}>Location History</Text>
-          <Text style={{ textAlign: 'right' }}>July 30, 2002</Text>
+          <Text style={{ textAlign: 'right' }}>{dayjs(date).format('MMMM DD, YYYY')}</Text>
         </View>
         <Table
           tdStyle={{ padding: 5 }}
@@ -51,48 +59,38 @@ export function LocationHistoryReport() {
             <TD>Start Time</TD>
             <TD>End Time</TD>
           </TH>
-          <TR>
-            <TD>Sarmiento, Charles Aaron Y.</TD>
-            <TD>09:00AM</TD>
-            <TD>04:30PM</TD>
-          </TR>
+          {sorted.map(person => (
+            <TR>
+              <TD>{formatName(person)}</TD>
+              <TD>{dayjs(person.location_history[0].created_at).format('hh:mm A')}</TD>
+              <TD>{dayjs(person.location_history[person.location_history.length-1].created_at).format('hh:mm A')}</TD>
+            </TR>
+          ))}
         </Table>
       </Page>
-      <Page size="LETTER" style={styles.page}>
-        <View style={styles.title}>
-          <Text style={{ fontWeight: 'bold', fontSize: 14 }}>Location History</Text>
-          <Text style={{ textAlign: 'right' }}>Sarmiento, Charles Aaron Y.</Text>
-        </View>
-        <Table
-          tdStyle={{ padding: 5 }}
-          weightings={[0.8, 0.2]}
-        >
-          <TH>
-            <TD>Location</TD>
-            <TD>Time</TD>
-          </TH>
-          <TR>
-            <TD>F. Manalo Street, Brgy. Kabayanan</TD>
-            <TD>09:00AM</TD>
-          </TR>
-          <TR>
-            <TD>F. Manalo Street, Brgy. Kabayanan</TD>
-            <TD>09:15AM</TD>
-          </TR>
-          <TR>
-            <TD>F. Manalo Street, Brgy. Kabayanan</TD>
-            <TD>09:30AM</TD>
-          </TR>
-          <TR>
-            <TD>F. Manalo Street, Brgy. Kabayanan</TD>
-            <TD>09:45AM</TD>
-          </TR>
-          <TR>
-            <TD>F. Manalo Street, Brgy. Kabayanan</TD>
-            <TD>10:00AM</TD>
-          </TR>
-        </Table>
-      </Page>
+      {sorted.map((person, index) => (
+        <Page key={index} size="LETTER" style={styles.page}>
+          <View style={styles.title}>
+            <Text style={{ fontWeight: 'bold', fontSize: 14 }}>Location History</Text>
+            <Text style={{ textAlign: 'right' }}>{formatName(person)}</Text>
+          </View>
+          <Table
+            tdStyle={{ padding: 5 }}
+            weightings={[0.8, 0.2]}
+          >
+            <TH>
+              <TD>Location</TD>
+              <TD>Time</TD>
+            </TH>
+            {person.location_history.map(location => (
+              <TR>
+                <TD>{location.location_name}</TD>
+                <TD>{dayjs(location.created_at).format('hh:mm A')}</TD>
+              </TR>
+            ))}
+          </Table>
+        </Page>
+      ))}
     </Document>
   )
 }

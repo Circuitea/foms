@@ -37,7 +37,7 @@ import { usePage } from "@inertiajs/react";
 
 export default function PersonnelMarkersLayer({ isClickable = true }: { isClickable?: boolean }) {
     const { data } = usePage<PageProps<{ locations: { data: PersonnelLocation[] } }>>().props.locations;
-    const [locations, setLocations] = useState<PersonnelLocation[]>([]);
+    const [locations, setLocations] = useState<PersonnelLocation[]>(data);
     useEcho<{ personnelLocations: PersonnelLocation[] }>('location', 'LocationUpdated', ({ personnelLocations }) => {
         setLocations(personnelLocations);
     });
@@ -45,7 +45,7 @@ export default function PersonnelMarkersLayer({ isClickable = true }: { isClicka
   return (
     <LayerGroup>
         {/* {personnelMarkers.map((personnelMarker) => <PersonnelMarker isClickable={isClickable} marker={personnelMarker} />)} */}
-        {[...data, ...locations].map((location) => <PersonnelMarker isClickable={isClickable} marker={location} />)}
+        {locations.map((location) => <PersonnelMarker isClickable={isClickable} marker={location} />)}
     </LayerGroup>
   )
 }
