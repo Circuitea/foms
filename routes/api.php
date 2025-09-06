@@ -97,7 +97,11 @@ Route::post('/login', function (Request $request) {
         ]);
     }
 
-    return $user->createToken($request->device_name)->plainTextToken;
+    $token = $user->createToken($request->device_name)->plainTextToken;
+
+    return response()->json([
+        'token' => $token,
+    ]);
 });
 
 Route::post('/verify-token', function (Request $request) {
