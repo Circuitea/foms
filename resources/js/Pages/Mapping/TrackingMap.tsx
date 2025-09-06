@@ -7,7 +7,7 @@ import { Map } from "leaflet";
 import ZoomControl from "./Partials/ZoomControl";
 import BarangayBoundaries from "./Partials/BarangayBoundaries";
 
-export default function TrackingMap({ ref } : {ref: LegacyRef<Map>}) {
+export default function TrackingMap({ ref, selectedPersonnel } : {ref: LegacyRef<Map>, selectedPersonnel: number[]}) {
     return (
         <MapContainer ref={ref} className='min-h-full h-full z-0' center={[14.6034363, 121.0389469]} zoom={15} scrollWheelZoom={false} zoomControl={false}>
             <TileLayer
@@ -19,11 +19,10 @@ export default function TrackingMap({ ref } : {ref: LegacyRef<Map>}) {
                 style={{color: '#0000CC', weight: 4}}
                 // @ts-ignore
                 data={SanJuanBoundary}
-                
             />
 
             <BarangayBoundaries />
-            <PersonnelMarkersLayer />
+            <PersonnelMarkersLayer selectedPersonnel={selectedPersonnel} />
         </MapContainer>
     );
 }

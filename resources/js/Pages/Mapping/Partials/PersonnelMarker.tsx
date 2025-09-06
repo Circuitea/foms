@@ -7,7 +7,7 @@ import { Clock, MapPin, User, X } from "lucide-react";
 import { useState } from "react";
 import { Marker, Popup } from "react-leaflet";
 
-export default function PersonnelMarker({ marker, isClickable }: { marker: PersonnelLocation, isClickable: boolean}) {
+export default function PersonnelMarker({ marker, isClickable, selected }: { marker: PersonnelLocation, isClickable: boolean, selected: boolean }) {
   const [ isOpen, setOpen ] = useState(false);
    
 
@@ -17,7 +17,7 @@ export default function PersonnelMarker({ marker, isClickable }: { marker: Perso
     }
   }
 
-  return (
+  return selected ? (
     <div>
       <Marker position={[marker.latitude, marker.longitude]} eventHandlers={{click: onMarkerClick}}/>
       <Dialog open={isOpen} onOpenChange={setOpen}>
@@ -97,5 +97,5 @@ export default function PersonnelMarker({ marker, isClickable }: { marker: Perso
         </DialogContent>
       </Dialog>      
     </div>
-  );
+  ) : null;
 }
