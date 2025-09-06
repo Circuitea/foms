@@ -41,16 +41,25 @@ export type PageProps<
 };
 
 export interface PersonnelLocation {
-    personnel: Personnel,
+    personnel: Personnel & {
+        location_history: Location[];
+    },
     latitude: number,
     longitude: number,
     created_at: string,
     updated_at: string,
-    name: string;
+    location_name: string;
 };
 
 export interface Section {
     id: number,
     name: string,
     manager?: Personnel,
+}
+
+export interface Location {
+  latitude: number;
+  longitude: number;
+  location_name: string;
+  created_at: string;
 }

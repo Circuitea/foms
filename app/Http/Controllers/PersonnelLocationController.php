@@ -12,18 +12,9 @@ class PersonnelLocationController extends Controller
         $user = $request->user();
 
         PersonnelLocation::upsert([
-            ['id' => 1, 'latitude' => $request->input('latitude'), 'longitude' => $request->input('longitude')]
+            ['latitude' => $request['latitude'], 'longitude' => $request['longitude'], 'id' => $user->id],
         ], uniqueBy: ['id'], update: ['latitude', 'longitude']);
 
-        $history = new LocationHistory();
-
-        $history->fill([
-            'latitude' => $request->input('latitude'),
-            'longitude' => $request->input('longitude'),
-        ]);
-
-        $history->personnel()->associate($user);
-
-        return response(status: 200);
+        return response('ok', status: 200);
     }
 }

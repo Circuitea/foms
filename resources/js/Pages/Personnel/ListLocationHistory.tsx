@@ -1,26 +1,37 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { latLngBounds } from "leaflet";
 import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 import ZoomControl from "../Mapping/Partials/ZoomControl";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import dayjs from "dayjs";
 import { ChevronDown } from "lucide-react";
 import { LocationMarker } from "./LocationMarker";
-
+import { Location, PageProps, Personnel } from "@/types";
+import { router } from "@inertiajs/react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { DayButtonProps } from "react-day-picker";
 import 'leaflet/dist/leaflet.css';
 
-const locationHistory = [
-  { latitude: 14.595722, longitude: 121.028194, created_at: "2025-08-23T08:00:00Z" },
-  { latitude: 14.596682, longitude: 121.029252, created_at: "2025-08-23T08:05:00Z" },
-  { latitude: 14.597190, longitude: 121.028770, created_at: "2025-08-23T08:10:00Z" },
-]
+interface AvailableDate {
+  date: string;
+  count: number;
+}
 
-export default function ListLocationHistory() {
+export default function Listlocation_history({ location_history, personnel, selected_date, available_dates }: PageProps<{
+  location_history: Location[],
+  personnel: Personnel,
+  selected_date: string,
+  available_dates: AvailableDate[],
+}>) {
+  // const [date, setDate] = useState<Date>(dayjs(selected_date, "YYYY-M-D").toDate());
   const [openTooltips, setOpenTooltips] = useState<Record<number, boolean>>({});
-  const bounds = latLngBounds(locationHistory.map(location => [location.latitude, location.longitude]));
-
+  const bounds = location_history.length > 0
+  ? latLngBounds(location_history.map(location => [location.latitude, location.longitude]))
+  : latLngBounds([[14.6049536202617, 121.02954192937848]]);
+  
+  const date = dayjs(selected_date, 'YYYY-M-D').toDate();
   const changeTooltipState = (index: number, state: boolean) => {
     setOpenTooltips((prev) => ({
       ...prev,
@@ -29,7 +40,7 @@ export default function ListLocationHistory() {
   }
 
   return (
-    <div className="grid grid-cols-[60%_40%] gap-2 h-full px-8 py-2">
+    <div className="grid grid-cols-[60%_40%] gap-2 px-8 py-2">
       <div className="bg-white rounded-lg shadow border border-gray-200 h-full">
         <div className="px-6 py-4 border-b border-gray-200 h-full">
           <MapContainer
@@ -40,10 +51,10 @@ export default function ListLocationHistory() {
             bounds={bounds}
           >
             <Polyline
-              positions={locationHistory.map(location => [location.latitude, location.longitude])}
+              positions={location_history.map(location => [location.latitude, location.longitude])}
               pathOptions={{ color: 'red' }}
             />
-            {locationHistory.map((location, i) => (
+            {location_history.map((location, i) => (
               <LocationMarker location={location} visible={!!openTooltips[i]} />
             ))}
             <TileLayer
@@ -59,25 +70,63 @@ export default function ListLocationHistory() {
           <h3 className="text-lg font-medium text-gray-900">History</h3>
           <Popover>
             <PopoverTrigger className="rounded-lg py-1 px-2 border border-gray-200 flex gap-2 items-center justify-between">
-              {dayjs().format("MMM DD, YYYY")}
+              {dayjs(date).format("MMM DD, YYYY")}
               <ChevronDown className="w-4 h-4" />
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent align="end">
               <Calendar
+                required
+                disabled={(dateToDisable) => {
+                  const checkDate = dayjs(dateToDisable);
+                  return !available_dates.some(available_date => dayjs(available_date.date, 'YYYY-MM-DD').isSame(checkDate, 'D'));
+                }}
                 className="w-full"
+                selected={date}
+                defaultMonth={date}
+                onSelect={(newDate) => {
+                  const {years, months, date} = dayjs(newDate).toObject();
+
+                  router.visit(`/personnel/${personnel.id}/location-history/${years}-${months+1}-${date}`);
+                }}
+                mode="single"
+                components={{
+                  DayButton: ({ day, modifiers, ...buttonProps }: DayButtonProps) => {
+                    const dayCount = available_dates.find(available_date => available_date.date === dayjs(day.date).format('YYYY-MM-DD'))?.count;
+
+                    return dayCount ? (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <CalendarDayButton
+                            day={day}
+                            modifiers={modifiers}
+                            {...buttonProps}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Recorded Locations: {dayCount}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : <CalendarDayButton
+                          day={day}
+                          modifiers={modifiers}
+                          {...buttonProps}
+                        />;
+                  },
+                }}
               />
             </PopoverContent>
           </Popover>
         </div>
 
-        <div className="px-6 py-4 space-y-2">
-          {locationHistory.map((location, i) => (
+        <div className="px-6 py-4 space-y-2 h-screen overflow-y-auto">
+          {location_history.map((location, i) => (
             <div
               onMouseOver={() => changeTooltipState(i, true)}
               onMouseOut={() => changeTooltipState(i, false)}
-              className="border border-gray-200 shadow rounded-lg px-6 py-4 hover:bg-gray-50"
+              className="border border-gray-200 shadow rounded-lg px-6 py-4 hover:bg-gray-50 flex justify-between items-center"
             >
-              {dayjs(location.created_at).format("hh:mm A")}
+              <span className="text-sm">{location.location_name}</span>
+              <span className="text-xs text-gray-500">{dayjs(location.created_at).format("hh:mm A")}</span>
             </div>
           ))}
         </div>
@@ -88,7 +137,7 @@ export default function ListLocationHistory() {
 
 
 
-ListLocationHistory.layout = (e: ReactElement) => {
+Listlocation_history.layout = (e: ReactElement) => {
   const { id } = e.props.personnel;
 
   return (

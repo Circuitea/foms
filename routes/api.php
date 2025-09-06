@@ -1,10 +1,9 @@
 <?php
 
-use App\Events\LocationUpdated;
-use App\Http\Resources\PersonnelLocationResource;
+use App\Http\Controllers\PersonnelLocationController;
 use App\Models\Personnel;
-use App\Models\PersonnelLocation;
 use App\Status;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +15,24 @@ use Laravel\Sanctum\PersonalAccessToken;
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
+    });
+
+    Route::get('/location-history/people/{date?}', function (Request $request, ?string $date = null) {
+        $targetDate = $date ?? now()->toDateString();
+
+        $personnel = Personnel::with(['locationHistory' => function (Builder $query) use ($targetDate) {
+            $query->whereDate('created_at', $targetDate);
+        }])
+            ->whereHas('locationHistory', function (Builder $query) use ($targetDate) {
+                $query->whereDate('created_at', $targetDate);
+            })
+            ->get();
+
+        $personnel->each(function ($person) {
+            $person->locationHistory->each->append('location_name');
+        });
+
+        return response()->json($personnel);
     });
 
     Route::post('/status', function (Request $request) {
@@ -35,22 +52,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
     });
 
-    Route::post('/location', function (Request $request) {
-        $user = $request->user();
-
-        Log::info('New location update', [
-            'user' => $user->id,
-            'lat' => $request['latitude'],
-            'lng' => $request['longitude'],
-        ]);
-
-        PersonnelLocation::upsert([
-            ['latitude' => $request['latitude'], 'longitude' => $request['longitude'], 'id' => $user->id],
-        ], uniqueBy: ['id'], update: ['latitude', 'longitude']);
-
-        LocationUpdated::dispatch(PersonnelLocationResource::collection(PersonnelLocation::all()));
-
-    });
+    Route::post('/location', [PersonnelLocationController::class, 'store']);
 
     Route::post('/expo-push-token', function (Request $request) {
         Log::info('Received token from mobile application');
@@ -95,7 +97,11 @@ Route::post('/login', function (Request $request) {
         ]);
     }
 
-    return $user->createToken($request->device_name)->plainTextToken;
+    $token = $user->createToken($request->device_name)->plainTextToken;
+
+    return response()->json([
+        'token' => $token,
+    ]);
 });
 
 Route::post('/verify-token', function (Request $request) {
