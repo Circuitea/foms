@@ -8,12 +8,11 @@ import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import dayjs from "dayjs";
 import { ChevronDown } from "lucide-react";
 import { LocationMarker } from "./LocationMarker";
-
-import 'leaflet/dist/leaflet.css';
 import { Location, PageProps, Personnel } from "@/types";
 import { router } from "@inertiajs/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DayButtonProps } from "react-day-picker";
+import 'leaflet/dist/leaflet.css';
 
 interface AvailableDate {
   date: string;
@@ -26,12 +25,13 @@ export default function Listlocation_history({ location_history, personnel, sele
   selected_date: string,
   available_dates: AvailableDate[],
 }>) {
-  const [date, setDate] = useState<Date>(dayjs(selected_date, "YYYY-M-D").toDate());
+  // const [date, setDate] = useState<Date>(dayjs(selected_date, "YYYY-M-D").toDate());
   const [openTooltips, setOpenTooltips] = useState<Record<number, boolean>>({});
   const bounds = location_history.length > 0
-    ? latLngBounds(location_history.map(location => [location.latitude, location.longitude]))
-    : latLngBounds([[14.6049536202617, 121.02954192937848]]);
-
+  ? latLngBounds(location_history.map(location => [location.latitude, location.longitude]))
+  : latLngBounds([[14.6049536202617, 121.02954192937848]]);
+  
+  const date = dayjs(selected_date, 'YYYY-M-D').toDate();
   const changeTooltipState = (index: number, state: boolean) => {
     setOpenTooltips((prev) => ({
       ...prev,
@@ -77,19 +77,14 @@ export default function Listlocation_history({ location_history, personnel, sele
               <Calendar
                 required
                 disabled={(dateToDisable) => {
-                  const checkDate = dayjs(dateToDisable).format('YYYY-MM-DD');
-                  if (available_dates.find(available_date => available_date.date !== checkDate)) {
-                    console.log(true);
-                    return true;
-                  } else return false;
+                  const checkDate = dayjs(dateToDisable);
+                  return !available_dates.some(available_date => dayjs(available_date.date, 'YYYY-MM-DD').isSame(checkDate, 'D'));
                 }}
                 className="w-full"
                 selected={date}
                 defaultMonth={date}
                 onSelect={(newDate) => {
                   const {years, months, date} = dayjs(newDate).toObject();
-
-                  console.log(`years: ${years} | months: ${months+1} | $date: ${date}`);
 
                   router.visit(`/personnel/${personnel.id}/location-history/${years}-${months+1}-${date}`);
                 }}
