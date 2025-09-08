@@ -22,7 +22,7 @@ export default function MapPage () {
     setPersonnel(personnelLocations.map(location => location.personnel));
   });
 
-  const [selectedPersonnel, setSelectedPersonnel] = useState<number[]>([]);
+  const [selectedPersonnel, setSelectedPersonnel] = useState<number[]>(data.map(location => location.personnel.id));
 
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const { state } = useSidebar();
