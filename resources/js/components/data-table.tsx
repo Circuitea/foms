@@ -1,11 +1,12 @@
 "use client"
 
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
-import { Users } from "lucide-react" // Import Users component
-
+import { type ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, PaginationState, useReactTable } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ReactNode } from "react"
-import { Link } from "@inertiajs/react"
+import { ReactNode, useState } from "react"
+import { Button } from "./ui/button";
+import { ChevronFirst, ChevronLast, ChevronLeft, ChevronRight } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Label } from "./ui/label";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -16,16 +17,28 @@ interface DataTableProps<TData, TValue> {
 }
 
 export function DataTable<TData, TValue>({ columns, data, className, noData, getRowHref }: DataTableProps<TData, TValue>) {
-  const safeData = Array.isArray(data) ? data : []
-  const safeColumns = Array.isArray(columns) ? columns : []
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10
+  })
 
   const table = useReactTable({
-    data: safeData,
-    columns: safeColumns,
+    data,
+    columns,
 
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
 
-});
+    onPaginationChange: setPagination,
+
+    state: {
+      pagination
+    }
+
+  });
+
+  const pageSizeOptions = [5, 10, 20];
+  const pageIndexOptions = Array(table.getPageCount());
 
   const headerGroups = table.getHeaderGroups() || []
   const rows = table.getRowModel()?.rows || []
@@ -66,7 +79,7 @@ export function DataTable<TData, TValue>({ columns, data, className, noData, get
             ))
           ) : (
             <TableRow className="">
-              <TableCell colSpan={safeColumns.length} className="h-32 text-center">
+              <TableCell colSpan={columns.length} className="h-32 text-center">
               {noData || (
                   <div className="flex flex-col items-center justify-center text-gray-500">
                     <p className="text-lg font-medium">No data found</p>
@@ -77,6 +90,72 @@ export function DataTable<TData, TValue>({ columns, data, className, noData, get
           )}
         </TableBody>
       </Table>
+
+      <div className="grid grid-cols-3 py-2">
+        <div className="flex items-center gap-2">
+          <Select value={table.getState().pagination.pageSize.toString()} onValueChange={newSize => table.setPageSize(Number(newSize))}>
+            <SelectTrigger className="w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent
+              side="top"
+              align="start"
+              >
+              {pageSizeOptions.map(option => (
+                <SelectItem value={option.toString()}>{option}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span>per page</span>
+        </div>
+        <div className="flex justify-center items-center gap-2">
+          <Button
+            disabled={!table.getCanPreviousPage()}
+            variant="outline"
+            className="w-5"
+            onClick={table.firstPage}
+          >
+            <ChevronFirst />
+          </Button>
+          <Button
+            disabled={!table.getCanPreviousPage()}
+            variant="outline"
+            className="w-5"
+            onClick={table.previousPage}
+          >
+            <ChevronLeft />
+          </Button>
+          <Select
+            value={table.getState().pagination.pageIndex.toString()}
+            onValueChange={newPage => table.setPageIndex(Number(newPage))}
+          >
+            <SelectTrigger className="w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Array(table.getPageCount()).fill(null).map((_, i) => (
+                <SelectItem key={i} value={i.toString()}>{i+1}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            disabled={!table.getCanNextPage()}
+            variant="outline"
+            className="w-5"
+            onClick={table.nextPage}
+          >
+            <ChevronRight />
+          </Button>
+          <Button
+            disabled={!table.getCanNextPage()}
+            variant="outline"
+            className="w-5"
+            onClick={() => table.lastPage}
+          >
+            <ChevronLast />
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
