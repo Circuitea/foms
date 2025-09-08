@@ -311,7 +311,7 @@ export default function Dashboard() {
     }
 
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
           <div className="flex gap-1">
@@ -452,7 +452,7 @@ export default function Dashboard() {
     }
 
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
           <div className="flex items-center gap-2">
@@ -611,7 +611,7 @@ export default function Dashboard() {
     })
 
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">{title}</h3>
 
         <div className="flex items-center justify-between">
@@ -638,7 +638,7 @@ export default function Dashboard() {
               })}
 
               {/* Center circle */}
-              <circle cx="100" cy="100" r="40" fill="white" className="drop-shadow-sm" />
+              <circle cx="100" cy="100" r="40" fill="white" className="drop-shadow-xs" />
 
               {/* Center text */}
               <text
@@ -671,16 +671,16 @@ export default function Dashboard() {
                 <div
                   key={index}
                   className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                    isHovered ? "bg-gray-50 shadow-sm" : "hover:bg-gray-50"
+                    isHovered ? "bg-gray-50 shadow-xs" : "hover:bg-gray-50"
                   }`}
                   onMouseEnter={() => setHoveredPieIndex(index)}
                   onMouseLeave={() => setHoveredPieIndex(null)}
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }}></div>
+                    <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: item.color }}></div>
                     <span className={`text-xs truncate ${isHovered ? "font-medium" : ""}`}>{item.label}</span>
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0">
                     <p className={`text-xs font-semibold ${isHovered ? "text-gray-900" : "text-gray-700"}`}>
                       {item.value}
                     </p>
@@ -707,7 +707,7 @@ export default function Dashboard() {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Active Personnel</p>
@@ -723,7 +723,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Response Rate</p>
@@ -739,7 +739,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Avg Response Time</p>
@@ -767,7 +767,7 @@ export default function Dashboard() {
             {/* Main Content Area */}
             <div className="lg:col-span-2 space-y-6">
               {/* Personnel Tracking Section */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="bg-white rounded-lg shadow-xs border border-gray-200">
                 <div className="p-6 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
@@ -787,7 +787,7 @@ export default function Dashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-3">
                       <div
-                        className="relative bg-gradient-to-br from-blue-50 to-green-50 rounded-lg h-64 cursor-pointer hover:shadow-md transition-all"
+                        className="relative bg-linear-to-br from-blue-50 to-green-50 rounded-lg h-64 cursor-pointer hover:shadow-md transition-all"
                       >
                         {/* <div className="absolute inset-0 flex items-center justify-center">
                           <div className="text-center">
@@ -804,7 +804,7 @@ export default function Dashboard() {
                         <div className="absolute top-20 left-1/2 w-4  -4 bg-orange-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
                         <div className="absolute top-1/2 right-1/4 w-4 h-4 bg-pink-500 rounded-full animate-pulse shadow-lg border-2 border-white"></div> */}
                         <Link href="/map">
-                          <MapContainer className='min-h-full h-[16rem] z-0 border-2 border-dashed border-gray-300 rounded-lg' center={[14.6034363, 121.0389469]} zoom={14} scrollWheelZoom={false} dragging={false} zoomControl={false}>
+                          <MapContainer className='min-h-full h-64 z-0 border-2 border-dashed border-gray-300 rounded-lg' center={[14.6034363, 121.0389469]} zoom={14} scrollWheelZoom={false} dragging={false} zoomControl={false}>
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -878,7 +878,7 @@ export default function Dashboard() {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Upcoming Events */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="bg-white rounded-lg shadow-xs border border-gray-200">
                 <div className="p-6 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900">
@@ -948,7 +948,7 @@ export default function Dashboard() {
                                 <p>👥 {event.attendees} attendees</p>
                               </div>
                             </div>
-                            <Calendar className="w-4 h-4 opacity-75 ml-3 flex-shrink-0" />
+                            <Calendar className="w-4 h-4 opacity-75 ml-3 shrink-0" />
                           </div>
                         </div>
                       ))}
@@ -976,7 +976,7 @@ export default function Dashboard() {
                               <p className="font-medium text-sm leading-tight">{event.title}</p>
                               <p className="text-xs opacity-75 mt-1">{event.time}</p>
                             </div>
-                            <Calendar className="w-4 h-4 opacity-75 ml-3 flex-shrink-0" />
+                            <Calendar className="w-4 h-4 opacity-75 ml-3 shrink-0" />
                           </div>
                         </div>
                       ))
@@ -985,7 +985,7 @@ export default function Dashboard() {
               </div>
 
               {/* Notifications */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="bg-white rounded-lg shadow-xs border border-gray-200">
                 <div className="p-6 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
@@ -1027,11 +1027,11 @@ export default function Dashboard() {
 
               {/* Search and Filter Controls */}
               <div className="p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center">
-                <div className="relative flex-grow max-w-md">
+                <div className="relative grow max-w-md">
                   <input
                     type="text"
                     placeholder="Search Employee"
-                    className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1048,7 +1048,7 @@ export default function Dashboard() {
                 <DepartmentFilter onReset={() => {}} />
               </div>
 
-              <div className="flex-1 bg-gradient-to-br from-blue-50 to-green-50 relative overflow-hidden">
+              <div className="flex-1 bg-linear-to-br from-blue-50 to-green-50 relative overflow-hidden">
                 {/* Map Content */}
                 <div className="absolute inset-0">
                   <div className="w-full h-full bg-white">

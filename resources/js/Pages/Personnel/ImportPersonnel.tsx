@@ -209,7 +209,7 @@ export default function ImportPersonnel({ roles, sections }: PageProps<{
         </div>
       </div>
 
-      <div className='bg-white rounded-lg shadow-sm border border-gray-200 mb-6'>
+      <div className='bg-white rounded-lg shadow-xs border border-gray-200 mb-6'>
         <div className="px-6 py-4 border-b border-gray-200 bg-blue-50">
           <div className="flex items-center gap-2">
             <Import className="w-5 h-5 text-blue-600" />
@@ -266,7 +266,7 @@ export default function ImportPersonnel({ roles, sections }: PageProps<{
 
       {personnelList.length >= 1 && (
 
-        <div className='bg-white rounded-lg shadow-sm border border-gray-200'>
+        <div className='bg-white rounded-lg shadow-xs border border-gray-200'>
           <div className="px-6 py-4 border-b border-gray-200 bg-green-50">
             <div className="flex items-center gap-2">
               <User className="w-5 h-5 text-blue-600" />

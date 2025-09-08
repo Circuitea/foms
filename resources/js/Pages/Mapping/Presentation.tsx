@@ -303,7 +303,7 @@ function Presentation() {
   return (
     <div className="bg-gray-100 h-screen overflow-hidden flex flex-col">
       {/* Header - Using #1B2560 color */}
-      <header className="text-white px-6 py-3 shadow-md flex-shrink-0" style={{ backgroundColor: "#1B2560" }}>
+      <header className="text-white px-6 py-3 shadow-md shrink-0" style={{ backgroundColor: "#1B2560" }}>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             <Link
@@ -340,12 +340,12 @@ function Presentation() {
         {/* Main Content */}
         <div className="flex-1 p-4 flex flex-col overflow-hidden">
           {/* Controls */}
-          <div className="flex justify-between items-center mb-4 bg-white p-4 rounded-lg shadow-sm flex-shrink-0">
+          <div className="flex justify-between items-center mb-4 bg-white p-4 rounded-lg shadow-xs shrink-0">
             <div className="flex gap-3">
               {["All", "Management", "Monitoring", "Planning", "Others"].map((dept) => (
                 <Button
                   key={dept}
-                  variant={selectedDepartment === dept ? "default" : "outline"}
+                  variant={selectedDepartment === dept ? "default" : "outline-solid"}
                   className={`${
                     selectedDepartment === dept ? "text-white" : "border-gray-300 text-gray-700 hover:bg-gray-100"
                   } relative`}
@@ -464,12 +464,12 @@ function Presentation() {
                     <div className="flex items-center gap-1 mb-2">
                       {person.status === "Off-duty" ? (
                         <div className="flex items-center gap-1 text-gray-400">
-                          <EyeOff className="w-3 h-3 flex-shrink-0" />
+                          <EyeOff className="w-3 h-3 shrink-0" />
                           <span className="text-xs">Location tracking disabled</span>
                         </div>
                       ) : (
                         <>
-                          <MapPin className="w-3 h-3 flex-shrink-0 text-[#1B2560]" />
+                          <MapPin className="w-3 h-3 shrink-0 text-[#1B2560]" />
                           <span className="text-gray-700 text-xs truncate">{person.location}</span>
                         </>
                       )}
@@ -523,7 +523,7 @@ function Presentation() {
           </div>
 
           {/* Footer */}
-          <footer className="mt-4 flex justify-between items-center bg-white p-3 rounded-lg shadow-sm flex-shrink-0">
+          <footer className="mt-4 flex justify-between items-center bg-white p-3 rounded-lg shadow-xs shrink-0">
             <div className="text-gray-600 text-sm">
               Showing {currentPage * ITEMS_PER_PAGE + 1}-
               {Math.min((currentPage + 1) * ITEMS_PER_PAGE, filteredPersonnel.length)} of {filteredPersonnel.length}{" "}
@@ -552,7 +552,7 @@ function Presentation() {
         </div>
 
         {/* Right Sidebar - Enhanced with more content */}
-        <div className="w-72 bg-white shadow-md p-4 flex-shrink-0 overflow-y-auto">
+        <div className="w-72 bg-white shadow-md p-4 shrink-0 overflow-y-auto">
           {/* System Status */}
           <div className="p-4 text-white rounded-lg mb-4" style={{ backgroundColor: "#1B2560" }}>
             <h4 className="font-semibold mb-3 flex items-center">

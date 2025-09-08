@@ -131,7 +131,7 @@ function PersonnelSelection({ personnel, selected, onClick }: { personnel: Perso
   return (
     <div
       className={cn(
-        "px-4 py-2 rounded-lg border shadow-sm flex justify-between items-baseline cursor-pointer",
+        "px-4 py-2 rounded-lg border shadow-xs flex justify-between items-baseline cursor-pointer",
         selected ? 'bg-blue-50 border-blue-400' : 'border-gray-200',
       )}
       onClick={onClick}

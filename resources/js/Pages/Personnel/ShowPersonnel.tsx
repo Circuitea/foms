@@ -25,7 +25,7 @@ export default function ShowPersonnel({ personnel }: ShowPersonnelProps) {
             <div className="px-2 bg-white rounded-lg inline-flex gap-2 items-center shadow-md">
               <div className={cn(
                 "w-2 h-2 rounded-full",
-                
+                "bg-green-500"
               )} />
               <span className="text-sm">{personnel.status ?? 'Unavailable'}</span>
             </div>

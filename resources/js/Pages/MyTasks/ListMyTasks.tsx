@@ -81,7 +81,7 @@ function TaskList({ tasks }: { tasks: Task[] }) {
               <TooltipTrigger>
                 <div
                   className={cn(
-                    `w-4 h-4 rounded-full mt-1 flex-shrink-0 bg-gray-400`,
+                    `w-4 h-4 rounded-full mt-1 shrink-0 bg-gray-400`,
                     task.priority.name === "urgent" ? "animate-pulse" : null,
                     !task.pivot.started_at ? 'bg-yellow-400' : !task.pivot.finished_at ? 'bg-blue-500' : 'bg-green-500'
                   )}
@@ -137,7 +137,7 @@ function TaskList({ tasks }: { tasks: Task[] }) {
               </div>
             </div>
 
-            <div className="relative flex-shrink-0 flex gap-2">
+            <div className="relative shrink-0 flex gap-2">
               {!task.pivot.started_at ? (
                 <Button
                   className="flex items-center justify-center rounded bg-[#1B2560]"

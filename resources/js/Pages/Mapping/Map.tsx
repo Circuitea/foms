@@ -67,9 +67,9 @@ export default function MapPage () {
             <div className="flex flex-col overflow-y-auto scroll-smooth">
               <div className="h-full flex flex-col w-full">
                 <div
-                  className="sticky top-0 flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 shadow-sm border-2 border-blue-200 bg-blue-50 mb-4"
+                  className="sticky top-0 flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 shadow-xs border-2 border-blue-200 bg-blue-50 mb-4"
                 >
-                  <div className="w-12 h-12 bg-[#1B2560] rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-[#1B2560] rounded-full flex items-center justify-center shrink-0">
                     <Users className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1">
@@ -120,7 +120,7 @@ export default function MapPage () {
                           <div className="font-medium text-gray-900 text-sm">{formatName(person)}</div>
                           <div className="text-xs text-gray-600">{person.email}</div>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-2 shrink-0">
                           {selectedPersonnel.includes(person.id) ? (
                             <Eye className="h-3 w-3 text-[#1B2560]" />
                           ) : (
@@ -128,7 +128,7 @@ export default function MapPage () {
                           )}
                         </div>
                         {/* {prioritizedUser?.id === person.id && (
-                          <div className="ml-2 flex-shrink-0">
+                          <div className="ml-2 shrink-0">
                             <div className="text-xs text-[#1B2560] bg-blue-200 px-2 py-1 rounded">📍</div>
                           </div>
                         )} */}
@@ -144,7 +144,7 @@ export default function MapPage () {
             <div className="absolute top-1/2 transform -translate-y-1/2 -left-6">
               <button
                 onClick={toggleSidebar}
-                className="w-6 h-16 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg shadow-md transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 hover:shadow-lg"
+                className="w-6 h-16 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg shadow-md transition-all duration-200 flex items-center justify-center focus:outline-hidden focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 hover:shadow-lg"
               >
                 <ChevronRight className="w-3 h-3 text-gray-600" />
               </button>
@@ -155,7 +155,7 @@ export default function MapPage () {
             <div className="absolute top-1/2 transform -translate-y-1/2 -left-6">
               <button
                 onClick={toggleSidebar}
-                className="w-6 h-16 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg shadow-md transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 hover:shadow-lg"
+                className="w-6 h-16 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg shadow-md transition-all duration-200 flex items-center justify-center focus:outline-hidden focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 hover:shadow-lg"
               >
                 <ChevronLeft className="w-3 h-3 text-gray-600" />
               </button>

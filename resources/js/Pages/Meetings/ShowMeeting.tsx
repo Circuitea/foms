@@ -174,7 +174,7 @@ export default function ShowMeeting({ meeting }: PageProps<{ meeting: Meeting }>
               <ul className="space-y-2">
                 {meeting.agendas.sort((a, b) => a.order - b.order).map((agenda) => (
                   <li key={agenda.order} className="flex items-start gap-2">
-                    <span className="bg-[#1B2560]/90 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
+                    <span className="bg-[#1B2560]/90 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium shrink-0">
                       {agenda.order + 1}
                     </span>
                     <span className="text-gray-700">{agenda.agenda}</span>

@@ -90,7 +90,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
 
         <form onSubmit={submit} className="space-y-6">
           {/* Basic Information */}
-          <Card className="border-gray-200 shadow-sm">
+          <Card className="border-gray-200 shadow-xs">
             <CardHeader className="bg-gray-50/50">
               <CardTitle className="flex items-center gap-2 text-[#1B2560]">
                 <Users className="w-5 h-5" />
@@ -114,7 +114,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                   />
                   {form.invalid("title") && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{form.errors.title}</span>
                     </div>
                   )}
@@ -124,7 +124,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                     Meeting Type *
                   </Label>
                   <Select onValueChange={(newType) => form.setData('type', parseInt(newType))}>
-                    <SelectTrigger className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                    <SelectTrigger className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                       <SelectValue placeholder="Select Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -135,7 +135,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                   </Select>
                   {form.invalid("type") && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{form.errors.type}</span>
                     </div>
                   )}
@@ -148,7 +148,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                     Priority Level *
                   </Label>
                   <Select onValueChange={(newPriority: MeetingPriority) => form.setData('priority', newPriority)} defaultValue="">
-                    <SelectTrigger className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                    <SelectTrigger className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                       <SelectValue placeholder="Select Priority" />
                     </SelectTrigger>
                     <SelectContent>
@@ -158,7 +158,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                   </Select>
                   {form.invalid("priority") && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{form.errors.priority}</span>
                     </div>
                   )}
@@ -168,7 +168,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                     Section *
                   </Label>
                   <Select onValueChange={(newVal) => form.setData('section', parseInt(newVal))}>
-                    <SelectTrigger className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                    <SelectTrigger className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                       <SelectValue placeholder="Select Section" />
                     </SelectTrigger>
                     <SelectContent>
@@ -179,7 +179,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                   </Select>
                   {form.invalid("section") && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{form.errors.section}</span>
                     </div>
                   )}
@@ -202,7 +202,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                 />
                 {form.invalid("description") && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{form.errors.description}</span>
                     </div>
                   )}
@@ -212,7 +212,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
           </Card>
 
           {/* Meeting Format */}
-          <Card className="border-gray-200 shadow-sm">
+          <Card className="border-gray-200 shadow-xs">
             <CardHeader className="bg-gray-50/50">
               <CardTitle className="flex items-center gap-2 text-[#1B2560]">
                 <Video className="w-5 h-5" />
@@ -227,7 +227,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
                       form.data.meetingFormat === "in_person_meeting"
                         ? "border-[#1B2560] bg-[#1B2560]/5 shadow-md"
-                        : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                        : "border-gray-200 hover:border-gray-300 hover:shadow-xs"
                     }`}
                     onClick={() => form.setData("meetingFormat", "in_person_meeting")}
                   >
@@ -242,7 +242,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
                       form.data.meetingFormat === "zoom_meeting"
                         ? "border-blue-500 bg-blue-50 shadow-md"
-                        : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                        : "border-gray-200 hover:border-gray-300 hover:shadow-xs"
                     }`}
                     onClick={() => form.setData("meetingFormat", "zoom_meeting")}
                   >
@@ -257,7 +257,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
                       form.data.meetingFormat === "google_meeting"
                         ? "border-green-500 bg-green-50 shadow-md"
-                        : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                        : "border-gray-200 hover:border-gray-300 hover:shadow-xs"
                     }`}
                     onClick={() => form.setData("meetingFormat", "google_meeting")}
                   >
@@ -334,7 +334,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
           </Card>
 
           {/* Schedule */}
-          <Card className="border-gray-200 shadow-sm">
+          <Card className="border-gray-200 shadow-xs">
             <CardHeader className="bg-gray-50/50">
               <CardTitle className="flex items-center gap-2 text-[#1B2560]">
                 <Clock className="w-5 h-5" />
@@ -423,7 +423,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
           </Card>
 
           {/* Meeting Agenda */}
-          <Card className="border-gray-200 shadow-sm">
+          <Card className="border-gray-200 shadow-xs">
             <CardHeader className="bg-gray-50/50">
               <CardTitle className="flex items-center gap-2 text-[#1B2560]">
                 <CalendarIcon className="w-5 h-5" />
@@ -435,7 +435,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                 <Label className="text-gray-700 font-medium">Agenda Items</Label>
                 {form.data.agendas.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <span className="bg-[#1B2560] text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium flex-shrink-0">
+                    <span className="bg-[#1B2560] text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium shrink-0">
                       {index + 1}
                     </span>
                     <Input
@@ -486,7 +486,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
                 Cancel
               </Link>
             </Button>
-            <Button disabled={form.processing} type="submit" className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white shadow-sm">
+            <Button disabled={form.processing} type="submit" className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white shadow-xs">
               Create Meeting
             </Button>
           </div>

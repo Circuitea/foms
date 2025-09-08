@@ -22,7 +22,7 @@ export default function ShowInventoryItem({
 
   return (
     <>
-      <div className="sticky top-0 flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0 bg-white">
+      <div className="sticky top-0 flex items-center justify-between p-6 border-b border-gray-200 shrink-0 bg-white">
         <div className="flex items-center gap-3">
           <Button variant="outline" asChild>
             <Link href="/inventory">

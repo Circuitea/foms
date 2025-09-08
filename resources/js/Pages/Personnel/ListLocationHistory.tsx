@@ -41,7 +41,7 @@ export default function Listlocation_history({ location_history, personnel, sele
 
   return (
     <div className="grid grid-cols-[60%_40%] gap-2 px-8 py-2">
-      <div className="bg-white rounded-lg shadow border border-gray-200 h-full">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full">
         <div className="px-6 py-4 border-b border-gray-200 h-full">
           <MapContainer
             className="h-full z-0"
@@ -65,7 +65,7 @@ export default function Listlocation_history({ location_history, personnel, sele
           </MapContainer>
         </div>
       </div>
-      <div className="bg-white rounded-lg shadow border border-gray-200">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-medium text-gray-900">History</h3>
           <Popover>
@@ -123,7 +123,7 @@ export default function Listlocation_history({ location_history, personnel, sele
             <div
               onMouseOver={() => changeTooltipState(i, true)}
               onMouseOut={() => changeTooltipState(i, false)}
-              className="border border-gray-200 shadow rounded-lg px-6 py-4 hover:bg-gray-50 flex justify-between items-center"
+              className="border border-gray-200 shadow-sm rounded-lg px-6 py-4 hover:bg-gray-50 flex justify-between items-center"
             >
               <span className="text-sm">{location.location_name}</span>
               <span className="text-xs text-gray-500">{dayjs(location.created_at).format("hh:mm A")}</span>

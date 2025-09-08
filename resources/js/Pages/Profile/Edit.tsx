@@ -39,7 +39,7 @@ export default function Edit({ mustVerifyEmail, status }: PageProps<{ mustVerify
       <Head title="Profile" />
 
       {/* Sticky Header */}
-      <div className="sticky top-0 z-40 bg-[#1B2560] text-white shadow-sm">
+      <div className="sticky top-0 z-40 bg-[#1B2560] text-white shadow-xs">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -60,15 +60,15 @@ export default function Edit({ mustVerifyEmail, status }: PageProps<{ mustVerify
 
       <div className="py-12 bg-gray-50 min-h-screen">
         <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-          <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
+          <div className="bg-white p-4 shadow-sm sm:rounded-lg sm:p-8 dark:bg-gray-800">
             <UpdateProfileInformationForm />
           </div>
 
-          <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
+          <div className="bg-white p-4 shadow-sm sm:rounded-lg sm:p-8 dark:bg-gray-800">
             <UpdatePasswordForm />
           </div>
 
-          <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
+          <div className="bg-white p-4 shadow-sm sm:rounded-lg sm:p-8 dark:bg-gray-800">
             <ListPersonalAccessTokens />
           </div>
         </div>
