@@ -59,26 +59,26 @@ const columns:ColumnDef<Personnel>[] = [
     id: 'position',
     accessorFn: person => person.position ?? 'CDRRMO Personnel',
   },
-  {
-    accessorKey: 'roles',
-    header: 'ROLES',
-    cell: (props) => {
-      const { roles } = usePage<PageProps<{ roles: RoleLabels }>>().props;
+  // {
+  //   accessorKey: 'roles',
+  //   header: 'ROLES',
+  //   cell: (props) => {
+  //     const { roles } = usePage<PageProps<{ roles: RoleLabels }>>().props;
 
-      return (
-        <div className="flex flex-col space-y-2 md:inline md:space-x-2">
-          {props.row.original.roles?.map((role) => (
-            <span
-              key={role.id}
-              className="text-center px-2 py-1 md:text-xs font-semibold rounded-xl bg-blue-200"
-            >
-              {roles[role.name]}
-            </span>
-          ))}
-        </div>
-      )
-    },
-  },
+  //     return (
+  //       <div className="flex flex-col space-y-2 md:inline md:space-x-2">
+  //         {props.row.original.roles?.map((role) => (
+  //           <span
+  //             key={role.id}
+  //             className="text-center px-2 py-1 md:text-xs font-semibold rounded-xl bg-blue-200"
+  //           >
+  //             {roles[role.name]}
+  //           </span>
+  //         ))}
+  //       </div>
+  //     )
+  //   },
+  // },
   {
     id: 'status',
     header: 'STATUS',
