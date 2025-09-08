@@ -56,6 +56,10 @@ const columns:ColumnDef<Personnel>[] = [
     ))
   },
   {
+    id: 'position',
+    accessorFn: person => person.position ?? 'CDRRMO Personnel',
+  },
+  {
     accessorKey: 'roles',
     header: 'ROLES',
     cell: (props) => {
