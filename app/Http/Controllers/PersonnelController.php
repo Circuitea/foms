@@ -155,4 +155,14 @@ class PersonnelController extends Controller
         ->get(),
       ]);
   }
+
+  public function show(Request $request, int $id) {
+    $personnel = Personnel::findOr($id, function () {
+      abort(404);
+    });
+
+    return Inertia::render('Personnel/ShowPersonnel', [
+      'personnel' => $personnel,
+    ]);
+  }
 }

@@ -100,9 +100,11 @@ const columns:ColumnDef<Personnel>[] = [
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem>
-            <Eye className="h-4 w-4" />
-            View Profile
+          <DropdownMenuItem asChild>
+            <Link href={`/personnel/${row.original.id}`}>
+              <Eye className="h-4 w-4" />
+              View Profile
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href={`/personnel/${row.original.id}/activity`}>
@@ -127,7 +129,7 @@ interface Option {
   label: string,
 }
 
-export default function ListPersonnel({ personnel, total, sections, roles }: PageProps<{ personnel: Personnel[], total: number, sections: Section[], roles: RoleLabels }>) {
+export default function ListPersonnel({ personnel, sections }: PageProps<{ personnel: Personnel[], total: number, sections: Section[], roles: RoleLabels }>) {
   const sectionOptions: Option[] = [
     {value: 0, label: 'All Departments'},
     ...sections.map((section) => {
