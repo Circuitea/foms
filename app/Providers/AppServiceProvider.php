@@ -2,12 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\PersonalAccessToken;
 use App\Models\Personnel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Sanctum\PersonalAccessToken;
+use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,8 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        
         Vite::prefetch(concurrency: 3);
-
+        
         Relation::enforceMorphMap([
             'in_person_meeting' => 'App\Models\InPersonMeeting',
             'zoom_meeting' => 'App\Models\ZoomMeeting',
@@ -36,8 +38,11 @@ class AppServiceProvider extends ServiceProvider
             'start_task_activity' => 'App\Models\StartTaskActivity',
             'finish_task_activity' => 'App\Models\FinishTaskActivity',
             'change_status_activity' => 'App\Models\ChangeStatusActivity',
+            'personal_access_token' => 'App\Models\PersonalAccessToken',
         ]);
-
+        
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+        
         Gate::define('revoke-token', fn (Personnel $user, PersonalAccessToken $token) => $token->tokenable()->is($user));
     }
 }

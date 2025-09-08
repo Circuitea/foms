@@ -54,15 +54,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/location', [PersonnelLocationController::class, 'store']);
 
-    Route::post('/expo-push-token', function (Request $request) {
+    Route::post('/expo-token', function (Request $request) {
         Log::info('Received token from mobile application');
-        $user = $request->user();
+        $token = $request->user()->currentAccessToken();
 
         $data = $request->validate([
             'token' => ['required', 'string', 'regex:/^ExponentPushToken\[.+\]$/'],
         ]);
 
-        $user->expoTokens()->firstOrCreate([
+        $token->expoTokens()->firstOrCreate([
             'value' => $data['token'],
         ]);
 
@@ -73,8 +73,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::delete('/logout', function (Request $request) {
+        $token = $request->user()->currentAccessToken();
         /** @disregard */
-        $request->user()->currentAccessToken()->delete();
+        $token->expoTokens()->delete();
+        /** @disregard */
+        $token->delete();
 
         return response([
             'status' => 'OK',
@@ -101,21 +104,5 @@ Route::post('/login', function (Request $request) {
 
     return response()->json([
         'token' => $token,
-    ]);
-});
-
-Route::post('/verify-token', function (Request $request) {
-    Log::info('New token verification request sent.', [
-        'token' => $request->bearerToken(),
-    ]);
-
-    if (!$request->bearerToken()) {
-        return response()->json(['valid' => false], 401);
-    }
-
-    $token = PersonalAccessToken::findToken($request->bearerToken());
-    
-    return response()->json([
-        'valid' => $token !== null,
     ]);
 });

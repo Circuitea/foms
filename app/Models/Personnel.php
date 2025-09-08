@@ -17,7 +17,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use YieldStudio\LaravelExpoNotifier\Models\ExpoToken;
 
 /**
  * @property int $id
@@ -158,11 +157,6 @@ class Personnel extends Authenticatable
         return $this->belongsToMany(Task::class, 'personnel_task')
             ->using(PersonnelTask::class)
             ->withPivot(['started_at', 'finished_at']);
-    }
-
-    public function expoTokens(): MorphMany
-    {
-        return $this->morphMany(ExpoToken::class, 'owner');
     }
 
     public function activities(): HasMany
