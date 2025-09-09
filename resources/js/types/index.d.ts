@@ -12,6 +12,7 @@ export interface Personnel {
     sections: Section[];
     status?: Status;
     position?: string;
+    profile_picture_filename: string | null;
 }
 
 export type Status = 'available' | 'assigned' | 'on leave';

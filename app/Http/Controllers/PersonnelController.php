@@ -163,6 +163,10 @@ class PersonnelController extends Controller
 
     return Inertia::render('Personnel/ShowPersonnel', [
       'personnel' => $personnel,
+      'tasks' => [
+        'ongoing' => $personnel->assignedTasks()->wherePivotNull('finished_at')->wherePivotNotNull('started_at')->get(),
+        'finished' => $personnel->assignedTasks()->wherePivotNotNull('finished_at')->get(),
+      ]
     ]);
   }
 }
