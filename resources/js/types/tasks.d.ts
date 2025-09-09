@@ -30,6 +30,7 @@ export interface Task {
     personnel_id: number
     started_at?: number
     finished_at?: number
+    additional_notes?: string,
   }
   
   created_at: string

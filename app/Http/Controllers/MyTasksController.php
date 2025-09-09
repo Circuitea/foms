@@ -33,6 +33,7 @@ class MyTasksController extends Controller
                 'required',
                 Rule::in(['started', 'finished', 'canceled']),
             ],
+            'additional_notes' => 'required_if:status,finished|string|max:65535',
         ]);
         
         $task = Task::findOr($id, function () {
@@ -55,6 +56,7 @@ class MyTasksController extends Controller
         } else {
             $task->personnel()->updateExistingPivot($user->id, [
                 'finished_at' => Date::now(),
+                'additional_notes' => $request->input('additional_notes'),
             ]);
             $user->status = Status::AVAILABLE;
             $user->save();

@@ -9,8 +9,6 @@ class PersonnelTask extends Pivot
 {
     public $timestamps = false;
 
-    protected $with = ['report'];
-
     protected function casts(): array
     {
         return [
@@ -18,10 +16,4 @@ class PersonnelTask extends Pivot
             'finished_at' => 'datetime',
         ];
     }
-
-    public function report(): BelongsTo
-    {
-        return $this->belongsTo(TaskReport::class, 'task_report_id');
-    }
-    
 }

@@ -156,7 +156,7 @@ class Personnel extends Authenticatable
     {
         return $this->belongsToMany(Task::class, 'personnel_task')
             ->using(PersonnelTask::class)
-            ->withPivot(['started_at', 'finished_at']);
+            ->withPivot(['started_at', 'finished_at', 'additional_notes']);
     }
 
     public function activities(): HasMany
