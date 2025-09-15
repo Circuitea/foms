@@ -38,6 +38,16 @@ class TasksController extends Controller
     ]);
   }
 
+  public function show(Request $request, int $id) {
+    $task = Task::with(['priority', 'type', 'personnel', 'items.item', 'creator'])
+      ->findOr($id, function () {
+        abort(404);
+      });
+    return Inertia::render('Tasks/ShowTask', [
+      'task' => $task,
+    ]);
+  }
+
   public function new() {
     return Inertia::render('Tasks/NewTask', [
       'types' => TaskType::all(),

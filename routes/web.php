@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::get('/', [TasksController::class, 'list']);
         Route::get('/new', [TasksController::class, 'new']);
         Route::post('/new', [TasksController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
+        Route::get('/{id}', [TasksController::class, 'show']);
     });
 
     Route::middleware('auth')->group(function () {
@@ -80,5 +81,5 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::delete('/profile/token/{id}', [ProfileController::class, 'revokeToken']);
     });
 });
-
+                            
 require __DIR__.'/auth.php';

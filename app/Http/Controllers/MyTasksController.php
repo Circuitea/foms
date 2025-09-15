@@ -60,6 +60,18 @@ class MyTasksController extends Controller
             ]);
             $user->status = Status::AVAILABLE;
             $user->save();
+
+
+            $allFinished = $task->personnel->every(function ($person) {
+                return !is_null($person->pivot->finished_at);
+            });
+
+            if ($allFinished) {
+                $task->finished_at = Date::now();
+                $task->save();
+            }
+
+
         }
 
         return back();

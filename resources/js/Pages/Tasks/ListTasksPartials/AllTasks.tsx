@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { toProperCase } from "@/lib/utils";
 import { PageProps } from "@/types";
 import { Task } from "@/types/tasks";
-import { usePage } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { ColumnDef } from "@tanstack/react-table";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -34,8 +34,10 @@ const columns: ColumnDef<Task>[] = [
   {
     id: 'details',
     header: '',
-    cell: () => (
-      <Button variant="outline">Details</Button>
+    cell: ({ row }) => (
+      <Link href={`/tasks/${row.original.id}`}>
+        <Button variant="outline">Details</Button>
+      </Link>
     ),
   },
 ];

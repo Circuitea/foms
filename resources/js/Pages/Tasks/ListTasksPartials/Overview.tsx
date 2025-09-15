@@ -122,37 +122,38 @@ export default function Overview() {
         <div className="divide-y divide-gray-200">
           {tasks
             .map((task) => (
-              <div
-                key={task.id}
-                className="p-6 hover:bg-gray-50 cursor-pointer transition-colors"
-                onClick={() => {
-                }}
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className={`px-3 py-1.5 rounded-md text-xs font-medium ${getPriorityColor(task.priority.name)}`}>
-                      {task.priority.name.toUpperCase()}
-                    </span>
-                    <span className="text-sm text-gray-500">{task.type.name}</span>
-                    {!task.finished_at ? (
-                      <Clock className="w-4 h-4 text-blue-600" />
-                    ) : (
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                    )}
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${!task.finished_at ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                      {!task.finished_at ? "Ongoing" : "Finished"}
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
-                  <p className="text-sm text-gray-600 mt-1">{task.description.substring(0, 100)}...</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                    <span>📍 {task.location}</span>
-                    <span>⏱️ {task.duration}</span>
-                    <span>👥 {task.personnel.length} assigned</span>
-                    <span>📅 Due: {new Date(task.due_date).toLocaleDateString()}</span>
+              <Link key={task.id} href={`/tasks/${task.id}`}>
+                <div
+                  className="p-6 hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => {
+                  }}
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className={`px-3 py-1.5 rounded-md text-xs font-medium ${getPriorityColor(task.priority.name)}`}>
+                        {task.priority.name.toUpperCase()}
+                      </span>
+                      <span className="text-sm text-gray-500">{task.type.name}</span>
+                      {!task.finished_at ? (
+                        <Clock className="w-4 h-4 text-blue-600" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                      )}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${!task.finished_at ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                        {!task.finished_at ? "Ongoing" : "Finished"}
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
+                    <p className="text-sm text-gray-600 mt-1">{task.description.substring(0, 100)}...</p>
+                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                      <span>📍 {task.location}</span>
+                      <span>⏱️ {task.duration}</span>
+                      <span>👥 {task.personnel.length} assigned</span>
+                      <span>📅 Due: {new Date(task.due_date).toLocaleDateString()}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
         </div>
       </div>
