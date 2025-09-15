@@ -11,6 +11,9 @@ import dayjs from "dayjs";
 import { Bell, Clipboard } from "lucide-react";
 import { ReactElement } from "react";
 import { FinishTaskDialog } from "./FinishTaskDialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
 
@@ -59,7 +62,7 @@ function TaskList({ tasks }: { tasks: Task[] }) {
   }
 
   const changeTaskStatus = (id: number, status: 'started' | 'finished' | 'canceled') => {
-    router.post(`/my-tasks/${id}/status`, { status });
+    if (status !== 'finished') router.post(`/my-tasks/${id}/status`, { status });
     dispatch({
       type: 'set',
       status: status === 'finished' || status === 'canceled' ? 'available' : 'assigned',
@@ -81,7 +84,7 @@ function TaskList({ tasks }: { tasks: Task[] }) {
               <TooltipTrigger>
                 <div
                   className={cn(
-                    `w-4 h-4 rounded-full mt-1 flex-shrink-0 bg-gray-400`,
+                    `w-4 h-4 rounded-full mt-1 shrink-0 bg-gray-400`,
                     task.priority.name === "urgent" ? "animate-pulse" : null,
                     !task.pivot.started_at ? 'bg-yellow-400' : !task.pivot.finished_at ? 'bg-blue-500' : 'bg-green-500'
                   )}
@@ -137,7 +140,7 @@ function TaskList({ tasks }: { tasks: Task[] }) {
               </div>
             </div>
 
-            <div className="relative flex-shrink-0 flex gap-2">
+            <div className="relative shrink-0 flex gap-2">
               {!task.pivot.started_at ? (
                 <Button
                   className="flex items-center justify-center rounded bg-[#1B2560]"
@@ -157,20 +160,31 @@ function TaskList({ tasks }: { tasks: Task[] }) {
                   <FinishTaskDialog task={task} onSubmit={() => changeTaskStatus(task.id, 'finished')} />
                 </>
               ) : (
-                <Button
-                  className="bg-[#1B2560]"
-                  asChild
-                >
-                  <a
-                    href={`/my-tasks/${task.id}/report`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download
-                  >
-                    Download Report
-                  </a>
-                </Button>
-              )}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="flex items-center justify-center rounded bg-[#1B2560]">
+                      View Note
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>View Attached Note</DialogTitle>
+                      <DialogDescription>Additional note that will be attached to the final task report.</DialogDescription>
+                    </DialogHeader>
+                    <div className="h-full relative top-0">
+                      <div className="py-4 space-y-2">
+                        <Label htmlFor="notes">Additional Note</Label>
+                        <Textarea
+                          id="notes"
+                          value={task.pivot.additional_notes}
+                          rows={10}
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              ) }
             </div>
           </div>
         </div>

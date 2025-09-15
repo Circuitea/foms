@@ -70,7 +70,7 @@ export default function PersonnelTab() {
   }>>().props;
 
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-200">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium text-gray-900">Personnel Management</h3>

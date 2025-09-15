@@ -163,7 +163,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
         {/* Form Section */}
         <form onSubmit={submit} className="space-y-6" ref={formRef}>
           {/* Personal Information Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white rounded-lg shadow-xs border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 bg-blue-50">
               <div className="flex items-center gap-2">
                 <User className="w-5 h-5 text-blue-600" />
@@ -201,7 +201,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                     hidden
                     onChange={onFileChange}
                   />
-                  <div className="rounded-lg border border-input bg-background shadow-sm text-center w-full">
+                  <div className="rounded-lg border border-input bg-background shadow-xs text-center w-full">
                     {form.data.profile_picture ? form.data.profile_picture.name : 'No image uploaded'}
                   </div>
                   <p className="text-xs text-gray-500 mt-2 text-center">
@@ -277,7 +277,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                         />
                         {form.invalid("surname") && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
-                            <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                            <AlertCircle className="h-3 w-3 shrink-0" />
                             <span className="break-words">{form.errors.surname}</span>
                           </div>
                         )}
@@ -298,7 +298,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                         />
                         {form.invalid("first_name") && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
-                            <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                            <AlertCircle className="h-3 w-3 shrink-0" />
                             <span className="break-words">{form.errors.first_name}</span>
                           </div>
                         )}
@@ -319,7 +319,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                         />
                         {form.invalid("middle_name") && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
-                            <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                            <AlertCircle className="h-3 w-3 shrink-0" />
                             <span className="break-words">{form.errors.middle_name}</span>
                           </div>
                         )}
@@ -340,7 +340,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
                         />
                         {form.invalid("name_extension") && (
                           <div className="flex items-center gap-1 text-xs text-red-600">
-                            <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                            <AlertCircle className="h-3 w-3 shrink-0" />
                             <span className="break-words">{form.errors.name_extension}</span>
                           </div>
                         )}
@@ -353,7 +353,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
           </div>
 
           {/* Organization Information Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white rounded-lg shadow-xs border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 bg-green-50">
               <div className="flex items-center gap-2">
                 <Briefcase className="w-5 h-5 text-green-600" />
@@ -414,7 +414,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
           </div>
 
           {/* Contact Information Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white rounded-lg shadow-xs border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 bg-purple-50">
               <div className="flex items-center gap-2">
                 <Mail className="w-5 h-5 text-purple-600" />
@@ -476,7 +476,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
           </div>
 
           {/* Account Security */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white rounded-lg shadow-xs border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 bg-red-50">
               <div className="flex items-center gap-2">
                 <Mail className="w-5 h-5 text-red-600" />
@@ -516,7 +516,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
           </div>
 
           {/* Form Actions */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">
                 <span className="text-red-500">*</span> Required fields

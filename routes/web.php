@@ -43,6 +43,7 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::post('/new', [PersonnelController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
         Route::get('/import', [PersonnelController::class, 'import']);
         Route::post('/import', [PersonnelController::class, 'add']);
+        Route::get('/{id}', [PersonnelController::class, 'show']);
         Route::get('/{id}/activity', [PersonnelController::class, 'listActivity']);
         Route::get('/{id}/location-history/{date?}', [PersonnelController::class, 'listLocationHistory']);
     });
@@ -58,8 +59,6 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::get('/', [MyTasksController::class, 'list']);
         Route::get('/{id}', [MyTasksController::class, 'show']);
         Route::post('/{id}/status', [MyTasksController::class, 'updateStatus']);
-        Route::get('/{id}/report', [MyTasksController::class, 'showReport']);
-        Route::post('/{id}/report', [MyTasksController::class, 'storeReport']);
     });
 
     Route::prefix('inventory')->group(function() {
@@ -73,6 +72,7 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::get('/', [TasksController::class, 'list']);
         Route::get('/new', [TasksController::class, 'new']);
         Route::post('/new', [TasksController::class, 'create'])->middleware([HandlePrecognitiveRequests::class]);
+        Route::get('/{id}', [TasksController::class, 'show']);
     });
 
     Route::middleware('auth')->group(function () {
@@ -81,5 +81,5 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::delete('/profile/token/{id}', [ProfileController::class, 'revokeToken']);
     });
 });
-
+                            
 require __DIR__.'/auth.php';

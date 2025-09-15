@@ -97,7 +97,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
         </div>
 
         <form onSubmit={submitForm} className="space-y-6">
-          <Card className="border-gray-200 shadow-sm">
+          <Card className="border-gray-200 shadow-xs">
             <CardHeader className="bg-gray-50/50">
               <CardTitle className="flex items-center gap-2 text-[#1B2560]">
                 <Clipboard className="w-5 h-5" />
@@ -121,7 +121,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
                   />
                   {invalid('type_id') && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{errors.type_id}</span>
                     </div>
                   )}
@@ -143,7 +143,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
 
                   {invalid('priority_id') && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{errors.priority_id}</span>
                     </div>
                   )}
@@ -163,7 +163,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
                   />
                   {invalid('title') && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{errors.title}</span>
                     </div>
                   )}
@@ -183,7 +183,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
                   />
                   {invalid('description') && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{errors.description}</span>
                     </div>
                   )}
@@ -203,7 +203,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
                   />
                   {invalid('description') && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
-                      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{errors.description}</span>
                     </div>
                   )}
@@ -211,7 +211,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
               </div>
             </CardContent>
           </Card>
-          <Card className="border-gray-200 shadow-sm">
+          <Card className="border-gray-200 shadow-xs">
             <CardHeader className="bg-gray-50/50">
               <CardTitle className="flex items-end gap-2 text-[#1B2560]">
                 <Truck className="w-5 h-5" />
@@ -284,7 +284,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
             </CardContent>
 
           </Card>
-          <Card className="border-gray-200 shadow-sm">
+          <Card className="border-gray-200 shadow-xs">
             <CardContent className="p-6 grid grid-cols-1 md:grid-cols-[1fr_2%_1fr] gap-2">
               <div className="space-y-4">
                 <div className="bg-gray-50/50">
@@ -295,7 +295,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
                 </div>
                 {data.equipment_items.map((item, i) => (
                   <div key={i+1} className="flex items-end gap-2 w-full">
-                    <div className="flex-[8]">
+                    <div className="flex-8">
                       <Label htmlFor={`equipment_item_${i+1}`}>Equipment Item</Label>
                       <Select
                         inputId={`equipment_item_${i+1}`}
@@ -309,7 +309,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
                         isClearable
                       />
                     </div>
-                    <div className="w-20 flex-shrink-0">
+                    <div className="w-20 shrink-0">
                       <Label htmlFor={`equipment_item_quantity_${i+1}`}>Quantity</Label>
                       <Input
                         id={`equipment_item_quantity_${i+1}`}

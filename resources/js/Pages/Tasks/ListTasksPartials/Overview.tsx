@@ -44,7 +44,7 @@ export default function Overview() {
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 rounded-lg" style={{ backgroundColor: "#1B2560" }}>
               <ClipboardList className="w-6 h-6 text-white" />
@@ -56,7 +56,7 @@ export default function Overview() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 rounded-lg" style={{ backgroundColor: "#1B2560" }}>
               <Clock className="w-6 h-6 text-white" />
@@ -70,7 +70,7 @@ export default function Overview() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 rounded-lg" style={{ backgroundColor: "#1B2560" }}>
               <AlertTriangle className="w-6 h-6 text-white" />
@@ -84,7 +84,7 @@ export default function Overview() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 rounded-lg" style={{ backgroundColor: "#1B2560" }}>
               <CheckCircle className="w-6 h-6 text-white" />
@@ -100,7 +100,7 @@ export default function Overview() {
       </div>
 
       {/* Active Tasks */}
-      <div className="bg-white rounded-lg shadow border border-gray-200">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-medium text-gray-900">Ongoing Tasks</h3>
           <div className="flex gap-2">
@@ -122,37 +122,38 @@ export default function Overview() {
         <div className="divide-y divide-gray-200">
           {tasks
             .map((task) => (
-              <div
-                key={task.id}
-                className="p-6 hover:bg-gray-50 cursor-pointer transition-colors"
-                onClick={() => {
-                }}
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className={`px-3 py-1.5 rounded-md text-xs font-medium ${getPriorityColor(task.priority.name)}`}>
-                      {task.priority.name.toUpperCase()}
-                    </span>
-                    <span className="text-sm text-gray-500">{task.type.name}</span>
-                    {!task.finished_at ? (
-                      <Clock className="w-4 h-4 text-blue-600" />
-                    ) : (
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                    )}
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${!task.finished_at ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                      {!task.finished_at ? "Ongoing" : "Finished"}
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
-                  <p className="text-sm text-gray-600 mt-1">{task.description.substring(0, 100)}...</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                    <span>📍 {task.location}</span>
-                    <span>⏱️ {task.duration}</span>
-                    <span>👥 {task.personnel.length} assigned</span>
-                    <span>📅 Due: {new Date(task.due_date).toLocaleDateString()}</span>
+              <Link key={task.id} href={`/tasks/${task.id}`}>
+                <div
+                  className="p-6 hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => {
+                  }}
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className={`px-3 py-1.5 rounded-md text-xs font-medium ${getPriorityColor(task.priority.name)}`}>
+                        {task.priority.name.toUpperCase()}
+                      </span>
+                      <span className="text-sm text-gray-500">{task.type.name}</span>
+                      {!task.finished_at ? (
+                        <Clock className="w-4 h-4 text-blue-600" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                      )}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${!task.finished_at ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                        {!task.finished_at ? "Ongoing" : "Finished"}
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
+                    <p className="text-sm text-gray-600 mt-1">{task.description.substring(0, 100)}...</p>
+                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                      <span>📍 {task.location}</span>
+                      <span>⏱️ {task.duration}</span>
+                      <span>👥 {task.personnel.length} assigned</span>
+                      <span>📅 Due: {new Date(task.due_date).toLocaleDateString()}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
         </div>
       </div>

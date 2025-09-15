@@ -56,25 +56,29 @@ const columns:ColumnDef<Personnel>[] = [
     ))
   },
   {
-    accessorKey: 'roles',
-    header: 'ROLES',
-    cell: (props) => {
-      const { roles } = usePage<PageProps<{ roles: RoleLabels }>>().props;
-
-      return (
-        <div className="flex flex-col space-y-2 md:inline md:space-x-2">
-          {props.row.original.roles?.map((role) => (
-            <span
-              key={role.id}
-              className="text-center px-2 py-1 md:text-xs font-semibold rounded-xl bg-blue-200"
-            >
-              {roles[role.name]}
-            </span>
-          ))}
-        </div>
-      )
-    },
+    id: 'position',
+    accessorFn: person => person.position ?? 'CDRRMO Personnel',
   },
+  // {
+  //   accessorKey: 'roles',
+  //   header: 'ROLES',
+  //   cell: (props) => {
+  //     const { roles } = usePage<PageProps<{ roles: RoleLabels }>>().props;
+
+  //     return (
+  //       <div className="flex flex-col space-y-2 md:inline md:space-x-2">
+  //         {props.row.original.roles?.map((role) => (
+  //           <span
+  //             key={role.id}
+  //             className="text-center px-2 py-1 md:text-xs font-semibold rounded-xl bg-blue-200"
+  //           >
+  //             {roles[role.name]}
+  //           </span>
+  //         ))}
+  //       </div>
+  //     )
+  //   },
+  // },
   {
     id: 'status',
     header: 'STATUS',
@@ -96,9 +100,11 @@ const columns:ColumnDef<Personnel>[] = [
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem>
-            <Eye className="h-4 w-4" />
-            View Profile
+          <DropdownMenuItem asChild>
+            <Link href={`/personnel/${row.original.id}`}>
+              <Eye className="h-4 w-4" />
+              View Profile
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href={`/personnel/${row.original.id}/activity`}>
@@ -123,7 +129,7 @@ interface Option {
   label: string,
 }
 
-export default function ListPersonnel({ personnel, total, sections, roles }: PageProps<{ personnel: Personnel[], total: number, sections: Section[], roles: RoleLabels }>) {
+export default function ListPersonnel({ personnel, sections }: PageProps<{ personnel: Personnel[], total: number, sections: Section[], roles: RoleLabels }>) {
   const sectionOptions: Option[] = [
     {value: 0, label: 'All Departments'},
     ...sections.map((section) => {
@@ -154,7 +160,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-4">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 rounded-lg">
                 <Users className="h-6 w-6 text-blue-600" />
@@ -167,7 +173,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-4">
             <div className="flex items-center">
               <div className="p-2 bg-green-100 rounded-lg">
                 <UserCheck className="h-6 w-6 text-green-600" />
@@ -179,7 +185,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-4">
             <div className="flex items-center">
               <div className="p-2 bg-yellow-100 rounded-lg">
                 <Clock className="h-6 w-6 text-yellow-600" />
@@ -191,7 +197,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-4">
             <div className="flex items-center">
               <div className="p-2 bg-purple-100 rounded-lg">
                 <MapPin className="h-6 w-6 text-purple-600" />
@@ -205,7 +211,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
         </div>
 
         {/* Controls */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div className="bg-white rounded-lg shadow-xs border border-gray-200 mb-6">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">Personnel Directory</h3>
           </div>
@@ -232,7 +238,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
               </div>
 
               {/* Filters */}
-              <div className="flex gap-2 flex-shrink-0">
+              <div className="flex gap-2 shrink-0">
                 <div className="flex items-center rounded-lg px-3 py-2 5 bg-white min-w-[140px]">
                   <Filter className="w-4 h-4 mr-2 text-gray-400" />
                   <Select className="w-full border-none"
@@ -255,7 +261,7 @@ export default function ListPersonnel({ personnel, total, sections, roles }: Pag
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2 flex-shrink-0">
+              <div className="flex gap-2 shrink-0">
                 {userHasPermission(/personnel\.(?:create|\*)/) && (
                   <div className="flex gap-2">
                     <Link

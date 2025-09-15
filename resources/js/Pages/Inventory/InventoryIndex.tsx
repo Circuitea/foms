@@ -155,7 +155,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
       </div>
 
       {/* Search and filter section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6 mb-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -204,7 +204,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
       </div>
 
       {/* Equipment table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">

@@ -87,7 +87,7 @@ class Task extends Model
 
     public function personnel(): BelongsToMany
     {
-        return $this->belongsToMany(Personnel::class, 'personnel_task')->using(PersonnelTask::class)->withPivot(['started_at', 'finished_at', 'task_report_id']);
+        return $this->belongsToMany(Personnel::class, 'personnel_task')->using(PersonnelTask::class)->withPivot(['started_at', 'finished_at', 'additional_notes']);
     }
 
     public function items(): HasMany

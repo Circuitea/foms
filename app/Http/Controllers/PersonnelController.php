@@ -155,4 +155,18 @@ class PersonnelController extends Controller
         ->get(),
       ]);
   }
+
+  public function show(Request $request, int $id) {
+    $personnel = Personnel::findOr($id, function () {
+      abort(404);
+    });
+
+    return Inertia::render('Personnel/ShowPersonnel', [
+      'personnel' => $personnel,
+      'tasks' => [
+        'ongoing' => $personnel->assignedTasks()->wherePivotNull('finished_at')->wherePivotNotNull('started_at')->get(),
+        'finished' => $personnel->assignedTasks()->wherePivotNotNull('finished_at')->get(),
+      ]
+    ]);
+  }
 }

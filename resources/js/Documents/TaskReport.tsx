@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
 
 const BlankLine = () => <Text style={styles.text}>{"\n"}</Text>
 
-export function TaskReport({ task, user, notes }: { task: Task, user: Personnel, notes: string }) {
+export function TaskReport({ task }: { task: Task }) {
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
@@ -41,16 +41,15 @@ export function TaskReport({ task, user, notes }: { task: Task, user: Personnel,
           <Text style={{ textAlign: 'center', color: '#6b7280' }}>{"{HEADER PLACEHOLDER}"}</Text>
         </View>
         <View>
-          <HeadingOne>RECEIVER INFORMATION</HeadingOne>
+          <HeadingOne>TASK CREATOR INFORMATION</HeadingOne>
           <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Name: </Text>{formatName(task.creator)}</Text>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Position: </Text>{"{ASSIGNED BY (POSITION)}"}</Text>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Section: </Text>{"{ASSIGNED BY (SECTION)}"}</Text>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Date: </Text>{"{DATE NOW}"}</Text>
+          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Position: </Text>{task.creator.position ?? 'CDRRMO Personnel'}</Text>
+          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Date: </Text>{dayjs(task.finished_at).format('MMMM DD, YYYY - hh:mm A')}</Text>
         </View>
         <BlankLine />
         <Text style={[styles.text, styles.title]}>{task.title}</Text>
         <BlankLine />
-        <View>
+        {/* <View>
           <HeadingOne>SENDER INFORMATION</HeadingOne>
           <View style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
             <View>
@@ -64,70 +63,72 @@ export function TaskReport({ task, user, notes }: { task: Task, user: Personnel,
               <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Date Finished: </Text>{"{DATE FINISHED}"}</Text>
             </View>
           </View>
-        </View>
-
-        
+        </View> */}
 
         <View>
           <HeadingOne>TASK INFORMATION</HeadingOne>
           <HeadingTwo>INCIDENT INFORMATION</HeadingTwo>
           <Text style={[styles.text, { textAlign: 'justify' }]}>
-            This task (ID: {task.id}) is an {task.priority.name} team deployment. The operation is located in {task.location},
-            at coordinates {"{COORDINATES}"}. {formatName(task.creator)} reported it from the {"{SECTION NAME}"}. The task was
-            officially issued at {dayjs(task.created_at).format("MMMM DD, YYYY hh:mm A")}.
+            This task <Text style={{ fontWeight: 'bold' }}>(ID: {task.id})</Text> is an <Text style={{ fontWeight: 'bold' }}>{task.priority.name}</Text> priority team deployment.
+            The operation is located in <Text style={{ fontWeight: 'bold' }}>{task.location}</Text>.
+            The task was officially issued on <Text style={{ fontWeight: 'bold' }}>{dayjs(task.created_at).format("MMMM DD, YYYY [at] hh:mm A")}</Text>.
           </Text>
           <HeadingTwo>DESCRIPTION</HeadingTwo>
           <Text style={[styles.text, { textAlign: 'justify' }]}>
             {task.description}
           </Text>
 
-          <HeadingTwo>REQUIRED RESOURCES</HeadingTwo>
-          <Table tdStyle={{ padding: 5 }} weightings={[0.8, 0.2]}>
-            <TH>
-              <TD>Resource</TD>
-              <TD>Quantity</TD>
-            </TH>
-            {task.items.map((item, i) => (
-              <TR key={i}>
-                <TD>{item.item.name}</TD>
-                <TD>{item.amount}</TD>
-              </TR>
-            ))}
-          </Table>
+          
         </View>
+      </Page>
+      <Page size="LETTER" style={styles.page}>
+        <HeadingOne>ALLOCATED RESOURCES</HeadingOne>
+        <Table tdStyle={{ padding: 5 }} weightings={[0.8, 0.2]}>
+          <TH>
+            <TD>Resource</TD>
+            <TD>Quantity</TD>
+          </TH>
+          {task.items.map((item, i) => (
+            <TR key={i}>
+              <TD>{item.item.name}</TD>
+              <TD>{item.amount}</TD>
+            </TR>
+          ))}
+        </Table>
+      </Page>
 
+      <Page size="LETTER" style={styles.page}>
         <View>
-          <HeadingOne>ADDITIONAL NOTES</HeadingOne>
-            {notes.trim() === '' 
-              ? (
-                <Text style={[{fontStyle: 'italic'}]}>No additional notes provided.</Text>
-              ) : (
-                <Text style={[styles.text, {textAlign: 'justify'}]}>
-                  {notes}
-                </Text>
-              )
-            }
-        </View>
-        
-        <View>
-          <HeadingOne>LOCATION LIST</HeadingOne>
-          <Table tdStyle={{ padding: 5 }} weightings={[0.8, 0.2]}>
+          <HeadingOne>ASSIGNED PERSONNEL</HeadingOne>
+          <Table
+            tdStyle={{ padding: 5 }}
+            weightings={[0.5, 0.25, 0.25]}
+          >
             <TH>
-              <TD>Place</TD>
-              <TD>Time</TD>
+              <TD>Personnel</TD>
+              <TD>Task Started</TD>
+              <TD>Task Ended</TD>
             </TH>
-            <TR>
-              <TD>Location 1</TD>
-              <TD>11:00AM</TD>
-            </TR>
-            <TR>
-              <TD>Location 2</TD>
-              <TD>11:05AM</TD>
-            </TR>
-            <TR>
-              <TD>Location 3</TD>
-              <TD>11:10AM</TD>
-            </TR>
+            {task.personnel.map(person => (
+              <>
+                <TR>
+                  <TD>{formatName(person)}</TD>
+                  <TD>{dayjs(person.pivot.started_at).format('YYYY-MM-DD hh:mm A')}</TD>
+                  <TD>{dayjs(person.pivot.finished_at).format('YYYY-MM-DD hh:mm A')}</TD>
+                </TR>
+                {!!person.pivot.additional_notes && (
+                  <TR>
+                    <TD weighting={1}>
+                      <Text>
+                        Note:
+                        {'\n'}
+                        {person.pivot.additional_notes}
+                      </Text>
+                    </TD>
+                  </TR>
+                )}
+              </>
+            ))}
           </Table>
         </View>
       </Page>

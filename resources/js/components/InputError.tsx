@@ -7,7 +7,7 @@ export default function InputError({
 }: { message?: string, invalid?: boolean }) {
   return invalid ? (
     <div className="flex items-center gap-1 text-xs text-red-600">
-      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+      <AlertCircle className="h-3 w-3 shrink-0" />
       <span className="break-words">{message}</span>
     </div>
   ) : null;

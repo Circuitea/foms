@@ -822,7 +822,7 @@ export default function ShowNotifications() {
                     <select
                       value={taskStatus}
                       onChange={(e) => setTaskStatus(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="Pending">Pending</option>
                       <option value="In Progress">In Progress</option>
@@ -861,7 +861,7 @@ export default function ShowNotifications() {
                     <select
                       value={supportType}
                       onChange={(e) => setSupportType(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="Personnel">Additional Personnel</option>
                       <option value="Equipment">Equipment</option>
@@ -876,7 +876,7 @@ export default function ShowNotifications() {
                       value={supportRequest}
                       onChange={(e) => setSupportRequest(e.target.value)}
                       placeholder="Describe what support you need and why..."
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 h-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 h-24 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div className="flex gap-3 pt-4">
@@ -962,7 +962,7 @@ export default function ShowNotifications() {
                     </svg>
                     <h4 className="text-lg font-medium text-gray-500 mb-2">Map Implementation Area</h4>
                     <p className="text-gray-400 mb-4">San Juan City Emergency Map will be integrated here</p>
-                    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 max-w-md mx-auto">
+                    <div className="bg-white rounded-lg p-4 shadow-xs border border-gray-200 max-w-md mx-auto">
                       <h5 className="font-medium text-gray-700 mb-2">Map Features to Implement:</h5>
                       <ul className="text-sm text-gray-600 space-y-1 text-left">
                         <li>• Interactive San Juan City map</li>

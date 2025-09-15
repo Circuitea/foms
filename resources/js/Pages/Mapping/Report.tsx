@@ -303,7 +303,7 @@ function Report() {
                       value={annualRange.start}
                       onChange={(e) => setAnnualRange((prev) => ({ ...prev, start: e.target.value }))}
                       disabled={isAnnualDisabled || false}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                       onClick={() => (isAnnualDisabled ? undefined : setSelectedReportType("annual"))}
                     >
                       <option value="">Choose start year</option>
@@ -324,7 +324,7 @@ function Report() {
                       value={annualRange.end}
                       onChange={(e) => setAnnualRange((prev) => ({ ...prev, end: e.target.value }))}
                       disabled={isAnnualDisabled || false}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                       onClick={() => (isAnnualDisabled ? undefined : setSelectedReportType("annual"))}
                     >
                       <option value="">Choose end year</option>
@@ -396,7 +396,7 @@ function Report() {
                       value={monthlyRange.start}
                       onChange={(e) => setMonthlyRange((prev) => ({ ...prev, start: e.target.value }))}
                       disabled={isMonthlyDisabled || false}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                       onClick={() => (isMonthlyDisabled ? undefined : setSelectedReportType("monthly"))}
                     />
                   </div>
@@ -412,7 +412,7 @@ function Report() {
                       onChange={(e) => setMonthlyRange((prev) => ({ ...prev, end: e.target.value }))}
                       min={monthlyRange.start || undefined}
                       disabled={isMonthlyDisabled || false}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                       onClick={() => (isMonthlyDisabled ? undefined : setSelectedReportType("monthly"))}
                     />
                   </div>
@@ -473,7 +473,7 @@ function Report() {
                       value={weeklyMonth}
                       onChange={(e) => setWeeklyMonth(e.target.value)}
                       disabled={isWeeklyDisabled || false}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                       onClick={() => (isWeeklyDisabled ? undefined : setSelectedReportType("weekly"))}
                     />
                   </div>
@@ -494,7 +494,7 @@ function Report() {
                           : undefined
                       }
                       disabled={!weeklyMonth || isWeeklyDisabled || false}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                       onClick={() => (isWeeklyDisabled ? undefined : setSelectedReportType("weekly"))}
                     />
                     {!weeklyMonth && !isWeeklyDisabled && (
@@ -518,7 +518,7 @@ function Report() {
                           : undefined
                       }
                       disabled={!weeklyMonth || isWeeklyDisabled || false}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                       onClick={() => (isWeeklyDisabled ? undefined : setSelectedReportType("weekly"))}
                     />
                     {!weeklyMonth && !isWeeklyDisabled && (
@@ -583,7 +583,7 @@ function Report() {
                       value={dailyMonth}
                       onChange={(e) => setDailyMonth(e.target.value)}
                       disabled={isDailyDisabled || false}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                       onClick={() => (isDailyDisabled ? undefined : setSelectedReportType("daily"))}
                     />
                   </div>
@@ -604,7 +604,7 @@ function Report() {
                           : undefined
                       }
                       disabled={!dailyMonth || isDailyDisabled || false}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#1B2560] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                       onClick={() => (isDailyDisabled ? undefined : setSelectedReportType("daily"))}
                     />
                     {!dailyMonth && !isDailyDisabled && (

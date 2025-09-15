@@ -70,6 +70,7 @@ class ProfileController extends Controller
 
         Gate::authorize('revoke-token', $token);
 
+        $token->expoTokens()->delete();
         $token->delete();
 
         return back();

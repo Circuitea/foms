@@ -46,7 +46,7 @@ export default function ListMeetings({ activeMeetings, finishedMeetings }: PageP
                 <div className="flex items-start gap-4">
                   {/* Status indicator */}
                   <div
-                    className={`w-3 h-3 rounded-full mt-2 flex-shrink-0 ${
+                    className={`w-3 h-3 rounded-full mt-2 shrink-0 ${
                       meeting.status === "Active" ? "bg-[#1B2560] animate-pulse" : "bg-gray-400"
                     }`}
                   ></div>
@@ -181,7 +181,7 @@ export default function ListMeetings({ activeMeetings, finishedMeetings }: PageP
                 <div className="flex items-start gap-4">
                   {/* Status indicator */}
                   <div
-                    className={`w-3 h-3 rounded-full mt-2 flex-shrink-0 ${
+                    className={`w-3 h-3 rounded-full mt-2 shrink-0 ${
                       meeting.status === "Active" ? "bg-[#1B2560] animate-pulse" : "bg-gray-400"
                     }`}
                   ></div>

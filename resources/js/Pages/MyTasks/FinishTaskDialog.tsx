@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { TaskReport } from "@/Documents/TaskReport";
 import { Task } from "@/types/tasks";
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { pdf, PDFDownloadLink, PDFViewer, usePDF } from "@react-pdf/renderer";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
@@ -13,21 +13,6 @@ import { useEffect, useMemo, useState } from "react";
 export function FinishTaskDialog({ task, onSubmit }: { task: Task, onSubmit: () => void }) {
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState('');
-  const [debouncedNotes, setDebouncedNotes] = useState('');
-  const { user } = usePage().props.auth;
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedNotes(notes);
-    }, 1000);
-
-    return () => clearTimeout(handler);
-  }, [notes]);
-
-  const document = useMemo(
-    () => <TaskReport task={task} user={user} notes={debouncedNotes} />,
-    [task, user, debouncedNotes]
-  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -38,48 +23,41 @@ export function FinishTaskDialog({ task, onSubmit }: { task: Task, onSubmit: () 
           Finish
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-7xl h-full grid-rows-12">
+      <DialogContent className="">
         <DialogHeader className="">
           <DialogTitle>Finish Task?</DialogTitle>
-          <DialogDescription>The following report will be generated for the completion of this task.</DialogDescription>
+          <DialogDescription>Additional notes can be included in the report.</DialogDescription>
         </DialogHeader>
-        <div className="row-span-11 grid grid-cols-[60%_40%] h-full relative top-0">
-          <PDFViewer className="h-full w-full">
-            {document}
-          </PDFViewer>
-          <div className="ml-4 space-y-4">
-            <div className="px-6 py-4 space-y-2 bg-gray-50 border-gray-200 shadow-lg rounded-lg">
-              <Label htmlFor="notes">Additional Notes</Label>
-              <Textarea
-                id="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </div>
-            <div className="px-6 py-4 bg-gray-50 border-gray-200 shadow-lg rounded-lg flex justify-end items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-[#1B2560]"
-                onClick={() => {
-                  pdf(document).toBlob().then((blob) => {
-                    return axios.postForm(`/my-tasks/${task.id}/report`, {
-                      report: blob,
-                    });
-                  }).then(() => {
-                    onSubmit()
-                  });
-                }}
-              >
-                Submit Report and Finish Task
-              </Button>
-            </div>
+        <div className="h-full relative top-0">
+          <div className="py-4 space-y-2">
+            <Label htmlFor="notes">Additional Notes</Label>
+            <Textarea
+              id="notes"
+              value={notes}
+              rows={10}
+              onChange={(e) => setNotes(e.target.value)}
+            />
           </div>
         </div>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="bg-[#1B2560]"
+            onClick={() => {
+              router.post(`/my-tasks/${task.id}/status`, {
+                status: 'finished',
+                additional_notes: notes,
+              });
+            }}
+          >
+            Submit Report and Finish Task
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

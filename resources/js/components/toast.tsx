@@ -31,7 +31,7 @@ function Toast({ id, type, title, description }: ToastProps) {
         >
           <div className="p-4">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                   <AlertCircle
                       className={'h-5 w-5 ' +
                           type === 'error' ? 'text-red-400' :
@@ -46,7 +46,7 @@ function Toast({ id, type, title, description }: ToastProps) {
                   <p className="mt-1 text-sm text-gray-500">{description}</p>
               </div>
 
-              <div className="ml-4 flex-shrink-0 flex">
+              <div className="ml-4 shrink-0 flex">
                   <Button
                       onClick={() => sonnerToast.dismiss(id)}
                       ><X className="h-5 w-5" /></Button>

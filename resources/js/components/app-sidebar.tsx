@@ -86,7 +86,7 @@ export function AppSidebar() {
               <SidebarTrigger className="ml-auto" />
             </div>
             <div className="flex flex-col items-center space-y-2 py-4 group-data-[collapsible=icon]:hidden">
-              <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+              <div className="w-28 h-28 rounded-full bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                 <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center">
                   {profilePicturePath ? (
                     <img src={profilePicturePath} className="w-20 h-20 rounded-full" />
@@ -118,7 +118,7 @@ export function AppSidebar() {
                 const menuItemContent = (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
-                      className="py-3 px-4 rounded-lg hover:shadow-sm transition-all duration-200"
+                      className="py-3 px-4 rounded-lg hover:shadow-xs transition-all duration-200"
                       tooltip={item.title}
                       asChild
                     >
@@ -145,7 +145,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="py-3 px-4 rounded-lg hover:shadow-sm transition-all duration-200"
+              className="py-3 px-4 rounded-lg hover:shadow-xs transition-all duration-200"
               tooltip="Settings"
               asChild
             >
@@ -159,7 +159,7 @@ export function AppSidebar() {
             <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
               <DialogTrigger asChild>
                 <SidebarMenuButton
-                  className="py-3 px-4 rounded-lg hover:shadow-sm transition-all duration-200"
+                  className="py-3 px-4 rounded-lg hover:shadow-xs transition-all duration-200"
                   tooltip="Logout"
                 >
                   <LogOut />

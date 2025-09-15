@@ -20,7 +20,7 @@ export interface Task {
   priority: TaskPriority
   creator: Personnel
 
-  personnel: Personnel[]
+  personnel: PersonnelWithPivot[]
   items: {
     item: Item,
     amount: number,
@@ -30,10 +30,20 @@ export interface Task {
     personnel_id: number
     started_at?: number
     finished_at?: number
+    additional_notes?: string,
   }
   
   created_at: string
   updated_at: string
+  finished_at?: string
+}
+
+export type PersonnelWithPivot = Personnel & {
+  pivot: {
+    started_at?: string;
+    finished_at?: string;
+    additional_notes?: string;
+  }
 }
 
 export interface TaskType {

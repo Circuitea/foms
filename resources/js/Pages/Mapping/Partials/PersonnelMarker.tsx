@@ -63,7 +63,7 @@ export default function PersonnelMarker({ marker, isClickable, selected }: { mar
             <div className="space-y-3">
               {marker.personnel.location_history.map((location, index) => (
                 <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0 mt-1">
+                  <div className="shrink-0 mt-1">
                     <div className={`w-3 h-3 rounded-full bg-gray-400`}></div>
                     </div>
                   <div className="flex-1">

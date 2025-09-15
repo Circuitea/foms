@@ -1,12 +1,39 @@
+import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
+import { toProperCase } from "@/lib/utils";
 import { PageProps } from "@/types";
 import Item, { ItemCondition } from "@/types/inventory";
 import { Link } from "@inertiajs/react";
+import { ColumnDef } from "@tanstack/react-table";
+import dayjs from "dayjs";
 import { Calendar, MapPin, MoveLeft, Package } from "lucide-react";
 import { useEffect } from "react";
 
+interface ItemTransaction {
+  id: number;
+  title: string;
+  amount: number;
+  quality: string;
+  created_at: string;
+}
 
+const columns: ColumnDef<ItemTransaction>[] = [
+  {
+    accessorKey: 'title',
+  },
+  {
+    accessorKey: 'amount',
+  },
+  {
+    id: 'quality',
+    accessorFn: transaction => toProperCase(transaction.quality),
+  },
+  {
+    id: 'date',
+    accessorFn: transaction => dayjs(transaction.created_at).format('MMMM DD, YYYY hh:mm A'),
+  },
+]
 
 export default function ShowInventoryItem({
   item
@@ -16,13 +43,37 @@ export default function ShowInventoryItem({
   },
 }>) {
 
+  const data: ItemTransaction[] = [
+    {
+      id: 1,
+      title: 'Item Initial Amount',
+      amount: 10,
+      quality: 'available',
+      created_at: '2025-09-09T19:21:45Z',
+    },
+    {
+      id: 2,
+      title: 'For Task ID: 1',
+      amount: -1,
+      quality: 'available',
+      created_at: '2025-09-09T19:22:45Z',
+    },
+    {
+      id: 3,
+      title: 'For Task ID: 1',
+      amount: 1,
+      quality: 'deployed',
+      created_at: '2025-09-09T19:23:45Z',
+    },
+  ];
+
   useEffect(() => {
     console.log(item);
-  }, [])
+  }, []);
 
   return (
     <>
-      <div className="sticky top-0 flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0 bg-white">
+      <div className="sticky top-0 flex items-center justify-between p-6 border-b border-gray-200 shrink-0 bg-white">
         <div className="flex items-center gap-3">
           <Button variant="outline" asChild>
             <Link href="/inventory">
@@ -114,7 +165,7 @@ export default function ShowInventoryItem({
               )} */}
             </div>
 
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-blue-50 rounded-lg p-2 shadow-lg">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Package className="w-5 h-5" />
                 Quantity & Availability
@@ -138,72 +189,15 @@ export default function ShowInventoryItem({
                 </div>
               </div>
             </div>
-
-            {/* <div className="bg-yellow-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                Inspection Schedule
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Last Inspection</label>
-                  <p className="text-sm text-gray-900">LAST INSPECTION</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Next Inspection</label>
-                  <p className="text-sm text-gray-900">NEXT INSPECTION</p>
-                </div>
-              </div>
-            </div> */}
-
-            {/* {item.maintenanceHistory && item.maintenanceHistory.length > 0 && (
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Wrench className="w-5 h-5" />
-                  Maintenance History
-                </h3>
-                <div className="space-y-3">
-                  {item.maintenanceHistory.map((record, index) => (
-                    <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-900">{record.type}</p>
-                          <p className="text-sm text-gray-600">{record.description}</p>
-                          <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                            <User className="w-3 h-3" />
-                            {record.technician}
-                          </p>
-                        </div>
-                        <span className="text-sm text-gray-500">{record.date}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )} */}
-
-            {/* {item.deploymentHistory && item.deploymentHistory.length > 0 && (
-              <div className="bg-green-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <History className="w-5 h-5" />
-                  Deployment History
-                </h3>
-                <div className="space-y-3">
-                  {item.deploymentHistory.map((record, index) => (
-                    <div key={index} className="border-l-4 border-green-500 pl-4 py-2">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-900">{record.user}</p>
-                          <p className="text-sm text-gray-600">{record.purpose}</p>
-                          <p className="text-xs text-gray-500">Deployed: {record.date}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )} */}
           </div>
+        </div>
+        <div className="p-4 bg-gray-100 gap-2 shadow-lg rounded-lg w-full mt-4">
+          <h3 className="font-bold text-lg mb-4">Item Transactions</h3>
+          <DataTable
+            className="w-full"
+            columns={columns}
+            data={data}
+          />
         </div>
       </div>
     </>

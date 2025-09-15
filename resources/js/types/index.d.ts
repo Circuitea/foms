@@ -8,9 +8,11 @@ export interface Personnel {
     name_extension?: string;
     email: string;
     mobile_number?: string;
-    roles: Role[],
-    sections: Section[],
-    status: Status | null,
+    roles: Role[];
+    sections: Section[];
+    status?: Status;
+    position?: string;
+    profile_picture_filename: string | null;
 }
 
 export type Status = 'available' | 'assigned' | 'on leave';

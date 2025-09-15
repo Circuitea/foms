@@ -41,7 +41,7 @@ export function Activity({ activity }: { activity: ActivityDetail }) {
   const [bgColor, Icon, iconColor] = getTypeTheme(activity.activity_type);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-white rounded-lg shadow-xs border border-gray-200">
       <div className={cn(
         "px-6 py-4 border-b border-gray-200",
         bgColor,
