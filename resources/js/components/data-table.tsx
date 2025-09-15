@@ -150,7 +150,7 @@ export function DataTable<TData, TValue>({ columns, data, className, noData, get
             disabled={!table.getCanNextPage()}
             variant="outline"
             className="w-5"
-            onClick={() => table.lastPage}
+            onClick={table.lastPage}
           >
             <ChevronLast />
           </Button>
