@@ -30,17 +30,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Transaction extends Model
 {
-    protected $table = 'inventory_transactions';
-    
-    public $fillable = ['title', 'description'];
+    protected $fillable = ['name', 'description'];
 
     public function personnel(): BelongsTo
     {
         return $this->belongsTo(Personnel::class, 'personnel_id');
     }
 
-    public function transactionEntries(): HasMany
+    public function consumables(): HasMany
     {
-        return $this->hasMany(TransactionEntry::class, 'transaction_id');
+        return $this->hasMany(ConsumableTransactionEntry::class, 'transaction_id');
     }
+
+    public function equipment(): HasMany
+    {
+        return $this->hasMany(EquipmentTransactionEntry::class, 'transaction_id');
+    }
+
 }
