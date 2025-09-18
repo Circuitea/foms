@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useStatusDispatch } from "@/context/status-context";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
@@ -14,6 +13,7 @@ import { FinishTaskDialog } from "./FinishTaskDialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PageTabs, PageTabsContent, PageTabsList, PageTabsTrigger } from "@/components/tabs";
 
 export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
 
@@ -24,22 +24,22 @@ export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
 
   return (
     <div>
-      <Tabs defaultValue="active">
+      <PageTabs defaultValue="active">
         <div className="sticky top-16 border-b border-gray-200 bg-[#1B2560]">
-          <TabsList>
-            {tabs.map(({ value, label }, i) => <TabsTrigger key={i} value={value}>{label}</TabsTrigger>)}
-          </TabsList>
+          <PageTabsList>
+            {tabs.map(({ value, label }, i) => <PageTabsTrigger key={i} value={value}>{label}</PageTabsTrigger>)}
+          </PageTabsList>
         </div>
 
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             {tabs.map(({ value, tasks }, i) => (
-              <TabsContent key={i} value={value}>
+              <PageTabsContent key={i} value={value}>
                 <TaskList tasks={tasks} />
-              </TabsContent>
+              </PageTabsContent>
             ))}          
         </div>
-      </Tabs>
+      </PageTabs>
     </div>
   );
 }
