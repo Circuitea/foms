@@ -47,6 +47,24 @@ jobs:
       - name: Install Javascript dependencies
         run: npm ci
 
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo REVERB_APP_ID=${{ secrets.REVERB_APP_ID }} >> .env
+          echo REVERB_APP_KEY=${{ secrets.REVERB_APP_KEY }} >> .env
+          echo REVERB_APP_SECRET=${{ secrets.REVERB_APP_SECRET }} >> .env
+          echo REVERB_HOST=foms.djcayz.xyz >> .env
+          echo REVERB_PORT=443 >> .env
+          echo REVERB_SERVER_HOST=127.0.0.1 >> .env
+          echo REVERB_SERVER_PORT=8080 >> .env
+          echo BROADCAST_CONNECTION=reverb >> .env
+          echo VITE_REVERB_APP_KEY="${REVERB_APP_KEY}" >> .env
+          echo VITE_REVERB_HOST="${REVERB_HOST}" >> .env
+          echo VITE_REVERB_PORT="${REVERB_PORT}" >> .env
+          echo VITE_REVERB_SCHEME="${REVERB_SCHEME}" >> .env
+          cat .env
+        
+
       - name: Build Vite assets
         run: npm run build
       
