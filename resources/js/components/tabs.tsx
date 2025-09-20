@@ -2,17 +2,16 @@ import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
-import { Tabs, TabsContent, TabsList } from "./ui/tabs"
 
-const PageTabs = Tabs
+const PageTabs = TabsPrimitive.Root
 
 const PageTabsList = React.forwardRef<
-  React.ElementRef<typeof TabsList>,
-  React.ComponentPropsWithoutRef<typeof TabsList>
+  React.ElementRef<typeof TabsPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
 >(({ className, ...props }, ref) => (
   <div className="border-t border-gray-600 bg-[#1B2560]">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-[#1B2560]">
-      <TabsList
+      <TabsPrimitive.List
         ref={ref}
         className={cn(
           // "inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
@@ -24,7 +23,7 @@ const PageTabsList = React.forwardRef<
     </div>
   </div>
 ))
-PageTabsList.displayName = TabsList.displayName
+PageTabsList.displayName = TabsPrimitive.List.displayName
 
 const PageTabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
@@ -44,10 +43,10 @@ const PageTabsTrigger = React.forwardRef<
 PageTabsTrigger.displayName = TabsPrimitive.Trigger.displayName
 
 const PageTabsContent = React.forwardRef<
-  React.ElementRef<typeof TabsContent>,
-  React.ComponentPropsWithoutRef<typeof TabsContent>
+  React.ElementRef<typeof TabsPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
 >(({ className, ...props }, ref) => (
-  <TabsContent
+  <TabsPrimitive.Content
     ref={ref}
     className={cn(
       "ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
@@ -56,6 +55,6 @@ const PageTabsContent = React.forwardRef<
     {...props}
   />
 ));
-PageTabsContent.displayName = TabsContent.displayName
+PageTabsContent.displayName = TabsPrimitive.Content.displayName
 
 export { PageTabs, PageTabsList, PageTabsTrigger, PageTabsContent }
