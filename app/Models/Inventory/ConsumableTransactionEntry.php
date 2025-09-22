@@ -13,4 +13,9 @@ class ConsumableTransactionEntry extends Model
   {
     return $this->belongsTo(ConsumableItem::class, 'item_id');
   }
+
+  public function transaction(): BelongsTo
+  {
+    return $this->belongsTo(Transaction::class, 'transaction_id');
+  }
 }

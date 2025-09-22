@@ -1,44 +1,51 @@
 "use client"
 
-import { type ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, PaginationState, useReactTable } from "@tanstack/react-table"
+import { type ColumnDef, flexRender, getCoreRowModel, getExpandedRowModel, getPaginationRowModel, GroupingState, PaginationState, Row, RowSelectionState, useReactTable } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ReactNode, useState } from "react"
+import { Dispatch, ReactNode, SetStateAction, useState } from "react"
 import { Button } from "./ui/button";
 import { ChevronFirst, ChevronLast, ChevronLeft, ChevronRight } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Label } from "./ui/label";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   className?: string;
   noData?: ReactNode;
-  getRowHref?: (row: TData) => string | undefined;
+  getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
+  selectedRows?: RowSelectionState;
+  setSelectedRows?: Dispatch<SetStateAction<RowSelectionState>>;
 }
 
-export function DataTable<TData, TValue>({ columns, data, className, noData, getRowHref }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, className, noData, selectedRows, setSelectedRows, getRowId }: DataTableProps<TData, TValue>) {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10
-  })
+  });
+
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});  
+
 
   const table = useReactTable({
     data,
     columns,
 
+    getRowId,
+
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
 
     onPaginationChange: setPagination,
+    onRowSelectionChange: setSelectedRows ?? setRowSelection,
 
     state: {
-      pagination
-    }
+      pagination,
+      rowSelection: selectedRows ?? rowSelection,
+    },
 
   });
 
   const pageSizeOptions = [5, 10, 20];
-  const pageIndexOptions = Array(table.getPageCount());
 
   const headerGroups = table.getHeaderGroups() || []
   const rows = table.getRowModel()?.rows || []
@@ -53,7 +60,7 @@ export function DataTable<TData, TValue>({ columns, data, className, noData, get
                 return (
                   <TableHead
                     key={header.id}
-                    className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
+                    className="px-6 py-3 text-xs font-medium text-center text-white uppercase tracking-wider"
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
@@ -91,7 +98,7 @@ export function DataTable<TData, TValue>({ columns, data, className, noData, get
         </TableBody>
       </Table>
 
-      <div className="grid grid-cols-3 py-2">
+      <div className="flex justify-between py-2">
         <div className="flex items-center gap-2">
           <Select value={table.getState().pagination.pageSize.toString()} onValueChange={newSize => table.setPageSize(Number(newSize))}>
             <SelectTrigger className="w-20">

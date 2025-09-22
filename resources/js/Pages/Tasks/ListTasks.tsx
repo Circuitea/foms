@@ -43,9 +43,9 @@ export default function ListTasks() {
           <PageTabsContent value="personnel">
             <PersonnelTab />
           </PageTabsContent>
-          <PageTabsContent value="templates">
+          {/* <PageTabsContent value="templates">
             templates
-          </PageTabsContent>
+          </PageTabsContent> */}
         </div>
       </PageTabs>
     </div>
