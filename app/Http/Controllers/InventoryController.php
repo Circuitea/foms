@@ -31,24 +31,14 @@ class InventoryController extends Controller
         ]);
     }
 
-    public function list(Request $request, int $typeID) {
+    public function list(Request $request, string $typeID) {
+        $type = ItemType::findOrFail($typeID);
         return Inertia::render('Inventory/ListInventory', [
-            'type' => ItemType::find($typeID),
-            'items' => Item::where('type_id', $typeID)
-                ->get()
-                ->map(fn (Item $item) => [
-                    ... $item->toArray(),
-                    'conditions' => ItemCondition::with([
-                        'transactionEntries' => function ($query) use ($item) {
-                            $query->where('item_id', $item->id);
-                        },
-                    ])->get()->map(fn (ItemCondition $condition) => [
-                        ... $condition->toArray(),
-                        // 'label' => ItemConditionEnum::from($condition->name)->label(),
-                        'label' => $condition->name->label(),
-                        'amount' => $condition->transactionEntries->sum('amount'),
-                    ]),
-                ]),
+            'type' => $type,
+            'items' => [
+                'equipment' => $type->equipmentGroups->each->load('items'),
+                'consumables' => $type->consumables,
+            ],
         ]);
     }
 
