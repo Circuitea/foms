@@ -33,8 +33,13 @@ class NewTaskRequest extends FormRequest
             'duration' => 'required|numeric|gte:0',
             'type_id' => 'required|exists:' . TaskType::class . ',id',
             'priority_id' => 'required|exists:' . TaskPriority::class . ',id',
-            'equipment_items' => 'required|list',
-            'personnel' => 'required|list',
+            'items' => ['required', 'array'],
+            'items.equipment' => ['nullable', 'array'],
+            'items.equipment.*' => ['integer', 'exists:equipment_items,id'],
+            'items.consumables' => ['nullable', 'array'],
+            'items.consumables.*.id' => ['required_with:items.consumables', 'integer', 'exists:consumable_items,id'],
+            'items.consumables.*.count' => ['required_with:items.consumables', 'integer', 'min:1'],
+            'personnel' => 'nullable|list',
         ];
     }
 }

@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { useRealTimeClock } from "@/hooks/use-clock";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { cn } from "@/lib/utils";
 import { PageProps, Personnel } from "@/types";
@@ -16,34 +15,30 @@ import { useForm } from "laravel-precognition-react-inertia";
 import { AlertCircle, ArrowLeft, CheckCheck, ChevronDown, Clipboard, Info, MinusCircle, Plus, PlusCircle, Truck, Users, XCircle } from "lucide-react";
 import { FormEventHandler, useState } from "react";
 import Select from 'react-select';
+import { InventoryItems, ItemSelection, ItemSelectionDialog } from "./ItemSelectionDialog";
+import { Badge } from "@/components/ui/badge";
 
 type NewTaskEntry = Pick<Task, 'title' | 'description' | 'location' | 'due_date' | 'duration'> & {
-  creator_id?: number,
-  type_id?: number,
-  priority_id?: number,
-  equipment_items: {
-    id?: number,
-    quantity: number,
-  }[]
-  personnel?: number[],
+  creator_id?: number;
+  type_id?: number;
+  priority_id?: number;
+  items: {
+    equipment: number[];
+    consumables: ({ id: number; count: number; })[];
+  };
+  personnel?: number[];
 };
-
-interface ItemEntry {
-  id: number;
-  name: string;
-  description: string;
-  amount: number;
-}
 
 type CreateTaskProps = PageProps<{
   types: TaskType[],
   priorities: TaskPriority[],
-  items: ItemEntry[],
   personnel: Personnel[],
+  items: InventoryItems,
 }>;
 
 export default function NewTask({ types, priorities, items, personnel }: CreateTaskProps) {
   const [isDatePickerOpen, setDatePickerOpen] = useState(false);
+  const [isItemSelectionDialogOpen, setItemSelectionDialogOpen] = useState(false);
   const { data, setData, submit, invalid, validate, errors, processing } = useForm<NewTaskEntry>('post', '/tasks/new', {
     title: '',
     description: '',
@@ -52,9 +47,15 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
     due_date: dayjs().second(0).millisecond(0).toJSON(),
     duration: 120,
 
-    equipment_items: [{quantity: 0}],
+    items: {
+      equipment: [],
+      consumables: [],
+    },
+
     personnel: [],
   });
+
+  const totalCount = data.items.equipment.length + data.items.consumables.length;
 
   const typeOptions = types.map((type) => {
     return {
@@ -70,11 +71,6 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
     };
   });
 
-  const itemOptions = items.map(item => ({
-    value: item.id,
-    label: `${item.name} (Available: ${item.amount})`,
-  }));
-
   const personnelOptions = personnel.map(person => ({
     value: person.id,
     label: `${person.first_name} ${person.surname.charAt(0)}.`,
@@ -85,6 +81,10 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
 
     submit()
   }
+
+  const equipmentItems = items.equipment
+    .map(group => group.items)
+    .flat();
 
   return (
     <>
@@ -293,55 +293,38 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
                     Task Equipment
                   </h1>
                 </div>
-                {data.equipment_items.map((item, i) => (
-                  <div key={i+1} className="flex items-end gap-2 w-full">
-                    <div className="flex-8">
-                      <Label htmlFor={`equipment_item_${i+1}`}>Equipment Item</Label>
-                      <Select
-                        inputId={`equipment_item_${i+1}`}
-                        options={itemOptions.filter(option => !data.equipment_items.some(item => item.id === option.value && data.equipment_items.indexOf(item) !== i))}
-                        value={itemOptions.find(option => option.value === data.equipment_items[i].id)}
-                        onChange={(newItem) => {
-                          const equipment_items = data.equipment_items;
-                          equipment_items[i] = { ...equipment_items[i], id: newItem?.value }
-                          setData('equipment_items', equipment_items);
-                        }}
-                        isClearable
-                      />
-                    </div>
-                    <div className="w-20 shrink-0">
-                      <Label htmlFor={`equipment_item_quantity_${i+1}`}>Quantity</Label>
-                      <Input
-                        id={`equipment_item_quantity_${i+1}`}
-                        type="number"
-                        value={item.quantity}
-                        max={data.equipment_items[i].id ? items.find(item => item.id === data.equipment_items[i].id)?.amount : 0}
-                        min={0}
-                        onChange={(e) => {
-                          const equipment_items = data.equipment_items;
-                          equipment_items[i] = {...equipment_items[i], quantity: parseInt(e.target.value) };
-                          setData('equipment_items', equipment_items);
-                        }}
-                        disabled={!data.equipment_items[i].id}
-                      />
-                    </div>
-                    {data.equipment_items.length > 1 && (
-                      <Button
-                        type="button"
-                        variant='outline'
-                        className="text-red-600 border-red-300 hover:bg-red-50"
-                        onClick={() => {
-                          setData('equipment_items', data.equipment_items.filter((_, index) => index !== i ))
-                        }}>
-                        <XCircle className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-                <Button type="button" onClick={() => setData('equipment_items', [...data.equipment_items, {quantity: 0}])} variant="outline" className="mt-2 w-full">
-                  <PlusCircle className="w-4 h-4" />
-                  Add
+                <Button type="button" onClick={() => setItemSelectionDialogOpen(true)}>
+                  Select Inventory Items
                 </Button>
+                <ItemSelectionDialog
+                  items={items}
+                  selected={data.items}
+                  onConfirm={(selected) => {
+                    setData('items', selected);
+                    validate('items');
+                  }}
+                  onClose={() => setItemSelectionDialogOpen(false)}
+                  isOpen={isItemSelectionDialogOpen}
+                />
+
+                {totalCount > 0 && (
+                  <div className="border-t pt-3">
+                    <h4 className="font-medium text-sm mb-2">Selected Items ({totalCount})</h4>
+                    <div className="flex flex-wrap gap-1">
+                      {data.items.equipment.map((selection) => (
+                        <Badge key={selection} variant="secondary">
+                          {equipmentItems.find(item => item.id === selection)?.name}
+                        </Badge>
+                      ))}
+                      {data.items.consumables.map((selection) => (
+                        <Badge key={selection.id} variant="secondary">
+                          {items.consumables.find(item => item.id === selection.id)?.name}
+                          {selection.count && ` (${selection.count})`}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="col-start-3">
@@ -355,6 +338,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
                 <Label htmlFor="personnel">Personnel</Label>
                 <Select
                   inputId="personnel"
+                  isSearchable
                   isMulti
                   options={personnelOptions}
                   closeMenuOnSelect={false}

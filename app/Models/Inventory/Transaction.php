@@ -3,6 +3,7 @@
 namespace App\Models\Inventory;
 
 use App\Models\Personnel;
+use App\Models\Task\Task;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -30,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Transaction extends Model
 {
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['title', 'description'];
 
     public function personnel(): BelongsTo
     {
@@ -45,6 +46,11 @@ class Transaction extends Model
     public function equipment(): HasMany
     {
         return $this->hasMany(EquipmentTransactionEntry::class, 'transaction_id');
+    }
+
+    public function task(): BelongsTo
+    {
+        return $this->belongsTo(Task::class, 'task_id');
     }
 
 }
