@@ -57,11 +57,12 @@ jobs:
           echo REVERB_PORT=443 >> .env
           echo REVERB_SERVER_HOST=127.0.0.1 >> .env
           echo REVERB_SERVER_PORT=8080 >> .env
+          echo REVERB_SCHEME=https
           echo BROADCAST_CONNECTION=reverb >> .env
-          echo VITE_REVERB_APP_KEY="${REVERB_APP_KEY}" >> .env
-          echo VITE_REVERB_HOST="${REVERB_HOST}" >> .env
-          echo VITE_REVERB_PORT="${REVERB_PORT}" >> .env
-          echo VITE_REVERB_SCHEME="${REVERB_SCHEME}" >> .env
+          echo VITE_REVERB_APP_KEY="${{ secrets.REVERB_APP_ID }}" >> .env
+          echo VITE_REVERB_HOST=foms.djcayz.xyz >> .env
+          echo VITE_REVERB_PORT=443 >> .env
+          echo VITE_REVERB_SCHEME=https >> .env
           cat .env
         
 
