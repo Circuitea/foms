@@ -2,7 +2,6 @@ import { MapContainer, TileLayer, GeoJSON, Tooltip, LayersControl } from "react-
 import SanJuanBoundary from './sanjuan-boundary.json';
 import { LegacyRef, PropsWithChildren, useState } from "react";
 import PersonnelMarkersLayer from "./Partials/PersonnelMarkersLayer";
-import 'leaflet/dist/leaflet.css';
 import { Map } from "leaflet";
 import ZoomControl from "./Partials/ZoomControl";
 import BarangayBoundaries from "./Partials/BarangayBoundaries";
