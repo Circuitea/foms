@@ -1,3 +1,4 @@
+import { LocationMarker } from "@/components/LocationMarker";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toProperCase } from "@/lib/utils";
@@ -16,10 +17,10 @@ export default function PersonnelMarker({ marker, isClickable, selected }: { mar
       setOpen(true);
     }
   }
-
   return selected ? (
     <div>
-      <Marker position={[marker.latitude, marker.longitude]} eventHandlers={{click: onMarkerClick}}/>
+      {/* <Marker position={[marker.latitude, marker.longitude]} eventHandlers={{click: onMarkerClick}}/> */}
+      <LocationMarker location={marker} visible={false} onClick={onMarkerClick} />
       <Dialog open={isOpen} onOpenChange={setOpen}>
         <DialogContent className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
           <DialogHeader>

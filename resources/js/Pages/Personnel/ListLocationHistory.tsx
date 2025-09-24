@@ -7,12 +7,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import dayjs from "dayjs";
 import { ChevronDown } from "lucide-react";
-import { LocationMarker } from "./LocationMarker";
 import { Location, PageProps, Personnel } from "@/types";
 import { router } from "@inertiajs/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DayButtonProps } from "react-day-picker";
 import 'leaflet/dist/leaflet.css';
+import { LocationMarker } from "@/components/LocationMarker";
 
 interface AvailableDate {
   date: string;
