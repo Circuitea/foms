@@ -11,10 +11,6 @@ import duration from 'dayjs/plugin/duration';
 import toObject from 'dayjs/plugin/toObject';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-configureEcho({
-    broadcaster: 'reverb',
-});
-
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 dayjs.extend(relativeTime);
