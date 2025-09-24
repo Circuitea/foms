@@ -107,6 +107,7 @@ jobs:
             php artisan migrate --force
 
             php artisan queue:restart || true
+            php artisan reverb:restart || true
 
             php artisan up
 
