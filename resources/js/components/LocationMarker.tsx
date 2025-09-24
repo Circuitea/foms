@@ -7,9 +7,11 @@ import dayjs from "dayjs";
 export function LocationMarker({
   location,
   visible = false,
+  onClick
 } : {
-  location: { location_name: string, latitude: number, longitude: number, created_at: string },
-  visible: boolean
+  location: { location_name: string, latitude: number, longitude: number, created_at: string };
+  visible: boolean;
+  onClick?: () => void;
 }) {
   const ref = useRef<LeafletMarker>(null);
   const markerIcon = icon({
@@ -36,6 +38,7 @@ export function LocationMarker({
       ref={ref}
       position={[location.latitude, location.longitude]}
       icon={ref.current?.isTooltipOpen() ? hoveredMarkerIcon : markerIcon}
+      eventHandlers={{ click: onClick }}
     >
       <Tooltip>
         {location.location_name} - {dayjs(location.created_at).format("hh:mm A")}

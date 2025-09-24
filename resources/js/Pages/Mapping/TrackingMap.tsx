@@ -8,7 +8,7 @@ import BarangayBoundaries from "./Partials/BarangayBoundaries";
 
 export default function TrackingMap({ ref, selectedPersonnel } : {ref: LegacyRef<Map>, selectedPersonnel: number[]}) {
     return (
-        <MapContainer ref={ref} className='min-h-full h-full z-0' center={[14.6034363, 121.0389469]} zoom={15} scrollWheelZoom={false} zoomControl={false}>
+        <MapContainer ref={ref} className='min-h-full h-full z-0' center={[14.6034363, 121.0389469]} zoom={15} scrollWheelZoom={false} zoomControl={false} doubleClickZoom={false}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
