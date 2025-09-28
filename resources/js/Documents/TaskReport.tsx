@@ -81,21 +81,45 @@ export function TaskReport({ task }: { task: Task }) {
           
         </View>
       </Page>
-      <Page size="LETTER" style={styles.page}>
-        <HeadingOne>ALLOCATED RESOURCES</HeadingOne>
-        <Table tdStyle={{ padding: 5 }} weightings={[0.8, 0.2]}>
-          <TH>
-            <TD>Resource</TD>
-            <TD>Quantity</TD>
-          </TH>
-          {task.items.map((item, i) => (
-            <TR key={i}>
-              <TD>{item.item.name}</TD>
-              <TD>{item.amount}</TD>
-            </TR>
-          ))}
-        </Table>
-      </Page>
+      {!!task.transaction && (
+        <Page size="LETTER" style={styles.page}>
+          <HeadingOne>ALLOCATED RESOURCES</HeadingOne>
+          {(!!task.transaction.equipment && task.transaction.equipment.length > 0) && (
+            <>
+              <HeadingTwo>Equipment</HeadingTwo>
+              <Table tdStyle={{ padding: 5 }}>
+                <TH>
+                  <TD>Resource</TD>
+                </TH>
+                {task.transaction.equipment.map((item, i) => (
+                  <TR key={i}>
+                    <TD>{item.item.name}</TD>
+                  </TR>
+                ))}
+              </Table>
+            </>
+          )}
+          {(!!task.transaction.consumables && task.transaction.consumables.length > 0) && (
+            <>
+              <HeadingTwo>Equipment</HeadingTwo>
+              <Table tdStyle={{ padding: 5 }} weightings={[0.6, 0.2, 0.2]}>
+                <TH>
+                  <TD>Resource</TD>
+                  <TD>Type</TD>
+                  <TD>Quantity</TD>
+                </TH>
+                {task.transaction.consumables.map((consumable, i) => (
+                  <TR key={i}>
+                    <TD>{consumable.item.name}</TD>
+                    <TD>{consumable.item.type.name}</TD>
+                    <TD>{Math.abs(consumable.quantity)}</TD>
+                  </TR>
+                ))}
+              </Table>
+            </>
+          )}
+        </Page>
+      )}
 
       <Page size="LETTER" style={styles.page}>
         <View>
