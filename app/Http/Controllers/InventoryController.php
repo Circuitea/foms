@@ -4,57 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NewInventoryItemRequest;
 use App\ItemConditionEnum;
+use App\Models\Inventory\ConsumableItem;
+use App\Models\Inventory\EquipmentGroup;
 use App\Models\Inventory\Item;
 use App\Models\Inventory\ItemCondition;
 use App\Models\Inventory\ItemType;
 use App\Models\Inventory\Transaction;
 use App\Models\Inventory\TransactionEntry;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class InventoryController extends Controller
 {
     public function index() {
         return Inertia::render('Inventory/InventoryIndex', [
-            'types' => ItemType::withCount('items')->get(),
-            'items' => Item::all()
-                ->map(fn (Item $item) => [
-                    ... $item->toArray(),
-                    'conditions' => ItemCondition::with([
-                        'transactionEntries' => function ($query) use ($item) {
-                            $query->where('item_id', $item->id);
-                        },
-                    ])->get()->map(fn (ItemCondition $condition) => [
-                        ... $condition->toArray(),
-                        // 'label' => ItemConditionEnum::from($condition->name)->label(),
-                        'label' => $condition->name->label(),
-                        'amount' => $condition->transactionEntries->sum('amount'),
-                    ]),
-                ]),
-            'totalCount' => Item::count(),
+            'types' => ItemType::all(),
+            'items' => [
+                'equipment' => EquipmentGroup::with(['type', 'items'])->get()->each->loadCount('items'),
+                'consumables' => ConsumableItem::with(['type'])->get()->each->loadSum('entries as count', 'quantity'),
+            ],
         ]);
     }
 
-    public function list(Request $request, int $typeID) {
+    public function list(Request $request, string $typeID) {
+        $type = ItemType::findOrFail($typeID);
         return Inertia::render('Inventory/ListInventory', [
-            'type' => ItemType::find($typeID),
-            'items' => Item::where('type_id', $typeID)
-                ->get()
-                ->map(fn (Item $item) => [
-                    ... $item->toArray(),
-                    'conditions' => ItemCondition::with([
-                        'transactionEntries' => function ($query) use ($item) {
-                            $query->where('item_id', $item->id);
-                        },
-                    ])->get()->map(fn (ItemCondition $condition) => [
-                        ... $condition->toArray(),
-                        // 'label' => ItemConditionEnum::from($condition->name)->label(),
-                        'label' => $condition->name->label(),
-                        'amount' => $condition->transactionEntries->sum('amount'),
-                    ]),
-                ]),
+            'type' => $type,
+            'items' => [
+                'equipment' => $type->equipmentGroups->each->load('items'),
+                'consumables' => $type->consumables,
+            ],
         ]);
     }
 
@@ -95,24 +79,82 @@ class InventoryController extends Controller
         return redirect('/inventory');
     }
 
-    public function show(Request $request, int $id) {
-        $item = Item::with(['type'])->findOrFail($id);
+    public function showEquipment(Request $request, string $id) {
+        $item = EquipmentGroup::with(['type', 'items'])->findOrFail($id);
 
-        return Inertia::render('Inventory/ShowInventoryItem', [
-            'item' => [
-                ... $item->toArray(),
-                'conditions' => ItemCondition::with([
-                    'transactionEntries' => function ($query) use ($item) {
-                        $query->where('item_id', $item->id);
-                    },
-                ])
-                    ->get()
-                    ->map(fn (ItemCondition $condition) => [
-                        ... $condition->toArray(),
-                        'label' => $condition->name->label(),
-                        'amount' => (int) $condition->transactionEntries()->sum('amount'),
-                    ]),
-            ],
+        return Inertia::render('Inventory/ShowEquipmentItem', [
+            'item' => $item,
+        ]);
+    }
+
+    public function showConsumable(Request $request, string $id) {
+        $item = ConsumableItem::with(['type'])->findOrFail($id);
+
+        $rawMonths = $item->entries()
+            ->join('transactions as t', 'consumable_transaction_entries.transaction_id', '=', 't.id')
+            ->selectRaw('YEAR(t.created_at) as year, MONTH(t.created_at) as month')
+            ->groupBy(DB::raw('YEAR(t.created_at), MONTH(t.created_at)'))
+            ->orderByRaw('year DESC, month ASC')
+            ->get()
+            ->toArray();
+        
+        $months = [];
+
+        foreach($rawMonths as $row) {
+            $months[$row['year']][] = $row['month'];
+        }
+
+        if (!empty($rawMonths)) {
+            usort($rawMonths, fn($a, $b) =>
+                ($a['year'] <=> $b['year']) ?: ($a['month'] <=> $b['month'])
+            );
+        
+            $first = $rawMonths[0];
+            $last = $rawMonths[array_key_last($rawMonths)];
+        
+            $defaultStartMonth = sprintf('%04d-%02d', $first['year'], $first['month']);
+            $defaultEndMonth = sprintf('%04d-%02d', $last['year'], $last['month']);
+        } else {
+            // Fallback to current and previous months if no data
+            $defaultStartMonth = now()->subMonths(5)->format('Y-m');
+            $defaultEndMonth = now()->format('Y-m');
+        }
+
+        $startMonth = $request->input('start_date', $defaultStartMonth);
+        $endMonth = $request->input('end_date', $defaultEndMonth);
+
+        $startDate = Date::createFromFormat('Y-m', $startMonth)->startOfMonth()->toDateString();
+        $endDate = Date::createFromFormat('Y-m', $endMonth)->endOfMonth()->toDateString();
+
+        $item->load(['entries' => function (Builder $query) use($startDate, $endDate) {
+            $query->whereHas('transaction', function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('created_at', [$startDate, $endDate]);
+            });
+            // Optionally eager load the transaction itself
+            $query->with('transaction');
+        }]);
+
+        $totals = $item->entries()
+            ->join('transactions as t', 'consumable_transaction_entries.transaction_id', '=', 't.id')
+            ->whereBetween('t.created_at', [$startDate, $endDate])
+            ->selectRaw("
+                YEAR(t.created_at) as year,
+                WEEK(t.created_at, 3) as week,
+                SUM(consumable_transaction_entries.quantity) as weekly_quantity,
+                SUM(SUM(consumable_transaction_entries.quantity)) OVER (ORDER BY YEAR(t.created_at), WEEK(t.created_at, 3)) as running_total
+            ")
+            ->groupBy(DB::raw("YEAR(t.created_at), WEEK(t.created_at,3)"))
+            ->orderByRaw('year, week')
+            ->get();
+
+        Log::info('test', [$item]);
+
+        return Inertia::render('Inventory/ShowConsumableItem', [
+            'start_date' => Inertia::always($startMonth),
+            'end_date' => Inertia::always($endMonth),
+            'item' => Inertia::always($item),
+            'totals' => fn () => $totals,
+            'months' => $months,
         ]);
     }
 }

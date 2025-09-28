@@ -14,25 +14,19 @@ import {
   Check,
   X,
   ClipboardCheck,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
-import type React from "react"
 import { PageProps } from "@/types"
 import { Link } from "@inertiajs/react"
-import { DataTable } from "@/components/data-table"
 import { ColumnDef } from "@tanstack/react-table"
-import { ItemEntry, ItemType } from "@/types/inventory"
 import { cn, userHasPermission } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import AddItemForm from "./Partials/AddItemForm"
-import { useRealTimeClock } from "@/hooks/use-clock"
-
-// Success notification component
-interface SuccessNotificationProps {
-  show: boolean
-  message: string
-  onClose: () => void
-}
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ConsumableItem, EquipmentGroup, EquipmentItem, ItemType } from "@/types/inventory"
+import { DataTable } from "@/components/data-table"
+import { Button } from "@/components/ui/button"
 
 const getConditionColor = (condition: string) => {
   switch (condition) {
@@ -51,82 +45,82 @@ const getConditionColor = (condition: string) => {
   }
 }
 
-const columns: ColumnDef<ItemEntry>[] = [
+type EquipmentEntry = EquipmentGroup & {  items_count: number }
+type ConsumableEntry = ConsumableItem & { count: string }
+
+const equipmentColumns: ColumnDef<EquipmentEntry>[] = [
   {
     accessorKey: 'name',
-    header: 'EQUIPMENT',
-    cell: (({ row }) => (
-      <div>
-        <div className="text-sm font-medium text-gray-900">{row.getValue('name')}</div>
-        <div className="text-sm text-gray-500">{row.original.description}</div>
-      </div>
-    ))
+    cell: ({ row }) => (
+      <span>{row.getValue('name')}</span>
+    )
   },
   {
-    id: 'status',
-    header: 'STATUS',
-    accessorFn: () => 10,
-    cell: (({ row }) => (
-      <div className="flex items-center">
-        <CheckCircle className="w-4 h-4 text-green-600" />
-        <span className="ml-2 text-sm text-gray-900">
-          {row.original.conditions.find(condition => condition.name === 'available')?.amount}/{row.original.conditions.reduce((total, condition) => total + condition.amount, 0)} Available
-        </span>
-      </div>
-    ))
+    accessorKey: 'type',
+    cell: ({ row }) => (
+      <span>{row.original.type.icon} {row.original.type.name}</span>
+    )
   },
   {
-    id: 'conditions',
-    header: 'QUANTITY',
-    cell: (({ row }) => (
-      <div className="text-sm text-gray-900">
-        <div>Total: {row.original.conditions.reduce((total, condition) => total + condition.amount, 0)}</div>
-        <div className="text-xs text-gray-500 flex gap-2">
-          {row.original.conditions.map(condition => `${condition.label}: ${condition.amount}`).join(' | ')}
-        </div>
-      </div>
-    ))
-  },
-  {
-    id: 'condition',
-    header: 'CONDITION',
-    cell: (({ row }) => (
-      <div className="space-x-1">
-        {row.original.conditions.filter(condition => condition.amount > 0).map((condition) => (
-          <span className={cn(
-            'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-            getConditionColor(condition.name)
-          )}>
-            {condition.label}
-          </span>
-        ))}
-      </div>
-    ))
-  },
-  {
-    id: 'location',
-    header: 'LOCATION',
-    accessorFn: () => 'Storage Room A',
+    accessorKey: 'items_count',
+    header: 'Count'
   },
   {
     id: 'details',
     cell: ({ row }) => (
-      <Button variant="outline" asChild>
-        <Link href={`/inventory/item/${row.original.id}`}>
-          Details
-        </Link>
-      </Button>
-    )
-  },
+      <div className="flex justify-end">
+        <Button
+          className="bg-[#1B2560]"
+          asChild
+        >
+          <Link href={`/inventory/equipment/${row.original.id}`}>
+            Details
+          </Link>
+        </Button>
+      </div>
+    ),
+  }
 ];
 
-type IndexItemType = ItemType & {items_count: number}
+const consumableColumns: ColumnDef<ConsumableEntry>[] = [
+  {
+    accessorKey: 'name',
+    cell: ({ row }) => (
+      <span>{row.getValue('name')}</span>
+    )
+  },
+  {
+    accessorKey: 'type',
+    cell: ({ row }) => (
+      <span>{row.original.type.icon} {row.original.type.name}</span>
+    )
+  },
+  {
+    accessorKey: 'count',
+    header: 'Count'
+  },
+  {
+    id: 'details',
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <Button
+          className="bg-[#1B2560]"
+          asChild
+        >
+          <Link href={`/inventory/consumable/${row.original.id}`}>
+            Details
+          </Link>
+        </Button>
+      </div>
+    ),
+  }
+]; 
 
-export default function InventoryIndex({ types, items, totalCount }: PageProps<{ types: IndexItemType[], items: ItemEntry[], totalCount: number }>) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+export default function InventoryIndex({ types, items, totalCount }: PageProps<{ types: ItemType[], items: {
+  equipment: EquipmentEntry[],
+  consumables: ConsumableEntry[],
+}, totalCount: number }>) {
   const [searchTerm, setSearchTerm] = useState("")
-  const [filterCondition, setFilterCondition] = useState<string>("all")
-  const currentTime = useRealTimeClock()
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -147,7 +141,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
                   </div>
                 </div>
                 <h3 className="text-lg font-bold text-[#1B2560]">{type.name}</h3>
-                <p className="text-sm text-gray-600 font-medium">{type.items_count} items</p>
+                {/* <p className="text-sm text-gray-600 font-medium">items</p> */}
               </div>
             </div>
           </Link>
@@ -170,7 +164,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
             </div>
           </div>
           <div className="flex gap-4">
-            <div className="relative">
+            {/* <div className="relative">
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <select
                 value={filterCondition}
@@ -192,7 +186,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
               >
                 Clear Filter
               </button>
-            )}
+            )} */}
           </div>
         </div>
 
@@ -204,38 +198,39 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
       </div>
 
       {/* Equipment table */}
-      <div className="bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Equipment Inventory
-              {/* {selectedCategory && (
-                <span className="ml-2 text-sm font-normal text-gray-600">
-                  - {categories.find((c) => c.id === selectedCategory)?.name}
-                </span>
-              )} */}
-            </h2>
-            <span className="text-sm text-gray-600">
-              {items.length} of {totalCount} items
-            </span>
+      <Tabs defaultValue="equipment">
+        <div className="bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Inventory
+              </h2>
+              <TabsList>
+                <TabsTrigger value="equipment">Equipment</TabsTrigger>
+                <TabsTrigger value="consumables">Consumables</TabsTrigger>
+              </TabsList>
+              <span className="text-sm text-gray-600">
+                {0} of {totalCount} items
+              </span>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <TabsContent value="equipment">
+              <DataTable
+                columns={equipmentColumns}
+                data={items.equipment}
+              />
+            </TabsContent>
+            <TabsContent value="consumables">
+              <DataTable
+                columns={consumableColumns}
+                data={items.consumables}
+              />
+            </TabsContent>
           </div>
         </div>
-
-        <div className="overflow-x-auto">
-          <DataTable
-            columns={columns}
-            data={items}
-            noData={(
-              <div className="text-center py-12">
-                <Package className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No equipment found</h3>
-                <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
-              </div>
-            )}
-            getRowHref={(row) => `/inventory/item/${row.id}`}
-          />
-        </div>
-      </div>
+      </Tabs>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from "dayjs"
 import { Personnel } from "."
-import Item from "./inventory"
+import Item, { ConsumableItem, ConsumableTransactionEntry, EquipmentGroup, EquipmentItem, EquipmentTransactionEntry, Transaction } from "./inventory"
 
 export interface Task {
   id: number
@@ -21,10 +21,11 @@ export interface Task {
   creator: Personnel
 
   personnel: PersonnelWithPivot[]
-  items: {
-    item: Item,
-    amount: number,
-  }[],
+  
+  transaction?: Transaction & {
+    equipment?: (EquipmentTransactionEntry & { item: (ConsumableItem & {group: EquipmentGroup}) })[];
+    consumables?: (ConsumableTransactionEntry & { item: ConsumableItem })[];
+  }
 
   pivot: {
     personnel_id: number

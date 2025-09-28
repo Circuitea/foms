@@ -12,18 +12,18 @@ import { Meeting } from "@/types/meetings"
 import { PageProps } from "@/types"
 import { useRealTimeClock } from "@/hooks/use-clock"
 import dayjs from "dayjs"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { PageTabs, PageTabsContent, PageTabsList, PageTabsTrigger } from "@/components/tabs"
 
 
 export default function ListMeetings({ activeMeetings, finishedMeetings }: PageProps<{ activeMeetings: Meeting[], finishedMeetings: Meeting[] }>) {
   return (
-    <Tabs defaultValue="active">
-      <TabsList className="border-b w-full flex items-center justify-between">
+    <PageTabs defaultValue="active">
+      <PageTabsList className="border-b w-full flex items-center justify-between">
         <div className="flex items-center gap-2">
           {[{name: 'Active Meetings', value: 'active', count: activeMeetings.length}, {name: 'Finished Meetings', value: 'finished', count: finishedMeetings.length}].map((tab)=> (
-            <TabsTrigger value={tab.value}>
+            <PageTabsTrigger value={tab.value}>
               {tab.name} ({tab.count})
-            </TabsTrigger>
+            </PageTabsTrigger>
           ))}
         </div>
         <div className="flex">
@@ -33,8 +33,8 @@ export default function ListMeetings({ activeMeetings, finishedMeetings }: PageP
             </Button>
           )}
         </div>
-      </TabsList>
-      <TabsContent value="active">
+      </PageTabsList>
+      <PageTabsContent value="active">
         <div className="container mx-auto px-4 md:px-6 py-6 space-y-4">
           {activeMeetings.map((meeting) => (
             <Link href={`/meetings/${meeting.id}`}>
@@ -168,8 +168,8 @@ export default function ListMeetings({ activeMeetings, finishedMeetings }: PageP
             </div>
           )}
         </div>
-      </TabsContent>
-      <TabsContent value="finished">
+      </PageTabsContent>
+      <PageTabsContent value="finished">
         <div className="container mx-auto px-4 md:px-6 py-6 space-y-4">
           {finishedMeetings.map((meeting) => (
             <Link href={`/meetings/${meeting.id}`}>
@@ -303,8 +303,8 @@ export default function ListMeetings({ activeMeetings, finishedMeetings }: PageP
             </div>
           )}
         </div>
-      </TabsContent>
-    </Tabs>
+      </PageTabsContent>
+    </PageTabs>
   )
 }
 
