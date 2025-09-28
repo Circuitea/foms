@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\PersonnelLocationController;
 use App\Models\Personnel;
-use App\Models\Task\Task;
 use App\Status;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -82,28 +81,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         return response([
             'status' => 'OK',
-        ]);
-    });
-    
-    Route::get('/tasks', function (Request $request) {
-        $user = $request->user();
-
-        return response([
-            'tasks' => $user->assignedTasks->load([
-                'priority',
-                'type',
-                'creator',
-            ]),
-        ]);
-    });
-
-    Route::get('/task/{id}', function (Request $request, string $id) {
-        $task = Task::with(['priority', 'type', 'creator', 'transaction' => ['equipment.item.group.type', 'consumables.item.type'] ])->findOr($id, function () {
-            abort(404);
-        });
-
-        return response([
-            'task' => $task,
         ]);
     });
 });

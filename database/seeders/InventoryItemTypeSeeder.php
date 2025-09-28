@@ -13,9 +13,9 @@ class InventoryItemTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        ItemType::create(['name' => 'Logistic Items', 'icon' => '🚛']);
-        ItemType::create(['name' => 'Medical Items', 'icon' => '🏥']);
-        ItemType::create(['name' => 'Office Items', 'icon' => '🏢']);
-        ItemType::create(['name' => 'Rescue Items', 'icon' => '👥']);
+        ItemType::create(['name' => 'Logistic Equipment', 'icon' => '🚛']);
+        ItemType::create(['name' => 'Medical Equipment', 'icon' => '🏥']);
+        ItemType::create(['name' => 'Office Equipment', 'icon' => '🏢']);
+        ItemType::create(['name' => 'Rescue Equipment', 'icon' => '👥']);
     }
 }

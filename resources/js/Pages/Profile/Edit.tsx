@@ -38,6 +38,26 @@ export default function Edit({ mustVerifyEmail, status }: PageProps<{ mustVerify
     <div>
       <Head title="Profile" />
 
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-40 bg-[#1B2560] text-white shadow-xs">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Users className="w-6 h-6 text-white" />
+              <h1 className="text-xl font-semibold text-white">Settings</h1>
+            </div>
+            <div className="text-sm font-mono text-white">{currentTime}</div>
+          </div>
+          <div className="mt-2">
+            <nav className="text-sm text-gray-300">
+              <span>CDRRMO Staff Portal</span>
+              <span className="mx-2">{">"}</span>
+              <span>Settings</span>
+            </nav>
+          </div>
+        </div>
+      </div>
+
       <div className="py-12 bg-gray-50 min-h-screen">
         <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
           <div className="bg-white p-4 shadow-sm sm:rounded-lg sm:p-8 dark:bg-gray-800">

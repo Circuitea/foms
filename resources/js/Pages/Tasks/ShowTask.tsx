@@ -60,44 +60,22 @@ export default function ShowTask({ task }: PageProps<{ task: Task }>) {
 
         
       </div>
-      {!!task.transaction && (
-        <div className="bg-white rounded-lg shadow-lg p-4">
-          <div className="flex items-center gap-2">
-            <Wrench className="w-5 h-5" />
-            <h2 className="font-bold text-xl">Allocated Resources</h2>
-          </div>
-          <div className="grid grid-cols-2">
-            {/* {task.items.map(item => (
-              <div className="flex gap-2 items-center">
-                <Dot className="text-[#1B2560] w-10 h-10" />
-                <span>{item.item.name}</span>
-                <span>x</span>
-                <span>{item.amount}</span>
-              </div>
-            ))} */}
-            <div className="flex flex-col">
-              {task.transaction.equipment?.map(equipment => (
-                <div className="flex gap-2 items-center">
-                  <Dot className="text-[#1B2560] w-10 h-10" />
-                  <span>{equipment.item.name}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-col">
-              {task.transaction.consumables?.map(consumable => (
-                <div className="flex gap-2 items-center">
-                  <Dot className="text-[#1B2560] w-10 h-10" />
-                  <span>{consumable.item.name}</span>
-                  <span>x</span>
-                  <span>{consumable.quantity}</span>
-                </div>
-              ))}
-            </div>
-
-          </div>
+      <div className="bg-white rounded-lg shadow-lg p-4">
+        <div className="flex items-center gap-2">
+          <Wrench className="w-5 h-5" />
+          <h2 className="font-bold text-xl">Allocated Equipment</h2>
         </div>
-      )}
-      
+        <div className="flex flex-col">
+          {task.items.map(item => (
+            <div className="flex gap-2 items-center">
+              <Dot className="text-[#1B2560] w-10 h-10" />
+              <span>{item.item.name}</span>
+              <span>x</span>
+              <span>{item.amount}</span>
+            </div>
+          ))}
+        </div>
+      </div>
       <div className="bg-white rounded-lg shadow-lg p-4">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5" />

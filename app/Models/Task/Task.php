@@ -2,7 +2,6 @@
 
 namespace App\Models\Task;
 
-use App\Models\Inventory\Transaction;
 use App\Models\Inventory\TransactionEntry;
 use App\Models\Personnel;
 use App\TaskStatus;
@@ -11,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Date;
 
 /**
@@ -92,8 +90,8 @@ class Task extends Model
         return $this->belongsToMany(Personnel::class, 'personnel_task')->using(PersonnelTask::class)->withPivot(['started_at', 'finished_at', 'additional_notes']);
     }
 
-    public function transaction(): HasOne
+    public function items(): HasMany
     {
-        return $this->hasOne(Transaction::class, 'task_id');
+        return $this->hasMany(TransactionEntry::class, 'task_id');
     }
 }

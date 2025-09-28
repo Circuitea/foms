@@ -4,11 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NewTaskRequest;
 use App\ItemConditionEnum;
-use App\Models\Inventory\ConsumableItem;
-use App\Models\Inventory\ConsumableTransactionEntry;
-use App\Models\Inventory\EquipmentGroup;
-use App\Models\Inventory\EquipmentItem;
-use App\Models\Inventory\EquipmentTransactionEntry;
 use App\Models\Inventory\Item;
 use App\Models\Inventory\ItemCondition;
 use App\Models\Inventory\Transaction;
@@ -44,7 +39,7 @@ class TasksController extends Controller
   }
 
   public function show(Request $request, int $id) {
-    $task = Task::with(['priority', 'type', 'personnel', 'creator', 'transaction' => ['equipment.item.group.type', 'consumables.item.type']])
+    $task = Task::with(['priority', 'type', 'personnel', 'items.item', 'creator'])
       ->findOr($id, function () {
         abort(404);
       });
@@ -54,39 +49,18 @@ class TasksController extends Controller
   }
 
   public function new() {
-    $equipmentGroups = EquipmentGroup::with([
-        'items' => function ($query) {
-            $query->withCount([
-                'entries as unfinished_tasks_count' => function ($q) {
-                    $q->join('transactions as t', 'equipment_transaction_entries.transaction_id', '=', 't.id')
-                      ->join('tasks', 't.task_id', '=', 'tasks.id')
-                      ->whereNull('tasks.finished_at');
-                }
-            ]);
-        }
-    ])->get();
-
-    // Mark each item as available if unfinished_tasks_count === 0
-    foreach ($equipmentGroups as $group) {
-        foreach ($group->items as $item) {
-            $item->is_available = ($item->unfinished_tasks_count === 0);
-        }
-    }
-
-    $items = [
-      'equipment' => $equipmentGroups,
-      'consumables' => ConsumableItem::withSum('entries as count', 'quantity')
-        ->having('count', '>=', 1)
-        ->get(),
-    ];
-
-    Log::info('test', [$items]);
-
     return Inertia::render('Tasks/NewTask', [
       'types' => TaskType::all(),
       'priorities' => TaskPriority::all(),
+      'items' => Item::withSum(['transactionEntries as amount' => function ($query) {
+        $query->where('condition_id', ItemCondition::firstWhere('name', ItemConditionEnum::AVAILABLE)->id);
+      }], 'amount')->get()
+        ->map(fn ($item) => [
+          ... $item->toArray(),
+          'amount' => (int) $item->amount,
+        ])
+        ->filter(fn ($item) => $item['amount'] > 0),
       'personnel' => Personnel::all(),
-      'items' => $items,
     ]);
   }
 
@@ -123,32 +97,32 @@ class TasksController extends Controller
         'description' => 'For Deployment on Task: ' . $newTask->title,
       ]);
       $itemTransaction->personnel()->associate($creator);
-      $itemTransaction->task()->associate($newTask);
       $itemTransaction->save();
 
-      $items = $validated['items'];
+      collect($validated['equipment_items'])->each(function ($item) use ($itemTransaction, $newTask) {
+        $inventoryItem = Item::find($item['id']);
 
-      collect($items['equipment'])->each(function ($item) use ($itemTransaction) {
-        $equipmentItem = EquipmentItem::find($item);
+        $removeEntry = new TransactionEntry();
+        $addEntry = new TransactionEntry();
+        $removeEntry->amount = -1 * abs($item['quantity']);
+        $addEntry->amount = $item['quantity'];
 
-        $entry = new EquipmentTransactionEntry();
-        $entry->item()->associate($equipmentItem);
-        $entry->transaction()->associate($itemTransaction);
+        $removeEntry->condition()->associate(ItemCondition::firstWhere('name', ItemConditionEnum::AVAILABLE));
+        $addEntry->condition()->associate(ItemCondition::firstWhere('name', ItemConditionEnum::DEPLOYED));
 
-        $entry->save();
+        $removeEntry->transaction()->associate($itemTransaction);
+        $addEntry->transaction()->associate($itemTransaction);
+        
+        $removeEntry->item()->associate($inventoryItem);
+        $addEntry->item()->associate($inventoryItem);
+
+        $addEntry->task()->associate($newTask);
+
+        $removeEntry->save();
+        $addEntry->save();
+
       });
-
-      collect($items['consumables'])->each(function ($item) use ($itemTransaction) {
-        $consumableItem = ConsumableItem::find($item['id']);
-
-        $entry = new ConsumableTransactionEntry();
-        $entry->quantity = $item['count'];
-
-        $entry->item()->associate($consumableItem);
-        $entry->transaction()->associate($itemTransaction);
-
-        $entry->save();
-      });
+      
     });
 
     return redirect('/tasks');

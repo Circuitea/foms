@@ -1,40 +1,10 @@
-export interface EquipmentGroup {
-  id: number;
-  name: string;
-  type: ItemType;
-}
-
-export interface EquipmentItem {
-  id: number;
-  name: string;
-  description: string;
-  image_path?: string;
-  location: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface ConsumableItem {
-  id: number;
-  name: string;
-  description: string;
-  image_path?: string;
-  location: string;
-
-  type: ItemType;
-
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface EquipmentTransactionEntry {
-  id: number;
-}
-
-export interface ConsumableTransactionEntry {
-  id: number;
-  quantity: number;
-  transaction: Transaction;
+export default interface Item {
+    id: number;
+    name: string;
+    description: string;
+    imagePath: string;
+    type: ItemType;
+    location: string;
 }
 
 export interface ItemType {
@@ -43,9 +13,15 @@ export interface ItemType {
   icon: string,
 };
 
-export interface Transaction {
+export interface ItemCondition {
   id: number;
-  title: string;
-  description: string;
-  created_at: string;
+  name: ItemConditionValue;
+  label: string;
+  amount: number;
 }
+
+export type ItemEntry = Item & {
+  conditions: ItemCondition[];
+}
+
+export type ItemConditionValue = 'available' | 'deployed' | 'in_maintenance';
