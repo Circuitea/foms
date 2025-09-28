@@ -75,25 +75,28 @@ export default function ShowTask({ task }: PageProps<{ task: Task }>) {
                 <span>{item.amount}</span>
               </div>
             ))} */}
-            <div className="flex flex-col">
-              {task.transaction.equipment?.map(equipment => (
-                <div className="flex gap-2 items-center">
-                  <Dot className="text-[#1B2560] w-10 h-10" />
-                  <span>{equipment.item.name}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-col">
-              {task.transaction.consumables?.map(consumable => (
-                <div className="flex gap-2 items-center">
-                  <Dot className="text-[#1B2560] w-10 h-10" />
-                  <span>{consumable.item.name}</span>
-                  <span>x</span>
-                  <span>{consumable.quantity}</span>
-                </div>
-              ))}
-            </div>
-
+            {(!!task.transaction.equipment && task.transaction.equipment.length > 0) && (
+              <div className="flex flex-col">
+                {task.transaction.equipment?.map(equipment => (
+                  <div className="flex gap-2 items-center">
+                    <Dot className="text-[#1B2560] w-10 h-10" />
+                    <span>{equipment.item.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {(!!task.transaction.consumables && task.transaction.consumables.length > 0) && (
+              <div className="flex flex-col">
+                {task.transaction.consumables?.map(consumable => (
+                  <div className="flex gap-2 items-center">
+                    <Dot className="text-[#1B2560] w-10 h-10" />
+                    <span>{consumable.item.name}</span>
+                    <span>x</span>
+                    <span>{Math.abs(consumable.quantity)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
