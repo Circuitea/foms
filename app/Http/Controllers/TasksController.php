@@ -149,31 +149,6 @@ class TasksController extends Controller
 
         $entry->save();
       });
-
-      // collect($validated['equipment_items'])->each(function ($item) use ($itemTransaction, $newTask) {
-      //   $inventoryItem = Item::find($item['id']);
-
-      //   $removeEntry = new TransactionEntry();
-      //   $addEntry = new TransactionEntry();
-      //   $removeEntry->amount = -1 * abs($item['quantity']);
-      //   $addEntry->amount = $item['quantity'];
-
-      //   $removeEntry->condition()->associate(ItemCondition::firstWhere('name', ItemConditionEnum::AVAILABLE));
-      //   $addEntry->condition()->associate(ItemCondition::firstWhere('name', ItemConditionEnum::DEPLOYED));
-
-      //   $removeEntry->transaction()->associate($itemTransaction);
-      //   $addEntry->transaction()->associate($itemTransaction);
-        
-      //   $removeEntry->item()->associate($inventoryItem);
-      //   $addEntry->item()->associate($inventoryItem);
-
-      //   $addEntry->task()->associate($newTask);
-
-      //   $removeEntry->save();
-      //   $addEntry->save();
-
-      // });
-      
     });
 
     return redirect('/tasks');
