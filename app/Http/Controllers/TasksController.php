@@ -44,7 +44,7 @@ class TasksController extends Controller
   }
 
   public function show(Request $request, int $id) {
-    $task = Task::with(['priority', 'type', 'personnel', 'items.item', 'creator'])
+    $task = Task::with(['priority', 'type', 'personnel', 'creator', 'transaction' => ['equipment.item.group.type', 'consumables.item.type']])
       ->findOr($id, function () {
         abort(404);
       });

@@ -22,7 +22,6 @@ class MyTasksController extends Controller
                 'priority',
                 'type',
                 'creator',
-                'items.item',
             ]),
         ]);
     }

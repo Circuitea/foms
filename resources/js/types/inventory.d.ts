@@ -27,6 +27,10 @@ export interface ConsumableItem {
   updated_at?: string;
 }
 
+export interface EquipmentTransactionEntry {
+  id: number;
+}
+
 export interface ConsumableTransactionEntry {
   id: number;
   quantity: number;
