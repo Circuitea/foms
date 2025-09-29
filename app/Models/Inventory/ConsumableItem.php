@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ConsumableItem extends Model
 {
-    protected $fillable = ['name', 'description', 'location', 'image_path'];
+    protected $fillable = ['name', 'description', 'location', 'image_path', 'type_id'];
 
     public function type(): BelongsTo
     {
