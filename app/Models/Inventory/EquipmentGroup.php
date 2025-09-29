@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EquipmentGroup extends Model
 {
-    protected $fillable = ['name'];
+    public $timestamps = false;
+
+    protected $fillable = ['name', 'type_id'];
 
     public function type(): BelongsTo
     {
