@@ -80,7 +80,7 @@ export default function ListInventory({ items, type }: PageProps<{ items: {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="mx-auto px-6 py-8">
         <div className="bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">

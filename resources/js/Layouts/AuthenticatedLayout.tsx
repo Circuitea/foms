@@ -56,7 +56,7 @@ export default function Authenticated({
           </div>
           
           <div className="sticky top-0 h-16 bg-[#1B2560] shadow-xs z-50">
-            <div className={`max-w-7xl mx-auto px-6 ${!!breadcrumbEntries ? 'py-2' : 'py-4'} flex justify-between items-center gap-2`}>
+            <div className={`mx-auto px-6 ${!!breadcrumbEntries ? 'py-2' : 'py-4'} flex justify-between items-center gap-2`}>
               <div className="flex flex-col">
                 <div className="flex items-center gap-3">
                   {PageIcon && <PageIcon className="w-6 h-6 text-white" /> }

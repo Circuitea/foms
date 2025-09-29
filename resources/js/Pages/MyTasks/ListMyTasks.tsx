@@ -31,7 +31,7 @@ export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
           </PageTabsList>
         </div>
 
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div className="mx-auto sm:px-6 lg:px-8">
             
             {tabs.map(({ value, tasks }, i) => (
               <PageTabsContent key={i} value={value}>

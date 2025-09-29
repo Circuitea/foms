@@ -121,7 +121,7 @@ export default function ShowTask({ task }: PageProps<{ task: Task }>) {
             </Button>
 
           </DialogTrigger>
-          <DialogContent className="max-w-7xl h-full grid-rows-12">
+          <DialogContent className="h-full grid-rows-12">
             <DialogHeader>
               <DialogTitle>Report Preview</DialogTitle>
               <DialogDescription>Preview of the generated task report</DialogDescription>

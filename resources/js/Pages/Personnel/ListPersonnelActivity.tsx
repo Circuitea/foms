@@ -29,7 +29,7 @@ export default function ListPersonnelActivity({ personnel }: ListPersonnelActivi
   }, {});
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="mx-auto">
       <div className="px-6 py-4">
         <div className="px-6 py-4 border rounded-lg border-gray-200">
           <h3 className="text-lg font-medium text-gray-900"><b>{formatName(personnel)}</b>'s Activity</h3>

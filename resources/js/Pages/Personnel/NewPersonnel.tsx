@@ -134,7 +134,7 @@ export default function NewPersonnel({ roles, sections }: PageProps<{ roles: Rol
   }
 
   return (
-    <div className="container mx-auto px-4 md:px-6 py-6 max-w-7xl">
+    <div className="container mx-auto px-4 md:px-6 py-6">
       <Head title="Add New Personnel" />
 
       <div className="px-6 py-6">

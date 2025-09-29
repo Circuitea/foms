@@ -247,7 +247,7 @@ function Report() {
 
       {/* Main Content */}
       <div className="flex-1 p-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto">
           {/* Page Description */}
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Generate Personnel Location Reports</h2>

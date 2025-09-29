@@ -39,7 +39,7 @@ export default function Edit({ mustVerifyEmail, status }: PageProps<{ mustVerify
       <Head title="Profile" />
 
       <div className="py-12 bg-gray-50 min-h-screen">
-        <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+        <div className="mx-auto space-y-6 sm:px-6 lg:px-8">
           <div className="bg-white p-4 shadow-sm sm:rounded-lg sm:p-8 dark:bg-gray-800">
             <UpdateProfileInformationForm />
           </div>

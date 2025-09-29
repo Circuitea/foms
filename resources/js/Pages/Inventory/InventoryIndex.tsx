@@ -123,7 +123,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
   const [searchTerm, setSearchTerm] = useState("")
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="mx-auto px-6 py-8">
       <div className={`grid grid-cols-2 md:grid-cols-${types.length/2} gap-6 mb-8`}>
         {types.map((type) => (
           <Link

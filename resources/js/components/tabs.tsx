@@ -10,7 +10,7 @@ const PageTabsList = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
 >(({ className, ...props }, ref) => (
   <div className="border-t border-gray-600 bg-[#1B2560]">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-[#1B2560]">
+    <div className="mx-auto px-4 sm:px-6 lg:px-8 bg-[#1B2560]">
       <TabsPrimitive.List
         ref={ref}
         className={cn(

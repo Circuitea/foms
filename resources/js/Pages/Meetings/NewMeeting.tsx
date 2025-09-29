@@ -80,7 +80,7 @@ export default function NewMeeting({ types, sections }: PageProps<{ types: Meeti
   return (
     <>
       {/* Main Content */}
-      <div className="container mx-auto px-4 md:px-6 py-6 max-w-7xl">
+      <div className="container mx-auto px-4 md:px-6 py-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold text-[#1B2560] flex items-center gap-2">
             <CalendarIcon className="w-6 h-6 text-[#1B2560]" />
