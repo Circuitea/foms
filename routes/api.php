@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Laravel\Sanctum\PersonalAccessToken;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
@@ -63,6 +62,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'token' => ['required', 'string', 'regex:/^ExponentPushToken\[.+\]$/'],
         ]);
 
+        /** @disregard */
         $token->expoTokens()->firstOrCreate([
             'value' => $data['token'],
         ]);
@@ -98,12 +98,68 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::get('/task/{id}', function (Request $request, string $id) {
+        $task = $request->user()->assignedTasks
+            ->findOrFail($id)
+            ->load([
+                'priority',
+                'type',
+                'creator',
+                'transaction' => ['equipment.item.group.type', 'consumables.item.type'],
+            ]);
+
+        return response([
+            'task' => $task,
+        ]);
+    });
+
+    Route::post('/task/{id}/status', function (Request $request, string $id) {
+        $request->validate([
+            'status' => [
+                'required',
+                Rule::in(['started', 'finished', 'canceled']),
+            ],
+            'additional_notes' => 'string|max:65535',
+        ]);
+
         $task = Task::with(['priority', 'type', 'creator', 'transaction' => ['equipment.item.group.type', 'consumables.item.type'] ])->findOr($id, function () {
             abort(404);
         });
 
+        $user = $request->user();
+
+        if ($request->input('status') === 'started') {
+            $task->personnel()->updateExistingPivot($user->id, [
+                'started_at' => Date::now(),
+            ]);
+            $user->status = Status::ASSIGNED;
+            $user->save();
+        } else if ($request->input('status') === 'canceled') {
+            $task->personnel()->updateExistingPivot($user->id, [
+                'started_at' => null,
+            ]);
+            $user->status = Status::AVAILABLE;
+            $user->save();
+        } else {
+            $task->personnel()->updateExistingPivot($user->id, [
+                'finished_at' => Date::now(),
+                'additional_notes' => $request->input('additional_notes'),
+            ]);
+            $user->status = Status::AVAILABLE;
+            $user->save();
+
+
+            $allFinished = $task->personnel->every(function ($person) {
+                return !is_null($person->pivot->finished_at);
+            });
+
+            if ($allFinished) {
+                $task->finished_at = Date::now();
+                $task->save();
+            }
+        }
+
         return response([
-            'task' => $task,
+            'task' => $task->refresh(),
         ]);
     });
 });
