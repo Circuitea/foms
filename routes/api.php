@@ -121,11 +121,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'additional_notes' => 'string|max:65535',
         ]);
 
-        $task = Task::with(['priority', 'type', 'creator', 'transaction' => ['equipment.item.group.type', 'consumables.item.type'] ])->findOr($id, function () {
-            abort(404);
-        });
-
         $user = $request->user();
+
+        $task = $user->assignedTasks
+            ->findOrFail($id)
+            ->load([
+                'priority',
+                'type',
+                'creator',
+                'transaction' => ['equipment.item.group.type', 'consumables.item.type'],
+            ]);
+
 
         if ($request->input('status') === 'started') {
             $task->personnel()->updateExistingPivot($user->id, [
