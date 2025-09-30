@@ -165,7 +165,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         }
 
         return response([
-            'task' => $task->refresh(),
+            'task' => [
+                ... $task->toArray(),
+                'pivot' => $task->personnel()->where('personnel.id', $user->id)->first()?->pivot,
+            ],
         ]);
     });
 });
