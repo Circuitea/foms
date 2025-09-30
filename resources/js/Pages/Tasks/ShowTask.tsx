@@ -14,7 +14,6 @@ import { ArrowDown, ArrowUp, Clock, Dot, FileText, Flame, MapPin, Minus, User, U
 import { ReactElement } from "react"
 
 export default function ShowTask({ task }: PageProps<{ task: Task }>) {
-
   return (
     <div className="p-4 space-y-4">
       <div className="bg-white rounded-lg shadow-lg p-4 space-y-4">
@@ -23,9 +22,7 @@ export default function ShowTask({ task }: PageProps<{ task: Task }>) {
             <h1 className="text-2xl font-bold text-[#1B2560]">Task Details</h1>
             <span className="text-sm text-gray-500">Task ID: {task.id}</span>
           </div>
-
           <TaskPriority task={task} />
-
         </div>
 
         <div className="py-2">
@@ -67,14 +64,6 @@ export default function ShowTask({ task }: PageProps<{ task: Task }>) {
             <h2 className="font-bold text-xl">Allocated Resources</h2>
           </div>
           <div className="grid grid-cols-2">
-            {/* {task.items.map(item => (
-              <div className="flex gap-2 items-center">
-                <Dot className="text-[#1B2560] w-10 h-10" />
-                <span>{item.item.name}</span>
-                <span>x</span>
-                <span>{item.amount}</span>
-              </div>
-            ))} */}
             {(!!task.transaction.equipment && task.transaction.equipment.length > 0) && (
               <div className="flex flex-col">
                 {task.transaction.equipment?.map(equipment => (

@@ -28,6 +28,10 @@ export function StatusSelector() {
       value: 'on leave',
       label: 'On Leave',
     },
+    {
+      value: 'emergency',
+      label: 'In Emergency',  
+    }
   ];
 
   const handleStatusChange = async (newStatus: string) => {
