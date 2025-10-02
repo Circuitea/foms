@@ -3,13 +3,15 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { PropsWithChildren } from 'react';
 import ApplicationLogo from '@/components/ApplicationLogo';
 import { Toaster } from '@/components/ui/sonner';
-import { useEcho } from '@laravel/echo-react';
+import { useEcho, useEchoNotification } from '@laravel/echo-react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import toast from '@/components/toast';
 import { useRealTimeClock } from '@/hooks/use-clock';
 import { LucideIcon, Users } from 'lucide-react';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { StatusProvider } from '@/context/status-context';
+import { Task } from '@/types/tasks';
+import { TaskReport } from '@/Documents/TaskReport';
 
 interface Notification {
   title: string;
@@ -32,11 +34,10 @@ export default function Authenticated({
   PageIcon?: LucideIcon,
 }>) {
   const { user } = usePage().props.auth;
-  useEcho<Notification>(
-    `notifications.${user.id}`,
-    `NotificationSent`,
-    (e) => {
-      toast('success', e.title, e.message);
+  useEchoNotification<{ task: Task }>(
+    `App.Models.Personnel.${user.id}`,
+    (notification) => {
+      toast('task', 'New Task Assigned', `You have been assigned to Task '${notification.task.title}'`, notification.task.id)
     }
   )
 

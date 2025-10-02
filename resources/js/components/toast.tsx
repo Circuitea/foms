@@ -1,8 +1,9 @@
 import { AlertCircle, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { toast as sonnerToast } from "sonner";
+import { router } from "@inertiajs/react";
 
-export default function toast(type: ToastProps['type'], title: string, description: string) {
+export default function toast(type: ToastProps['type'], title: string, description: string, taskID?: number) {
     return sonnerToast.custom((id) => (
     <Toast
         id={id}
@@ -15,18 +16,20 @@ export default function toast(type: ToastProps['type'], title: string, descripti
 
 interface ToastProps {
     id: string | number;
-    type: 'error' | 'success' | 'warning';
+    type: 'error' | 'success' | 'warning' | 'task';
     title: string;
     description: string;
+    taskID?: number;
 }
 
-function Toast({ id, type, title, description }: ToastProps) {
+function Toast({ id, type, title, description, taskID }: ToastProps) {
     return (
         <div
             className={'max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden transform transition-all duration-300 ease-in-out ' + 
                 type === 'error' ? 'border-l-4 border-red-500' :
                     type === 'success' ? 'border-l-4 border-green-500' :
-                    'border-l-4 border-yellow-500'
+                        type === 'task' ? 'border-l-4 border-blue-500' :
+                        'border-l-4 border-yellow-500'
             }
         >
           <div className="p-4">
@@ -47,9 +50,22 @@ function Toast({ id, type, title, description }: ToastProps) {
               </div>
 
               <div className="ml-4 shrink-0 flex">
-                  <Button
-                      onClick={() => sonnerToast.dismiss(id)}
-                      ><X className="h-5 w-5" /></Button>
+                {type === 'task' ? (
+                    <Button
+                        onClick={() => {
+                            sonnerToast.dismiss(id)
+                            router.get(`/my-tasks`);
+                        }}
+                    >
+                        Details
+                    </Button>
+                ) : (
+                    <Button
+                        onClick={() => sonnerToast.dismiss(id)}
+                    >
+                        <X className="h-5 w-5" />
+                    </Button>
+                )}
               </div>
             </div>
           </div>

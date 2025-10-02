@@ -12,7 +12,7 @@ Broadcast::channel('location', function (Personnel $user) {
     return true;
 });
 
-Broadcast::channel('notifications.{userID}', function (Personnel $user, int $userID) {
+Broadcast::channel('App.Models.Personnel.{userID}', function (Personnel $user, int $userID) {
     return $user->id === $userID;
 });
 
