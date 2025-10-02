@@ -1,4 +1,5 @@
 import { Personnel } from ".";
+import { Task } from "./tasks";
 
 export interface EquipmentGroup {
   id: number;
