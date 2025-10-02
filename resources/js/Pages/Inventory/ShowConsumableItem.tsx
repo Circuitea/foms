@@ -2,10 +2,12 @@ import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ConsumableItemReport } from "@/Documents/ConsumableItemReport";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { PageProps } from "@/types";
 import { ConsumableItem, ConsumableTransactionEntry } from "@/types/inventory";
-import { Link, router } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import { MapPin, MoveLeft, Package } from "lucide-react";
 import { MutableRefObject, Ref, useEffect, useRef, useState } from "react";
@@ -27,6 +29,7 @@ type ItemPageProps = PageProps<{
 }>;
 
 export default function ShowConsumableItem({ item, totals, months, start_date, end_date }: ItemPageProps) {
+  const { user } = usePage().props.auth;
   const [startDate, setStartDate] = useState(start_date);
   const [endDate, setEndDate] = useState(end_date);
   const monthOptions: {value: string, label: string}[] = [];
@@ -148,9 +151,13 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
               <DataTable columns={columns} data={item.entries} />
             </div>
           </div>
-          <Button>
-            Generate Report
-          </Button>
+          <div className="pt-4 flex justify-end">
+            <Button asChild>
+              <PDFDownloadLink document={<ConsumableItemReport item={item} creator={user} />}>
+                Generate Report
+              </PDFDownloadLink>
+            </Button>
+          </div>
         </div>
       </div>
     </>

@@ -1,3 +1,5 @@
+import { Personnel } from ".";
+
 export interface EquipmentGroup {
   id: number;
   name: string;
@@ -29,6 +31,7 @@ export interface ConsumableItem {
 
 export interface EquipmentTransactionEntry {
   id: number;
+  transaction: Transaction;
 }
 
 export interface ConsumableTransactionEntry {
@@ -48,4 +51,6 @@ export interface Transaction {
   title: string;
   description: string;
   created_at: string;
+  personnel: Personnel;
+  task?: Task;
 }

@@ -130,7 +130,7 @@ class InventoryController extends Controller
             $query->whereHas('transaction', function ($q) use ($startDate, $endDate) {
                 $q->whereBetween('created_at', [$startDate, $endDate]);
             });
-            $query->with('transaction');
+            $query->with(['transaction' => ['personnel', 'task.personnel']]);
             // Add running total for each entry
             $query->selectRaw('
                 consumable_transaction_entries.*,
