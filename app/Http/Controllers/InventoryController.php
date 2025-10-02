@@ -153,8 +153,6 @@ class InventoryController extends Controller
             ->orderByRaw('year, week')
             ->get();
 
-        Log::info('test', [$item]);
-
         return Inertia::render('Inventory/ShowConsumableItem', [
             'start_date' => Inertia::always($startMonth),
             'end_date' => Inertia::always($endMonth),
