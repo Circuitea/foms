@@ -36,9 +36,11 @@ const styles = StyleSheet.create({
 interface ReportProps {
   item: ConsumableItem & { entries: (ConsumableTransactionEntry & {  running_total: string })[] };
   creator: Personnel;
+  from_date: string;
+  to_date: string;
 }
 
-export function ConsumableItemReport({ item, creator }: ReportProps) {
+export function ConsumableItemReport({ item, creator, from_date, to_date }: ReportProps) {
   const procurementEntries = item.entries.filter(entry => entry.quantity >= 0);
   const consumptionEntries = item.entries.filter(entry => entry.quantity < 0);
 
@@ -74,7 +76,7 @@ export function ConsumableItemReport({ item, creator }: ReportProps) {
       <Page size="LETTER" style={styles.page}>
         <HeadingOne>Summary</HeadingOne>
         <View>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Date Range:</Text> {dayjs().format("MMMM DD, YYYY")} to {}</Text>
+          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Date Range:</Text> {dayjs(from_date, "YYYY-MM").format("MMMM YYYY")} to {dayjs(to_date, "YYYY-MM").format("MMMM YYYY")}</Text>
           <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Total Entries:</Text> {item.entries.length}</Text>
         </View>
         
