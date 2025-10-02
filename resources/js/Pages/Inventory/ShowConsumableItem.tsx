@@ -9,6 +9,7 @@ import { ConsumableItem, ConsumableTransactionEntry } from "@/types/inventory";
 import { Link, router, usePage } from "@inertiajs/react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ColumnDef, RowSelectionState } from "@tanstack/react-table";
+import dayjs from "dayjs";
 import { MapPin, MoveLeft, Package } from "lucide-react";
 import { MutableRefObject, Ref, useEffect, useRef, useState } from "react";
 import { CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis } from "recharts";
@@ -153,7 +154,7 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
           </div>
           <div className="pt-4 flex justify-end">
             <Button asChild>
-              <PDFDownloadLink document={<ConsumableItemReport item={item} creator={user} />}>
+              <PDFDownloadLink fileName={`consumable_${item.id}_${dayjs(startDate, "YYYY-MM").format("YYYYMM")}-${dayjs(endDate, "YYYY-MM").format("YYYYMM")}`} document={<ConsumableItemReport item={item} creator={user} from_date={startDate} to_date={endDate} />}>
                 Generate Report
               </PDFDownloadLink>
             </Button>
