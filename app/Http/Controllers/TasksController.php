@@ -17,6 +17,7 @@ use App\Models\Personnel;
 use App\Models\Task\Task;
 use App\Models\Task\TaskPriority;
 use App\Models\Task\TaskType;
+use App\Notifications\TaskAssignedNotification;
 use App\RolesEnum;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 
 class TasksController extends Controller
@@ -80,8 +82,6 @@ class TasksController extends Controller
         ->get(),
     ];
 
-    Log::info('test', [$items]);
-
     return Inertia::render('Tasks/NewTask', [
       'types' => TaskType::all(),
       'priorities' => TaskPriority::all(),
@@ -91,6 +91,8 @@ class TasksController extends Controller
   }
 
   public function create(NewTaskRequest $request) {
+    $newTask = null;
+    
     DB::transaction(function () use ($request) {
       $validated = $request->validated();
       $type = TaskType::find($validated['type_id']);
@@ -149,6 +151,12 @@ class TasksController extends Controller
 
         $entry->save();
       });
+      
+      $task = $newTask->refresh();
+  
+      $notify = $task->load('personnel')->personnel;
+  
+      Notification::send($notify, new TaskAssignedNotification($task));
     });
 
     return redirect('/tasks');
