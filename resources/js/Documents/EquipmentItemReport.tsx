@@ -55,18 +55,67 @@ export function EquipmentItemReport() {
           <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Date Range:</Text> {dayjs().format("MMMM DD, YYYY")}</Text>
           <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Total Entries:</Text> 10</Text>
         </View>
-        <View style={{ marginTop: 16 }}>
-          <HeadingTwo>[EQUIPMENT ITEM]</HeadingTwo>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Item ID:</Text> 1</Text>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Number of Usage:</Text> 100</Text>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Quantity in Report:</Text> 12000123</Text>
+        <View style={{ marginTop: 8, borderBottom: 1, borderBottomColor: 'black', paddingBottom: 8 }}>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ width: '100%' }}>
+              <HeadingTwo>[EQUIPMENT ITEM]</HeadingTwo>
+              <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Item ID:</Text> 1</Text>
+              <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Number of Usage:</Text> 100</Text>
+              <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Quantity in Report:</Text> 12000123</Text>
+            </View>
+            <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', border: '1px solid black' }}>
+              <Text>Image here</Text>
+            </View>
+          </View>
         </View>
-        <View style={{ marginTop: 16 }}>
-          <HeadingTwo>[EQUIPMENT ITEM]</HeadingTwo>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Item ID:</Text> 1</Text>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Number of Usage:</Text> 100</Text>
-          <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Quantity in Report:</Text> 12000123</Text>
+        <View style={{ marginTop: 8 }}>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ width: '100%' }}>
+              <HeadingTwo>[EQUIPMENT ITEM]</HeadingTwo>
+              <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Item ID:</Text> 1</Text>
+              <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Number of Usage:</Text> 100</Text>
+              <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Quantity in Report:</Text> 12000123</Text>
+            </View>
+            <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', border: '1px solid black' }}>
+              <Text>Image here</Text>
+            </View>
+          </View>
         </View>
+      </Page>
+
+      <Page size="LETTER" style={styles.page}>
+        <HeadingOne>Usage History of 'ITEM NAME'</HeadingOne>
+        <Table tdStyle={{ padding: 2 }}>
+          <TH>
+            <TD>Personnel</TD>
+            <TD>Date</TD>
+            <TD>Task</TD>
+            <TD>Task Personnel</TD>
+          </TH>
+          <TR>
+            <TD>Transaction.Creator</TD>
+            <TD>Transaction.Created_At</TD>
+            <TD>Transaction.Task</TD>
+            <TD>Transaction.Task.Personnel</TD>
+          </TR>
+        </Table>
+      </Page>
+      <Page size="LETTER" style={styles.page}>
+        <HeadingOne>Usage History of 'ITEM NAME'</HeadingOne>
+        <Table tdStyle={{ padding: 2 }}>
+          <TH>
+            <TD>Personnel</TD>
+            <TD>Date</TD>
+            <TD>Task</TD>
+            <TD>Task Personnel</TD>
+          </TH>
+          <TR>
+            <TD>Transaction.Creator</TD>
+            <TD>Transaction.Created_At</TD>
+            <TD>Transaction.Task</TD>
+            <TD>Transaction.Task.Personnel</TD>
+          </TR>
+        </Table>
       </Page>
     </Document>
   )
