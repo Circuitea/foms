@@ -1,16 +1,27 @@
 import { LocationMarker } from "@/components/LocationMarker";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { toProperCase } from "@/lib/utils";
-import { PersonnelLocation, PersonnelMarkerDetails } from "@/types";
+import { cn, toProperCase } from "@/lib/utils";
+import { PersonnelLocation, Status } from "@/types";
 import dayjs from "dayjs";
 import { Clock, MapPin, User, X } from "lucide-react";
 import { useState } from "react";
-import { Marker, Popup } from "react-leaflet";
+
+const getStatusColor = (status?: Status) => {
+    if (!status) {
+      return 'bg-gray-200 text-gray-800';
+    }
+    const colors: Record<Status, string> = {
+      'available': "bg-green-200 text-green-800",
+      'assigned': "bg-blue-200 text-blue-800",
+      'on leave': "bg-yellow-200 text-yellow-800",
+      'emergency': 'bg-red-200 text-red-800',
+    }
+    return colors[status];
+  }
 
 export default function PersonnelMarker({ marker, isClickable, selected }: { marker: PersonnelLocation, isClickable: boolean, selected: boolean }) {
   const [ isOpen, setOpen ] = useState(false);
-   
 
   function onMarkerClick() {
     if (isClickable) {
@@ -19,7 +30,6 @@ export default function PersonnelMarker({ marker, isClickable, selected }: { mar
   }
   return selected ? (
     <div>
-      {/* <Marker position={[marker.latitude, marker.longitude]} eventHandlers={{click: onMarkerClick}}/> */}
       <LocationMarker location={marker} visible={false} onClick={onMarkerClick} />
       <Dialog open={isOpen} onOpenChange={setOpen}>
         <DialogContent className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
@@ -33,19 +43,15 @@ export default function PersonnelMarker({ marker, isClickable, selected }: { mar
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto p-6">
-            {/* Current Status */}
             <div className="bg-blue-50 rounded-lg p-4 mb-6">
             <h4 className="font-semibold text-gray-900 mb-3">Current Status</h4>
             <div className="grid grid-cols-2 gap-4">
               <div>
               <p className="text-sm text-gray-600">Status</p>
               <div
-                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium`}
+                className={`inline-flex items-center py-1 rounded-full text-xs font-medium`}
               >
-                <div
-                className={`w-2 h-2 rounded-full mr-1`}
-                ></div>
-                {toProperCase(marker.personnel.status ?? '')}
+                <span className={cn("inline-flex px-2 py-1 text-xs font-semibold rounded-full", getStatusColor(marker.personnel.status))}>{toProperCase(marker.personnel.status ?? 'Unavailable')}</span>
               </div>
               </div>
               <div>
@@ -76,13 +82,6 @@ export default function PersonnelMarker({ marker, isClickable, selected }: { mar
                   </div>
                 </div>
               ))}
-              {/* {(!mockLocationHistory[selectedPersonnelForDetail.id] ||}
-              mockLocationHistory[selectedPersonnelForDetail.id].length === 0) && (
-              <div className="text-center py-8">
-                <MapPin className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <p className="text-gray-500">No location history available</p>
-              </div>
-              ) */}
               </div>
             </div>
           </div>

@@ -55,7 +55,7 @@ export default function Listlocation_history({ location_history, personnel, sele
               pathOptions={{ color: 'red' }}
             />
             {location_history.map((location, i) => (
-              <LocationMarker location={location} visible={!!openTooltips[i]} />
+              <LocationMarker isGeneric location={location} visible={!!openTooltips[i]} />
             ))}
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
