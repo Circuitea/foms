@@ -9,7 +9,6 @@ export interface Task {
   location: string
   
   due_date: string
-  duration: number
   finished_at: string;
 
   type_id: number

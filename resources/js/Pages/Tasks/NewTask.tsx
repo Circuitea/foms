@@ -18,7 +18,7 @@ import Select from 'react-select';
 import { InventoryItems, ItemSelection, ItemSelectionDialog } from "./ItemSelectionDialog";
 import { Badge } from "@/components/ui/badge";
 
-type NewTaskEntry = Pick<Task, 'title' | 'description' | 'location' | 'due_date' | 'duration'> & {
+type NewTaskEntry = Pick<Task, 'title' | 'description' | 'location' | 'due_date'> & {
   creator_id?: number;
   type_id?: number;
   priority_id?: number;
