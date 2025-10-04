@@ -2,14 +2,17 @@ import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ConsumableItemReport } from "@/Documents/ConsumableItemReport";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
+import { getMonthName } from "@/lib/utils";
 import { PageProps } from "@/types";
 import { ConsumableItem, ConsumableTransactionEntry } from "@/types/inventory";
-import { Link, router } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { MapPin, MoveLeft, Package } from "lucide-react";
-import { useEffect, useState } from "react";
+import { MutableRefObject, Ref, useEffect, useRef, useState } from "react";
 import { CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis } from "recharts";
 
 interface YearWeekTotal {
@@ -20,7 +23,7 @@ interface YearWeekTotal {
 }
 
 type ItemPageProps = PageProps<{
-  item: ConsumableItem & { entries: ConsumableTransactionEntry[] };
+  item: ConsumableItem & { entries: (ConsumableTransactionEntry & { running_total: string })[] };
   totals: YearWeekTotal[];
   months: Record<number, number[]>; // year and months[]
   start_date: string;
@@ -28,17 +31,12 @@ type ItemPageProps = PageProps<{
 }>;
 
 export default function ShowConsumableItem({ item, totals, months, start_date, end_date }: ItemPageProps) {
+  const { user } = usePage().props.auth;
   const [startDate, setStartDate] = useState(start_date);
-  const [endDate, setEndDate] = useState(end_date)
-
-  useEffect(() => {
-    console.log(item);
-  }, []);
-
-
+  const [endDate, setEndDate] = useState(end_date);
   const monthOptions: {value: string, label: string}[] = [];
   Object.entries(months).forEach(([year, monthsInYear]) => monthsInYear.forEach(month => monthOptions.push({ value: `${year}-${String(month).padStart(2, '0')}`, label: `${getMonthName(month)} ${year}`})))
-  console.log(monthOptions);
+
 
   return (
     <>
@@ -107,7 +105,7 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
             </div>
           </div>
         </div>
-        <div className="p-4 bg-gray-100 gap-2 shadow-lg rounded-lg w-full mt-4">
+        <div className="p-4    gap-2 shadow-lg rounded-lg w-full mt-4">
           <div className="flex justify-between items-baseline mb-4">
             <h3 className="font-bold text-lg flex items-center gap-2">
               <LineChart className="w-5 h-5" />
@@ -145,7 +143,7 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white pr-8 rounded-lg shadow-lg">
+            <div id="chart" className="bg-white pr-8 rounded-lg shadow-lg">
               <QuantityGraph data={totals.map(total => ({
                 year_week: `${total.year}-W${total.week}`,
                 quantity: Number(total.running_total),
@@ -155,19 +153,17 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
               <DataTable columns={columns} data={item.entries} />
             </div>
           </div>
+          <div className="pt-4 flex justify-end">
+            <Button asChild>
+              <PDFDownloadLink fileName={`consumable_${item.id}_${dayjs(startDate, "YYYY-MM").format("YYYYMM")}-${dayjs(endDate, "YYYY-MM").format("YYYYMM")}`} document={<ConsumableItemReport item={item} creator={user} from_date={startDate} to_date={endDate} />}>
+                Generate Report
+              </PDFDownloadLink>
+            </Button>
+          </div>
         </div>
       </div>
     </>
   );
-}
-
-function getMonthName(monthNumber: number): string {
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
-  return months[monthNumber - 1] ?? "";
 }
 
 const chartConfig = {
@@ -202,9 +198,18 @@ const columns: ColumnDef<ConsumableTransactionEntry>[] = [
       </div>
     )
   },
+  {
+    accessorKey: 'running_total',
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <span className="w-full text-right">{row.getValue('running_total')}</span>
+      </div>
+    )
+  }
 ]
 
-function QuantityGraph({ data }: { data: QuantityData[] }) {
+function QuantityGraph({ data }: { data: QuantityData[]}) {
+
   return (
     <ChartContainer className="min-h-full w-full" config={chartConfig}>
       <LineChart

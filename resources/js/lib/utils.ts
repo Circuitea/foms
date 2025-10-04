@@ -37,3 +37,12 @@ export function formatName(personnel: Personnel): string {
 
   return nameParts.filter(Boolean).join(' ');
 }
+
+export function getMonthName(monthNumber: number): string {
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  return months[monthNumber - 1] ?? "";
+}
