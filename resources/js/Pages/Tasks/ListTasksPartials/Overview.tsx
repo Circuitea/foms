@@ -147,7 +147,6 @@ export default function Overview() {
                     <p className="text-sm text-gray-600 mt-1">{task.description.substring(0, 100)}...</p>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                       <span>📍 {task.location}</span>
-                      <span>⏱️ {task.duration}</span>
                       <span>👥 {task.personnel.length} assigned</span>
                       <span>📅 Due: {new Date(task.due_date).toLocaleDateString()}</span>
                     </div>
