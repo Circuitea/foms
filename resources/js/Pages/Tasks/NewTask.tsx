@@ -45,7 +45,6 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
     location: '',
 
     due_date: dayjs().second(0).millisecond(0).toJSON(),
-    duration: 120,
 
     items: {
       equipment: [],
@@ -268,17 +267,6 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
                     </PopoverContent>
                   </Popover>
 
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="duration" className="text-gray-700 font-medium">
-                    Duration <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="duration"
-                    type="number"
-                    value={data.duration}
-                    onChange={(e) => setData('duration', parseInt(e.target.value))}
-                  />
                 </div>
               </div>
             </CardContent>

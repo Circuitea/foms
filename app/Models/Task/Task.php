@@ -61,7 +61,6 @@ class Task extends Model
         'description',
         'location',
         'due_date',
-        'duration',
     ];
 
     protected function casts(): array

@@ -30,7 +30,6 @@ class NewTaskRequest extends FormRequest
             'description' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'due_date' => ['required', 'date', Rule::date()->afterToday()],
-            'duration' => 'required|numeric|gte:0',
             'type_id' => 'required|exists:' . TaskType::class . ',id',
             'priority_id' => 'required|exists:' . TaskPriority::class . ',id',
             'items' => ['required', 'array'],
