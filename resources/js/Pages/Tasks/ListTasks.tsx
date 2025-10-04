@@ -18,7 +18,6 @@ export default function ListTasks() {
             {[
               { id: "overview", label: "Overview", icon: ClipboardList },
               { id: "all", label: "All Tasks", icon: FileText },
-              { id: "personnel", label: "Personnel", icon: Users },
               // { id: "templates", label: "Templates", icon: FileText },
             ].map((tab) => (
               <PageTabsTrigger key={tab.id} value={tab.id}><tab.icon className="w-4 h-4" /> {tab.label}</PageTabsTrigger>
@@ -39,9 +38,6 @@ export default function ListTasks() {
           </PageTabsContent>
           <PageTabsContent value="all">
             <AllTasks />
-          </PageTabsContent>
-          <PageTabsContent value="personnel">
-            <PersonnelTab />
           </PageTabsContent>
           {/* <PageTabsContent value="templates">
             templates
