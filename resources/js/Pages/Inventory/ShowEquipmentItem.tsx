@@ -201,7 +201,7 @@ export default function ShowEquipmentItem({
                           className="bg-[#1B2560]"
                           asChild
                         >
-                          <PDFDownloadLink fileName={`equipment_${item.id}`} document={<EquipmentItemReport group={item} selectedItems={Object.keys(selectedItems)} creator={user} />}>
+                          <PDFDownloadLink fileName={`equipment_${item.id}_${dayjs(startDate, "YYYY-MM").format("YYYYMM")}-${dayjs(endDate, "YYYY-MM").format("YYYYMM")}`} document={<EquipmentItemReport group={item} selectedItems={Object.keys(selectedItems)} creator={user} />}>
                             Generate Report
                           </PDFDownloadLink>
                         </Button>
