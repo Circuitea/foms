@@ -46,7 +46,7 @@ const navItems: NavItem[] = [
     icon: Bell,
   },
   {
-    title: "All Tasks",
+    title: "Field Tasks",
     url: "/tasks",
     icon: CheckCheck,
     permissions: /tasks\.(?:read|\*)/,
