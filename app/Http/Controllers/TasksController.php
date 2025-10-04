@@ -105,7 +105,6 @@ class TasksController extends Controller
         'description' => $validated['description'],
         'location' => $validated['location'],
         'due_date' => Date::createFromFormat('Y-m-d\TH:i:s.v\Z', $validated['due_date']),
-        'duration' => $validated['duration'],
       ]);
 
       $newTask->section_id = 1;
