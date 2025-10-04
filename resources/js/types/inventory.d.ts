@@ -15,6 +15,8 @@ export interface EquipmentItem {
   location: string;
   created_at?: string;
   updated_at?: string;
+
+  entries: EquipmentTransactionEntry[];
 }
 
 export interface ConsumableItem {

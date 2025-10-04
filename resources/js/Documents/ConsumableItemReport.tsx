@@ -95,7 +95,7 @@ export function ConsumableItemReport({ item, creator, from_date, to_date }: Repo
       </Page>
 
       <Page size="LETTER" style={[styles.page]}>
-        <HeadingOne>Usage History of 'ITEM NAME'</HeadingOne>
+        <HeadingOne>Usage History of '{item.name}'</HeadingOne>
         <Table tdStyle={{ padding: 2 }} weightings={[0.25, 0.15, 0.15, 0.1, 0.1, 0.25]}>
           <TH>
             <TD>Personnel</TD>

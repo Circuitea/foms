@@ -2,11 +2,14 @@ import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { EquipmentItemReport } from "@/Documents/EquipmentItemReport";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { toProperCase } from "@/lib/utils";
+import { getMonthName, toProperCase } from "@/lib/utils";
 import { PageProps } from "@/types";
-import { EquipmentGroup, EquipmentItem } from "@/types/inventory";
-import { Link } from "@inertiajs/react";
+import { EquipmentGroup, EquipmentItem, EquipmentTransactionEntry } from "@/types/inventory";
+import { Link, router, usePage } from "@inertiajs/react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import { table } from "console";
 import dayjs from "dayjs";
@@ -54,13 +57,27 @@ const columns: ColumnDef<EquipmentItem>[] = [
 ]
 
 export default function ShowEquipmentItem({
-  item
+  item,
+  start_date,
+  end_date,
+  months
 }: PageProps<{
   item: EquipmentGroup & {
-    items: EquipmentItem[];
+    items: (EquipmentItem & { entries: EquipmentTransactionEntry[] })[];
   };
+  months: Record<number, number[]>; // year and months[]
+  start_date: string;
+  end_date: string;
 }>) {
   const [selectedItems, setSelectedItems] = useState<RowSelectionState>({})
+  const [startDate, setStartDate] = useState(start_date);
+  const [endDate, setEndDate] = useState(end_date);
+  const { user } = usePage().props.auth;
+
+  const monthOptions: {value: string, label: string}[] = [];
+  
+  Object.entries(months).forEach(([year, monthsInYear]) => monthsInYear.forEach(month => monthOptions.push({ value: `${year}-${String(month).padStart(2, '0')}`, label: `${getMonthName(month)} ${year}`})))
+
 
   useEffect(() => {
     console.log(item);
@@ -113,58 +130,96 @@ export default function ShowEquipmentItem({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <div className="bg-white p-4 shadow-lg rounded-lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Clipboard className="w-5 h-5" />
-                Equipment List
-              </h3>
-              <DataTable
-                columns={columns}
-                data={item.items}
-                selectedRows={selectedItems}
-                setSelectedRows={setSelectedItems}
-                getRowId={(row) => row.id.toString()}
-              />
+          <div className="flex flex-col">
+            <div className="flex justify-end">
+              <div className="p-4 flex gap-2 items-baseline">
+                <span>From</span>
+                <Select value={startDate} onValueChange={setStartDate}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {monthOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span>to</span>
+                <Select value={endDate} onValueChange={setEndDate}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {monthOptions.map(option => (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value}
+                        disabled={option.value < startDate}
+                      >{option.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button className="bg-[#1B2560]" onClick={() => router.reload({ data: {start_date: startDate, end_date: endDate}, only: ['i'] })}>Apply</Button>
+              </div>
             </div>
-            <div className="bg-white p-4 shadow-lg rounded-lg h-full flex flex-col">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Info className="w-5 h-5" />
-                Equipment Item
-              </h3>
-              {Object.keys(selectedItems).length > 0
-                ? (
-                  <div className="flex flex-col gap-2 h-full">
-                    {Object.keys(selectedItems).map(itemID => {
-                      const equipment_item = item.items.find(entry => entry.id === Number(itemID))
-                      return (
-                        <div className="bg-gray-50 p-2 rounded-lg shadow-lg">
-                          <h3>{equipment_item?.name}</h3>
-                          <div>
-                            <span>Date of Acquisition: </span>
-                            <span>{dayjs(equipment_item?.created_at).format('MMM DD, YYYY')}</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="bg-white p-4 shadow-lg rounded-lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Clipboard className="w-5 h-5" />
+                  Equipment List
+                </h3>
+                <DataTable
+                  columns={columns}
+                  data={item.items}
+                  selectedRows={selectedItems}
+                  setSelectedRows={setSelectedItems}
+                  getRowId={(row) => row.id.toString()}
+                />
+              </div>
+              <div className="bg-white p-4 shadow-lg rounded-lg h-full flex flex-col">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Info className="w-5 h-5" />
+                  Equipment Item
+                </h3>
+                {Object.keys(selectedItems).length > 0
+                  ? (
+                    <div className="flex flex-col gap-2 h-full">
+                      {Object.keys(selectedItems).map(itemID => {
+                        const equipment_item = item.items.find(entry => entry.id === Number(itemID))
+                        return (
+                          <div className="bg-gray-50 p-2 rounded-lg shadow-lg">
+                            <h3>{equipment_item?.name}</h3>
+                            <div>
+                              <span>Date of Acquisition: </span>
+                              <span>{dayjs(equipment_item?.created_at).format('MMM DD, YYYY')}</span>
+                            </div>
                           </div>
-                        </div>
+                        )}
                       )}
-                    )}
-                    <div className="mt-auto flex justify-end">
-                      <Button
-                        className="bg-[#1B2560]"
-                      >
-                        Generate Report
-                      </Button>
+                      <div className="mt-auto flex justify-end">
+                        <Button
+                          className="bg-[#1B2560]"
+                          asChild
+                        >
+                          <PDFDownloadLink fileName={`equipment_${item.id}`} document={<EquipmentItemReport group={item} selectedItems={Object.keys(selectedItems)} creator={user} />}>
+                            Generate Report
+                          </PDFDownloadLink>
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Package className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No equipment selected</h3>
-                    <p className="mt-1 text-sm text-gray-500">Select an Equipment Item from the list.</p>
-                  </div>
-                )
-              }
+                  ) : (
+                    <div className="text-center py-12">
+                      <Package className="mx-auto h-12 w-12 text-gray-400" />
+                      <h3 className="mt-2 text-sm font-medium text-gray-900">No equipment selected</h3>
+                      <p className="mt-1 text-sm text-gray-500">Select an Equipment Item from the list.</p>
+                    </div>
+                  )
+                }
+              </div>
             </div>
           </div>
+
+          
         </div>
         
       </div>
