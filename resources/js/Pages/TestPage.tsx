@@ -5,7 +5,7 @@ import { PDFViewer } from "@react-pdf/renderer";
 export default function TestPage() {
   return (
     <PDFViewer className="w-full h-screen">
-      <EquipmentItemReport />
+      {/* <EquipmentItemReport /> */}
     </PDFViewer>
   );
 }
