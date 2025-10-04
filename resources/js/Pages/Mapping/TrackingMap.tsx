@@ -5,8 +5,9 @@ import PersonnelMarkersLayer from "./Partials/PersonnelMarkersLayer";
 import { Map } from "leaflet";
 import ZoomControl from "./Partials/ZoomControl";
 import BarangayBoundaries from "./Partials/BarangayBoundaries";
+import { PersonnelLocation } from "@/types";
 
-export default function TrackingMap({ ref, selectedPersonnel } : {ref: LegacyRef<Map>, selectedPersonnel: number[]}) {
+export default function TrackingMap({ markerLocations, ref, selectedPersonnel } : { markerLocations: Record<number, PersonnelLocation>, ref: LegacyRef<Map>, selectedPersonnel: number[]}) {
     return (
         <MapContainer ref={ref} className='min-h-full h-full z-0' center={[14.6034363, 121.0389469]} zoom={15} scrollWheelZoom={false} zoomControl={false} doubleClickZoom={false}>
             <TileLayer
@@ -21,7 +22,7 @@ export default function TrackingMap({ ref, selectedPersonnel } : {ref: LegacyRef
             />
 
             <BarangayBoundaries />
-            <PersonnelMarkersLayer selectedPersonnel={selectedPersonnel} />
+            <PersonnelMarkersLayer markerLocations={markerLocations} selectedPersonnel={selectedPersonnel} />
         </MapContainer>
     );
 }

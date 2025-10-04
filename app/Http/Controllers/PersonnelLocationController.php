@@ -16,26 +16,13 @@ class PersonnelLocationController extends Controller
     public function store(Request $request)  {
         $user = $request->user();
 
-        // Log::info('new location from user', [
-        //     $user,
-        //     $request['latitude'],
-        //     $request['longitude'],
-        // ]);
-
         PersonnelLocation::upsert([
             ['latitude' => $request['latitude'], 'longitude' => $request['longitude'], 'id' => $user->id],
         ], uniqueBy: ['id'], update: ['latitude', 'longitude']);
 
         LocationUpdated::dispatch(PersonnelLocation::with(['personnel.locationHistory' => function (Builder $query) {
-            $query->orderBy('created_at', 'DESC')->limit(3);
-        }])->get()->map(fn ($loc) => [
-            ... $loc->toArray(),
-            'location_name' => Geoapify::reverseGeocode($loc->latitude, $loc->longitude),
-            'personnel' => [
-                ... $loc->personnel->toArray(),
-                'location_history' => $loc->personnel->locationHistory->each->append('location_name'),
-            ]
-        ]));
+            $query->orderByDesc('created_at')->limit(3);
+        }])->find($user->id)->append('location_name'));
 
         return response('ok', status: 200);
     }

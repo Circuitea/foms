@@ -43,6 +43,7 @@ export type PageProps<
 };
 
 export interface PersonnelLocation {
+    id: number;
     personnel: Personnel & {
         location_history: Location[];
     },

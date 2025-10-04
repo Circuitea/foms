@@ -16,13 +16,18 @@ import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function MapPage () {
-  const { data } = usePage<PageProps<{ locations: { data: PersonnelLocation[] } }>>().props.locations;
-  const [personnel, setPersonnel] = useState<Personnel[]>(data.map(location => location.personnel));
-  useEcho<{ personnelLocations: PersonnelLocation[] }>('location', 'LocationUpdated', ({ personnelLocations }) => {
-    setPersonnel(personnelLocations.map(location => location.personnel));
+  const { locations } = usePage<PageProps<{ locations: Record<number, PersonnelLocation> }>>().props;
+  console.log(locations)
+  const [markerLocations, setMarkerLocations] = useState<Record<number, PersonnelLocation>>(locations);
+  const [personnel, setPersonnel] = useState<Personnel[]>(Object.entries(markerLocations).map(([id, location]) => location.personnel));
+  useEcho<{ location: PersonnelLocation }>('location', 'LocationUpdated', ({ location }) => {
+    setMarkerLocations({
+      ...markerLocations,
+      [location.id]: location,
+    });
   });
 
-  const [selectedPersonnel, setSelectedPersonnel] = useState<number[]>(data.map(location => location.personnel.id));
+  const [selectedPersonnel, setSelectedPersonnel] = useState<number[]>(Object.entries(markerLocations).map(([id, location]) => location.personnel.id));
 
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const { state } = useSidebar();
@@ -54,7 +59,7 @@ export default function MapPage () {
       <div className="flex-1 flex min-h-0">
         <div className="flex-1 min-w-0">
           <div className="w-full h-full bg-gray-100 relative overflow-hidden">
-            <TrackingMap ref={map} selectedPersonnel={selectedPersonnel} />
+            <TrackingMap markerLocations={markerLocations} ref={map} selectedPersonnel={selectedPersonnel} />
           </div>
         </div>
 

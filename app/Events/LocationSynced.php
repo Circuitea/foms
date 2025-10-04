@@ -2,30 +2,24 @@
 
 namespace App\Events;
 
-use App\Http\Resources\PersonnelLocationCollection;
-use App\Models\PersonnelLocation;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
-class LocationUpdated implements ShouldBroadcast
+class LocationSynced
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    public mixed $location;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(PersonnelLocation $location) {
-        $this->location = $location->toResource();
-        Log::info('updating location', ['size' => strlen(json_encode($this->location))]);
+    public function __construct()
+    {
+        //
     }
 
     /**
@@ -36,7 +30,7 @@ class LocationUpdated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('location'),
+            new PrivateChannel('channel-name'),
         ];
     }
 }

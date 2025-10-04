@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PersonnelLocationResource;
 use App\Models\PersonnelLocation;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,9 +14,17 @@ class MapController extends Controller
 {
     public function index()
     {
+        $locations = PersonnelLocation::with(['personnel.locationHistory' => function (Builder $query) {
+            $query->orderByDesc('created_at')->limit(3);
+        }])
+            ->get()
+            ->map(function ($location) {
+                return $location->append('location_name');
+            });
+
         return Inertia::render('Mapping/Map', [
             'barangays' => collect(Storage::files('boundaries'))->map(fn ($barangay) => Storage::json($barangay)),
-            'locations' => PersonnelLocationResource::collection(PersonnelLocation::all()),
+            'locations' => $locations->keyBy('id'),
         ]);
     }
 }
