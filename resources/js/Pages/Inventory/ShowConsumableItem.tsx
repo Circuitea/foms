@@ -4,6 +4,7 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConsumableItemReport } from "@/Documents/ConsumableItemReport";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
+import { getMonthName } from "@/lib/utils";
 import { PageProps } from "@/types";
 import { ConsumableItem, ConsumableTransactionEntry } from "@/types/inventory";
 import { Link, router, usePage } from "@inertiajs/react";
@@ -104,7 +105,7 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
             </div>
           </div>
         </div>
-        <div className="p-4 bg-gray-100 gap-2 shadow-lg rounded-lg w-full mt-4">
+        <div className="p-4    gap-2 shadow-lg rounded-lg w-full mt-4">
           <div className="flex justify-between items-baseline mb-4">
             <h3 className="font-bold text-lg flex items-center gap-2">
               <LineChart className="w-5 h-5" />
@@ -163,15 +164,6 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
       </div>
     </>
   );
-}
-
-function getMonthName(monthNumber: number): string {
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
-  return months[monthNumber - 1] ?? "";
 }
 
 const chartConfig = {
