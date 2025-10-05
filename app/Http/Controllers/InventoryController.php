@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\NewConsumableItemRequest;
+use App\Http\Requests\NewEquipmentItemRequest;
 use App\Models\Inventory\ConsumableItem;
 use App\Models\Inventory\ConsumableTransactionEntry;
 use App\Models\Inventory\EquipmentGroup;
@@ -72,6 +73,33 @@ class InventoryController extends Controller
             $transactionEntry->save();
         });
 
+        return redirect('/inventory');
+    }
+
+    public function createEquipment(NewEquipmentItemRequest $request) {
+        DB::transaction(function() use ($request) {
+            $validated = $request->validated();
+            $group = null;
+
+            if ($validated['group_id'] === 'new') {
+                $group = EquipmentGroup::create([
+                    'name' => $validated['group_name'],
+                    'type_id' => $validated['group_type_id'],
+                ]);
+            } else {
+                $group = EquipmentGroup::find($validated['group_id']);
+            }
+
+            $newItem = new EquipmentItem();
+            $newItem->fill([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'location' => $validated['location'],
+            ]);
+            $newItem->group()->associate($group);
+            $newItem->save();
+        });
+        
         return redirect('/inventory');
     }
 

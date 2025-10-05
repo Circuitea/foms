@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { PageProps } from "@/types";
-import { ItemType } from "@/types/inventory";
+import { EquipmentGroup, ItemType } from "@/types/inventory";
 import { usePage } from "@inertiajs/react";
 import { useForm } from "laravel-precognition-react-inertia";
 import { Package, Plus } from "lucide-react";
@@ -17,6 +17,7 @@ import Select from 'react-select';
 export default function AddItemForm() {
   const { types } = usePage<PageProps<{ types: ItemType[] }>>().props;
   const [isOpen, setOpen] = useState(false);
+  const { equipment } = usePage<PageProps<{ items: { equipment: EquipmentGroup[] } }>>().props.items;
 
   useEffect(() => {
     consumableForm.reset();
@@ -65,8 +66,8 @@ export default function AddItemForm() {
   });
 
   const groupOptions = [
-    {value: 'new', label: 'New Group'},
-    {value: 1, label: 'RAOJGFOAJGFA'},
+    { value: 'new', label: 'New Group' },
+    ... equipment.map(group => ({ value: String(group.id), label: group.name })),
   ]
 
   const handleConsumableSubmit: FormEventHandler = (e) => {
@@ -183,10 +184,11 @@ export default function AddItemForm() {
                       options={groupOptions}
                       value={groupOptions.find(option => option.value === equipmentForm.data.group_id)}
                       onChange={(newValue) => equipmentForm.setData('group_id', newValue?.value !== 'new' ? Number(newValue?.value) : 'new')}
+                      onBlur={() => equipmentForm.validate('group_id')}
                       isClearable
                       isSearchable
                     />
-                    <InputError invalid={equipmentForm.invalid('location')} message={equipmentForm.errors.location} />
+                    <InputError invalid={equipmentForm.invalid('group_id')} message={equipmentForm.errors.group_id} />
                   </div>
                   {equipmentForm.data.group_id === 'new' && (
                     <div className="flex flex-col gap-2">
@@ -202,7 +204,7 @@ export default function AddItemForm() {
                           onChange={(e) => equipmentForm.setData('group_name', e.target.value)}
                           onBlur={() => equipmentForm.validate('group_name')}
                           />
-                        <InputError invalid={equipmentForm.invalid('name')} message={equipmentForm.errors.name} />
+                        <InputError invalid={equipmentForm.invalid('group_name')} message={equipmentForm.errors.group_name} />
                       </div>
                       <div>
                         <Label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
