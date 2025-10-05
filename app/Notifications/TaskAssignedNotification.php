@@ -51,8 +51,8 @@ class TaskAssignedNotification extends Notification
             ->channelId('default')
             ->jsonData([
                 'url' => '/(home)/task/' . $this->task->id,
-            ])
-            ->shouldBatch();
+            ]);
+            // ->shouldBatch();
     }
 
     public function toBroadcast($notifiable): BroadcastMessage
