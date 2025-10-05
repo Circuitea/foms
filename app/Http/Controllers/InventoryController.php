@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\NewInventoryItemRequest;
-use App\ItemConditionEnum;
+use App\Http\Requests\NewConsumableItemRequest;
 use App\Models\Inventory\ConsumableItem;
+use App\Models\Inventory\ConsumableTransactionEntry;
 use App\Models\Inventory\EquipmentGroup;
-use App\Models\Inventory\Item;
-use App\Models\Inventory\ItemCondition;
+use App\Models\Inventory\EquipmentItem;
 use App\Models\Inventory\ItemType;
 use App\Models\Inventory\Transaction;
-use App\Models\Inventory\TransactionEntry;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,39 +40,37 @@ class InventoryController extends Controller
         ]);
     }
 
-    public function create(NewInventoryItemRequest $request) {
-        // DB::transaction(function() use ($request) {
-        //     $validated = $request->validated();
-        //     $type = ItemType::find($validated['type_id']);
-        //     $user = Auth::user();
-        //     $condition = ItemCondition::firstWhere('name', ItemConditionEnum::AVAILABLE);
+    public function createConsumable(NewConsumableItemRequest $request) {
+        DB::transaction(function() use ($request) {
+            $validated = $request->validated();
+            $type = ItemType::find($validated['type_id']);
+            $user = Auth::user();
 
-        //     $newItem = new Item();
-        //     $newItem->fill([
-        //         'name' => $validated['name'],
-        //         'description' => $validated['description'],
-        //         'location' => $validated['location'],
-        //     ]);
-        //     $newItem->type()->associate($type);
-        //     $newItem->save();
+            $newItem = new ConsumableItem();
+            $newItem->fill([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'location' => $validated['location'],
+            ]);
+            $newItem->type()->associate($type);
+            $newItem->save();
 
-        //     $transaction = new Transaction();
-        //     $transaction->fill([
-        //         'title' => 'Initial Item Quantity',
-        //         'description' => 'Setting the initial quantity of the inventory item'
-        //     ]);
-        //     $transaction->personnel()->associate($user);
-        //     $transaction->save();
+            $transaction = new Transaction();
+            $transaction->fill([
+                'title' => 'Initial Item Quantity',
+                'description' => 'Setting the initial quantity of the inventory item'
+            ]);
+            $transaction->personnel()->associate($user);
+            $transaction->save();
 
-        //     $transactionEntry = new TransactionEntry();
-        //     $transactionEntry->amount = $request['initial_quantity'];
+            $transactionEntry = new ConsumableTransactionEntry();
+            $transactionEntry->quantity = $request['initial_quantity'];
 
-        //     $transactionEntry->transaction()->associate($transaction);
-        //     $transactionEntry->item()->associate($newItem);
-        //     $transactionEntry->condition()->associate($condition);
+            $transactionEntry->transaction()->associate($transaction);
+            $transactionEntry->item()->associate($newItem);
 
-        //     $transactionEntry->save();
-        // });
+            $transactionEntry->save();
+        });
 
         return redirect('/inventory');
     }
