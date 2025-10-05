@@ -20,9 +20,21 @@ class PersonnelLocationController extends Controller
             ['latitude' => $request['latitude'], 'longitude' => $request['longitude'], 'id' => $user->id],
         ], uniqueBy: ['id'], update: ['latitude', 'longitude']);
 
-        LocationUpdated::dispatch(PersonnelLocation::with(['personnel.locationHistory' => function (Builder $query) {
+        $location = PersonnelLocation::with(['personnel.locationHistory' => function (Builder $query) {
             $query->orderByDesc('created_at')->limit(3);
-        }])->find($user->id)->append('location_name'));
+        }])->find($user->id);
+
+        // Append location_name to the current location
+        $location->append('location_name');
+
+        // Append location_name to each locationHistory entry
+        if ($location->relationLoaded('personnel') && $location->personnel->relationLoaded('locationHistory')) {
+            $location->personnel->locationHistory->each(function ($historyEntry) {
+                $historyEntry->append('location_name');
+            });
+        }
+
+        LocationUpdated::dispatch($location);
 
         return response('ok', status: 200);
     }

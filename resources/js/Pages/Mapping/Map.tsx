@@ -14,20 +14,38 @@ import { formatName } from "@/lib/utils"
 import { GenerateLocationHistoryReportDialog } from "./Partials/GenerateLocationHistoryReportDialog"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { id } from "date-fns/locale"
 
 export default function MapPage () {
   const { locations } = usePage<PageProps<{ locations: Record<number, PersonnelLocation> }>>().props;
-  console.log(locations)
   const [markerLocations, setMarkerLocations] = useState<Record<number, PersonnelLocation>>(locations);
-  const [personnel, setPersonnel] = useState<Personnel[]>(Object.entries(markerLocations).map(([id, location]) => location.personnel));
+  const [personnel, setPersonnel] = useState<Personnel[]>(Object.entries(locations).map(([id, location]) => location.personnel));
   useEcho<{ location: PersonnelLocation }>('location', 'LocationUpdated', ({ location }) => {
     setMarkerLocations({
       ...markerLocations,
       [location.id]: location,
     });
+    if (!personnel.find(person => person.id === location.personnel.id)) {
+      setPersonnel([...personnel, location.personnel])
+    }
   });
 
-  const [selectedPersonnel, setSelectedPersonnel] = useState<number[]>(Object.entries(markerLocations).map(([id, location]) => location.personnel.id));
+  useEcho<{ locations: PersonnelLocation[] }>('location', 'LocationSynced', ({ locations }) => {
+    // setMarkerLocations(locations);
+    console.log(locations);
+    let newLocations: Record<number, PersonnelLocation> = {};
+
+    locations.forEach(location => {
+      newLocations = {
+        ... newLocations,
+        [location.id]: location,
+      };
+    });
+    setMarkerLocations(newLocations);
+    setPersonnel(locations.map(location => location.personnel))
+  });
+
+  const [hiddenPersonnel, setHiddenPersonnel] = useState<number[]>([]);
 
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const { state } = useSidebar();
@@ -59,7 +77,7 @@ export default function MapPage () {
       <div className="flex-1 flex min-h-0">
         <div className="flex-1 min-w-0">
           <div className="w-full h-full bg-gray-100 relative overflow-hidden">
-            <TrackingMap markerLocations={markerLocations} ref={map} selectedPersonnel={selectedPersonnel} />
+            <TrackingMap markerLocations={markerLocations} ref={map} hiddenPersonnel={hiddenPersonnel} />
           </div>
         </div>
 
@@ -90,7 +108,7 @@ export default function MapPage () {
                       <TooltipTrigger asChild>
                         <Button
                           variant="outline"
-                          onClick={() => setSelectedPersonnel(personnel.map(person => person.id))}
+                          onClick={() => setHiddenPersonnel([])}
                         >
                           <Eye className="h-3 w-3 text-[#1B2560]" />
                         </Button>
@@ -99,7 +117,7 @@ export default function MapPage () {
                     </Tooltip>
                     <Button
                       variant="outline"
-                      onClick={() => setSelectedPersonnel([])}
+                      onClick={() => setHiddenPersonnel(personnel.map(person => person.id))}
                     >
                       <EyeOff className="h-3 w-3 text-[#1B2560]" />
                     </Button>
@@ -109,13 +127,13 @@ export default function MapPage () {
                       <div
                         key={index}
                         onClick={() => {
-                          setSelectedPersonnel(selectedPersonnel.includes(person.id)
-                            ? selectedPersonnel.filter(selectedPerson => selectedPerson !== person.id)
-                            : [...selectedPersonnel, person.id]
+                          setHiddenPersonnel(hiddenPersonnel.includes(person.id)
+                            ? hiddenPersonnel.filter(hiddenPerson => hiddenPerson !== person.id)
+                            : [...hiddenPersonnel, person.id]
                           );
                         }}
                         className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all hover:bg-gray-100 ${
-                          selectedPersonnel.includes(person.id)
+                          !hiddenPersonnel.includes(person.id)
                             ? "bg-blue-100 border border-blue-300"
                             : "bg-gray-50 border border-gray-200"
                           // "bg-gray-50 border border-gray-200"
@@ -126,7 +144,7 @@ export default function MapPage () {
                           <div className="text-xs text-gray-600">{person.email}</div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          {selectedPersonnel.includes(person.id) ? (
+                          {!hiddenPersonnel.includes(person.id) ? (
                             <Eye className="h-3 w-3 text-[#1B2560]" />
                           ) : (
                             <EyeOff className="h-3 w-3 text-gray-400" />

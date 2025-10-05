@@ -1,9 +1,11 @@
 <?php
 
+use App\Events\LocationSynced;
 use App\Events\LocationUpdated;
 use App\Http\Resources\PersonnelLocationResource;
 use App\Models\LocationHistory;
 use App\Models\PersonnelLocation;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -24,3 +26,33 @@ Schedule::call(function () {
         });
     });
 })->everyFifteenMinutes();
+
+Schedule::call(function () {
+    DB::transaction(function () {
+        PersonnelLocation::where('updated_at', '<', now()->subMinutes(5))->delete();
+    });
+
+    $locations = PersonnelLocation::with([
+        'personnel',
+        'personnel.locationHistory' => function ($q) {
+            $q->orderByDesc('created_at');
+        },
+    ])->get();
+
+    // Trim locationHistory to latest 3 and append location_name to both personnel location and history
+    $locations->each(function (PersonnelLocation $loc) {
+        // Append location_name to the current personnel location
+        $loc->append('location_name');
+
+        // Trim and append location_name to each locationHistory entry
+        if ($loc->relationLoaded('personnel') && $loc->personnel->relationLoaded('locationHistory')) {
+            $history = $loc->personnel->locationHistory->take(3);
+            $history->each(function ($historyEntry) {
+                $historyEntry->append('location_name');
+            });
+            $loc->personnel->setRelation('locationHistory', $history);
+        }
+    });
+
+    LocationSynced::dispatch($locations);
+})->everyFiveMinutes();

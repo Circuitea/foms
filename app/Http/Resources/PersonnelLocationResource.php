@@ -21,6 +21,8 @@ class PersonnelLocationResource extends JsonResource
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'location_name' => Geoapify::reverseGeocode($this->latitude, $this->longitude),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
 
             'personnel' => $this->personnel->toResource(),
         ];
