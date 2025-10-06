@@ -1,16 +1,18 @@
 import { cn } from "@/lib/utils";
 import { ActivityDetail, ActivityType } from "@/types/activities"
 import dayjs from "dayjs";
-import { CircleAlert, CircleCheck, CirclePlay, LogIn, LogOut, LucideIcon, Pen } from "lucide-react";
+import { CircleAlert, CircleCheck, CirclePlay, CircleStop, LogIn, LogOut, LucideIcon, Pen } from "lucide-react";
 
 const getTypeTheme = (type: ActivityType): [string, LucideIcon, string] => {
   switch(type) {
     case 'login_activity':
       return ['bg-blue-100', LogIn, 'text-blue-600'];
     case 'logout_activity':
-      return ['bg-red-50', LogOut, 'text-red-600'];
+      return ['bg-orange-50', LogOut, 'text-orange-600'];
     case 'start_task_activity':
       return ['bg-yellow-50', CirclePlay, 'text-yellow-600'];
+    case 'cancel_task_activity':
+      return ['bg-red-50', CircleStop, 'text-red-600'];
     case 'finish_task_activity':
       return ['bg-green-50', CircleCheck, 'text-green-600'];
     case 'change_status_activity':
@@ -28,6 +30,8 @@ const getTitle = (activity: ActivityDetail): string => {
       return 'Logged out of Mobile Application';
     case 'start_task_activity':
       return `Started Task "${activity.activity.task?.title}"`;
+    case 'cancel_task_activity':
+      return `Canceled Task "${activity.activity.task?.title}"`;
     case 'finish_task_activity':
       return `Finished Task "${activity.activity.task?.title}"`;
     case 'change_status_activity':

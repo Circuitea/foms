@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityDetail;
+use App\Models\CancelTaskActivity;
+use App\Models\FinishTaskActivity;
+use App\Models\StartTaskActivity;
 use App\Models\Task\Task;
 use App\Models\Task\TaskReport;
 use App\Status;
@@ -46,12 +50,18 @@ class MyTasksController extends Controller
             ]);
             $user->status = Status::ASSIGNED;
             $user->save();
+            $activity = new StartTaskActivity();
+            $activity->task()->associate($task);
+            $activity->save();
         } else if ($request->input('status') === 'canceled') {
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => null,
             ]);
             $user->status = Status::AVAILABLE;
             $user->save();
+            $activity = new CancelTaskActivity();
+            $activity->task()->associate($task);
+            $activity->save();
         } else {
             $task->personnel()->updateExistingPivot($user->id, [
                 'finished_at' => Date::now(),
@@ -60,6 +70,9 @@ class MyTasksController extends Controller
             $user->status = Status::AVAILABLE;
             $user->save();
 
+            $activity = new FinishTaskActivity();
+            $activity->task()->associate($task);
+            $activity->save();
 
             $allFinished = $task->personnel->every(function ($person) {
                 return !is_null($person->pivot->finished_at);
@@ -69,9 +82,12 @@ class MyTasksController extends Controller
                 $task->finished_at = Date::now();
                 $task->save();
             }
-
-
         }
+
+        $activityDetail = new ActivityDetail();
+        $activityDetail->personnel()->associate($user);
+        $activityDetail->activity()->associate($activity);
+        $activityDetail->save();
 
         return back();
     }

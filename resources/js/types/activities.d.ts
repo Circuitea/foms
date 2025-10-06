@@ -1,6 +1,6 @@
 import { Task } from "./tasks";
 
-export type ActivityType = 'login_activity' | 'logout_activity' | 'start_task_activity' | 'finish_task_activity' | 'change_status_activity';
+export type ActivityType = 'login_activity' | 'logout_activity' | 'start_task_activity' | 'finish_task_activity' | 'change_status_activity' | 'cancel_task_activity';
 
 export interface ActivityDetail {
   activity_type: ActivityType;

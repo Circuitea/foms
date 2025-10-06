@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Task\Task;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class CancelTaskActivity extends Model
+{
+    public $timestamps = false;
+
+    protected $with = ['task'];
+
+    public function task(): BelongsTo
+    {
+        return $this->belongsTo(Task::class, 'task_id');
+    }
+}

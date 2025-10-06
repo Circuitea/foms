@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class ChangeStatusActivity extends Model
 {
     public $timestamps = false;
+
+    protected $fillable = ['old_status', 'new_status'];
     
     protected function casts(): array
     {

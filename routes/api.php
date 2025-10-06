@@ -1,7 +1,12 @@
 <?php
 
 use App\Http\Controllers\PersonnelLocationController;
+use App\Models\ActivityDetail;
+use App\Models\CancelTaskActivity;
+use App\Models\ChangeStatusActivity;
+use App\Models\FinishTaskActivity;
 use App\Models\Personnel;
+use App\Models\StartTaskActivity;
 use App\Models\Task\Task;
 use App\Status;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -42,10 +47,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
         $user = $request->user();
 
-        $user->status = Status::from($validated['status']);
-
+        
+        $oldStatus = $user->status;
+        
+        $newStatus = Status::from($validated['status']);
+        
+        $user->status = $newStatus;
         $user->save();
 
+        $changeStatusActivity = ChangeStatusActivity::create([
+            'old_status' => $oldStatus,
+            'new_status' => $newStatus,
+        ]);
+        
+        $activityDetail = new ActivityDetail();
+        $activityDetail->personnel()->associate($user);
+        $activityDetail->activity()->associate($changeStatusActivity);
+        $activityDetail->save();
+        
         return response([
             'status' => $user->status,
         ]);
@@ -131,7 +150,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 'creator',
                 'transaction' => ['equipment.item.group.type', 'consumables.item.type'],
             ]);
-
+        
 
         if ($request->input('status') === 'started') {
             $task->personnel()->updateExistingPivot($user->id, [
@@ -139,12 +158,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ]);
             $user->status = Status::ASSIGNED;
             $user->save();
+            $activity = new StartTaskActivity();
+            $activity->task()->associate($task);
+            $activity->save();
         } else if ($request->input('status') === 'canceled') {
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => null,
             ]);
             $user->status = Status::AVAILABLE;
             $user->save();
+            $activity = new CancelTaskActivity();
+            $activity->task()->associate($task);
+            $activity->save();
         } else {
             $task->personnel()->updateExistingPivot($user->id, [
                 'finished_at' => Date::now(),
@@ -153,6 +178,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
             $user->status = Status::AVAILABLE;
             $user->save();
 
+            $activity = new FinishTaskActivity();
+            $activity->task()->associate($task);
+            $activity->save();
 
             $allFinished = $task->personnel->every(function ($person) {
                 return !is_null($person->pivot->finished_at);
@@ -163,6 +191,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 $task->save();
             }
         }
+
+        $activityDetail = new ActivityDetail();
+        $activityDetail->personnel()->associate($user);
+        $activityDetail->activity()->associate($activity);
+        $activityDetail->save();
 
         return response([
             'task' => [
