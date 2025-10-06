@@ -27,23 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ConsumableItem, EquipmentGroup, EquipmentItem, ItemType } from "@/types/inventory"
 import { DataTable } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
-
-const getConditionColor = (condition: string) => {
-  switch (condition) {
-    case "Excellent":
-      return "bg-green-100 text-green-800"
-    case "Good":
-      return "bg-blue-100 text-blue-800"
-    case "Fair":
-      return "bg-yellow-100 text-yellow-800"
-    case "Poor":
-      return "bg-red-100 text-red-800"
-    case "Unserviceable":
-      return "bg-gray-100 text-gray-800"
-    default:
-      return "bg-gray-100 text-gray-800"
-  }
-}
+import NewTransactionForm from "./Partials/NewTransactionForm"
 
 type EquipmentEntry = EquipmentGroup & {  items_count: number }
 type ConsumableEntry = ConsumableItem & { count: string }
@@ -150,7 +134,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
 
       {/* Search and filter section */}
       <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6 mb-6">
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -164,37 +148,14 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
             </div>
           </div>
           <div className="flex gap-4">
-            {/* <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <select
-                value={filterCondition}
-                onChange={(e) => setFilterCondition(e.target.value)}
-                className="pl-10 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
-              >
-                <option value="all">All Conditions</option>
-                <option value="Excellent">Excellent</option>
-                <option value="Good">Good</option>
-                <option value="Fair">Fair</option>
-                <option value="Poor">Poor</option>
-                <option value="Unserviceable">Unserviceable</option>
-              </select>
-            </div>
-            {selectedCategory && (
-              <button
-                onClick={() => setSelectedCategory(null)}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-              >
-                Clear Filter
-              </button>
-            )} */}
+            {userHasPermission(/inventory\.(?:create|\*)/) && (
+              <AddItemForm />
+            )}
+            <NewTransactionForm />
           </div>
         </div>
 
-        <div className="flex gap-3 mt-4 pt-4 border-t border-gray-200">
-          {userHasPermission(/inventory\.(?:create|\*)/) && (
-            <AddItemForm />
-          )}
-        </div>
+        
       </div>
 
       {/* Equipment table */}

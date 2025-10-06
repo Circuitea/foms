@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NewConsumableItemRequest;
 use App\Http\Requests\NewEquipmentItemRequest;
+use App\Http\Requests\NewTransactionRequest;
 use App\Models\Inventory\ConsumableItem;
 use App\Models\Inventory\ConsumableTransactionEntry;
 use App\Models\Inventory\EquipmentGroup;
@@ -100,6 +101,10 @@ class InventoryController extends Controller
             $newItem->save();
         });
         
+        return redirect('/inventory');
+    }
+
+    public function createTransaction(NewTransactionRequest $request) {
         return redirect('/inventory');
     }
 

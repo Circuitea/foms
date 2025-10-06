@@ -102,7 +102,7 @@ export default function AddItemForm() {
           Add Item
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl">
         <Tabs defaultValue="consumable">
 
           <DialogHeader>

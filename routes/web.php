@@ -67,6 +67,7 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::get('/equipment/{ID}', [InventoryController::class, 'showEquipment']);
         Route::post('/consumable/new', [InventoryController::class, 'createConsumable'])->middleware([HandlePrecognitiveRequests::class]);
         Route::get('/consumable/{ID}', [InventoryController::class, 'showConsumable']);
+        Route::post('/transaction/new', [InventoryController::class, 'createTransaction'])->middleware([HandlePrecognitiveRequests::class]);
         Route::get('/{typeID}', [InventoryController::class, 'list']);
     });
 
