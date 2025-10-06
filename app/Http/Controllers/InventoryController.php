@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\NewInventoryItemRequest;
-use App\ItemConditionEnum;
+use App\Http\Requests\NewConsumableItemRequest;
+use App\Http\Requests\NewEquipmentItemRequest;
+use App\Http\Requests\NewTransactionRequest;
 use App\Models\Inventory\ConsumableItem;
+use App\Models\Inventory\ConsumableTransactionEntry;
 use App\Models\Inventory\EquipmentGroup;
-use App\Models\Inventory\Item;
-use App\Models\Inventory\ItemCondition;
+use App\Models\Inventory\EquipmentItem;
+use App\Models\Inventory\EquipmentTransactionEntry;
 use App\Models\Inventory\ItemType;
 use App\Models\Inventory\Transaction;
-use App\Models\Inventory\TransactionEntry;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,39 +43,97 @@ class InventoryController extends Controller
         ]);
     }
 
-    public function create(NewInventoryItemRequest $request) {
-        // DB::transaction(function() use ($request) {
-        //     $validated = $request->validated();
-        //     $type = ItemType::find($validated['type_id']);
-        //     $user = Auth::user();
-        //     $condition = ItemCondition::firstWhere('name', ItemConditionEnum::AVAILABLE);
+    public function createConsumable(NewConsumableItemRequest $request) {
+        DB::transaction(function() use ($request) {
+            $validated = $request->validated();
+            $type = ItemType::find($validated['type_id']);
+            $user = Auth::user();
 
-        //     $newItem = new Item();
-        //     $newItem->fill([
-        //         'name' => $validated['name'],
-        //         'description' => $validated['description'],
-        //         'location' => $validated['location'],
-        //     ]);
-        //     $newItem->type()->associate($type);
-        //     $newItem->save();
+            $newItem = new ConsumableItem();
+            $newItem->fill([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'location' => $validated['location'],
+            ]);
+            $newItem->type()->associate($type);
+            $newItem->save();
 
-        //     $transaction = new Transaction();
-        //     $transaction->fill([
-        //         'title' => 'Initial Item Quantity',
-        //         'description' => 'Setting the initial quantity of the inventory item'
-        //     ]);
-        //     $transaction->personnel()->associate($user);
-        //     $transaction->save();
+            $transaction = new Transaction();
+            $transaction->fill([
+                'title' => 'Initial Item Quantity',
+                'description' => 'Setting the initial quantity of the inventory item'
+            ]);
+            $transaction->personnel()->associate($user);
+            $transaction->save();
 
-        //     $transactionEntry = new TransactionEntry();
-        //     $transactionEntry->amount = $request['initial_quantity'];
+            $transactionEntry = new ConsumableTransactionEntry();
+            $transactionEntry->quantity = $request['initial_quantity'];
 
-        //     $transactionEntry->transaction()->associate($transaction);
-        //     $transactionEntry->item()->associate($newItem);
-        //     $transactionEntry->condition()->associate($condition);
+            $transactionEntry->transaction()->associate($transaction);
+            $transactionEntry->item()->associate($newItem);
 
-        //     $transactionEntry->save();
-        // });
+            $transactionEntry->save();
+        });
+
+        return redirect('/inventory');
+    }
+
+    public function createEquipment(NewEquipmentItemRequest $request) {
+        DB::transaction(function() use ($request) {
+            $validated = $request->validated();
+            $group = null;
+
+            if ($validated['group_id'] === 'new') {
+                $group = EquipmentGroup::create([
+                    'name' => $validated['group_name'],
+                    'type_id' => $validated['group_type_id'],
+                ]);
+            } else {
+                $group = EquipmentGroup::find($validated['group_id']);
+            }
+
+            $newItem = new EquipmentItem();
+            $newItem->fill([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'location' => $validated['location'],
+            ]);
+            $newItem->group()->associate($group);
+            $newItem->save();
+        });
+        
+        return redirect('/inventory');
+    }
+
+    public function createTransaction(NewTransactionRequest $request) {
+        DB::transaction(function () use ($request) {
+            $validated = $request->validated();
+            $user = Auth::user();
+
+            $newTransaction = Transaction::create([
+                'title' => $validated['title'],
+                'description' => $validated['description'],
+                'personnel_id' => $user->id,
+            ]);
+
+            collect($validated['entries'])->each(function ($entry) use ($newTransaction) {
+                if ($entry['type'] === 'equipment') {
+                    $equipmentItem = EquipmentItem::find($entry['item_id']);
+                    $newEntry = new EquipmentTransactionEntry();
+                    $newEntry->item()->associate($equipmentItem);
+                    $newEntry->transaction()->associate($newTransaction);
+                    $newEntry->save();
+                } else if($entry['type'] === 'consumable') {
+                    $consumableItem = ConsumableItem::find($entry['item_id']);
+                    $newEntry = new ConsumableTransactionEntry();
+                    $newEntry->quantity = $entry['quantity'];
+                    $newEntry->item()->associate($consumableItem);
+                    $newEntry->transaction()->associate($newTransaction);
+                    $newEntry->save();
+                }
+            });
+        });
+
 
         return redirect('/inventory');
     }

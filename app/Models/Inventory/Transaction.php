@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Transaction extends Model
 {
-    protected $fillable = ['title', 'description'];
+    protected $fillable = ['title', 'description', 'personnel_id', 'task_id'];
 
     public function personnel(): BelongsTo
     {

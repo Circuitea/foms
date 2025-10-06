@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\File;
 
-class NewInventoryItemRequest extends FormRequest
+class NewConsumableItemRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,7 +29,7 @@ class NewInventoryItemRequest extends FormRequest
             'name' => 'required|string|max:255',
             'type_id' => 'required|exists:' . ItemType::class . ',id',
             'location' => 'required|string|max:255',
-            'initial_quantity' => 'required|integer|gte:1',
+            'initial_quantity' => 'nullable|integer|gte:1',
             'description' => 'required|string|max:65535',
             'image' => ['nullable', File::image()->max('100mb')],
         ];

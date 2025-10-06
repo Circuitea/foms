@@ -15,7 +15,7 @@ import { useForm } from "laravel-precognition-react-inertia";
 import { AlertCircle, ArrowLeft, CheckCheck, ChevronDown, Clipboard, Info, MinusCircle, Plus, PlusCircle, Truck, Users, XCircle } from "lucide-react";
 import { FormEventHandler, useState } from "react";
 import Select from 'react-select';
-import { InventoryItems, ItemSelection, ItemSelectionDialog } from "./ItemSelectionDialog";
+import { InventoryItems, ItemSelection, ItemSelectionDialog } from "@/components/ItemSelectionDialog";
 import { Badge } from "@/components/ui/badge";
 
 type NewTaskEntry = Pick<Task, 'title' | 'description' | 'location' | 'due_date'> & {
