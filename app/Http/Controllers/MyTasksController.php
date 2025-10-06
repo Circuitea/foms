@@ -36,7 +36,7 @@ class MyTasksController extends Controller
                 'required',
                 Rule::in(['started', 'finished', 'canceled']),
             ],
-            'additional_notes' => 'string|max:65535',
+            'additional_notes' => 'nullable|string|max:65535',
         ]);
         
         $task = Task::findOr($id, function () {

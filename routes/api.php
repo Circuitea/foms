@@ -137,7 +137,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 'required',
                 Rule::in(['started', 'finished', 'canceled']),
             ],
-            'additional_notes' => 'string|max:65535',
+            'additional_notes' => 'nullable|string|max:65535',
         ]);
 
         $user = $request->user();
