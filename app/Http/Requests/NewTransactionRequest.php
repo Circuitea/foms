@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class NewTransactionRequest extends FormRequest
 {
@@ -26,7 +27,10 @@ class NewTransactionRequest extends FormRequest
             'description' => ['required', 'string', 'max:65535'],
             'entries' => ['required', 'array', 'min:1'],
             'entries.*.type' => ['required', 'in:equipment,consumable'],
-            'entries.*.item_id' => ['required', 'integer', 'exists:items,id'],
+            'entries.*.item_id' => ['required', 'integer', Rule::anyOf([
+                ['exists:equipment_items,id'],
+                ['exists:consumable_items,id'],
+            ])],
             'entries.*.quantity' => [
                 'required_if:entries.*.type,consumable',
                 'integer',

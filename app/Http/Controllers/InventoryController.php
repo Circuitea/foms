@@ -9,6 +9,7 @@ use App\Models\Inventory\ConsumableItem;
 use App\Models\Inventory\ConsumableTransactionEntry;
 use App\Models\Inventory\EquipmentGroup;
 use App\Models\Inventory\EquipmentItem;
+use App\Models\Inventory\EquipmentTransactionEntry;
 use App\Models\Inventory\ItemType;
 use App\Models\Inventory\Transaction;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -105,6 +106,35 @@ class InventoryController extends Controller
     }
 
     public function createTransaction(NewTransactionRequest $request) {
+        DB::transaction(function () use ($request) {
+            $validated = $request->validated();
+            $user = Auth::user();
+
+            $newTransaction = Transaction::create([
+                'title' => $validated['title'],
+                'description' => $validated['description'],
+                'personnel_id' => $user->id,
+            ]);
+
+            collect($validated['entries'])->each(function ($entry) use ($newTransaction) {
+                if ($entry['type'] === 'equipment') {
+                    $equipmentItem = EquipmentItem::find($entry['item_id']);
+                    $newEntry = new EquipmentTransactionEntry();
+                    $newEntry->item()->associate($equipmentItem);
+                    $newEntry->transaction()->associate($newTransaction);
+                    $newEntry->save();
+                } else if($entry['type'] === 'consumable') {
+                    $consumableItem = ConsumableItem::find($entry['item_id']);
+                    $newEntry = new ConsumableTransactionEntry();
+                    $newEntry->quantity = $entry['quantity'];
+                    $newEntry->item()->associate($consumableItem);
+                    $newEntry->transaction()->associate($newTransaction);
+                    $newEntry->save();
+                }
+            });
+        });
+
+
         return redirect('/inventory');
     }
 

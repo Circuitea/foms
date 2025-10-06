@@ -33,7 +33,7 @@ export default function NewTransactionForm() {
     title: string;
     description: string;
     entries: NewTransactionEntry[];
-  }>('post', '/transaction/new', {
+  }>('post', '/inventory/transaction/new', {
     title: '',
     description: '',
 
@@ -191,6 +191,11 @@ export default function NewTransactionForm() {
               onClick={() => setOpen(false)}
             >
               Cancel
+            </Button>
+            <Button
+              className="bg-[#1B2560]"
+            >
+              Submit
             </Button>
           </DialogFooter>
         </form>
