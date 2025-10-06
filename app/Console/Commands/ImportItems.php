@@ -88,6 +88,7 @@ class ImportItems extends Command
                         'name' => $data['name'],
                         'type_id' => $data['type_id'],
                         'description' => $data['description'],
+                        'model_identifier' => $data['model_identifier'],
                     ]);
                 } else {
                     // Equipment: disregard type_id
