@@ -26,6 +26,8 @@ export interface ConsumableItem {
   image_path?: string;
   location: string;
 
+  model_identifier?: string;
+
   type: ItemType;
 
   created_at?: string;

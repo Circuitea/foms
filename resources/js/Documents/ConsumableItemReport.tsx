@@ -5,6 +5,8 @@ import dayjs from "dayjs";
 import { ConsumableItem, ConsumableTransactionEntry } from "@/types/inventory";
 import { Personnel } from "@/types";
 import { formatName } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const styles = StyleSheet.create({
   page: {
@@ -38,9 +40,10 @@ interface ReportProps {
   creator: Personnel;
   from_date: string;
   to_date: string;
+  recommendation: number;
 }
 
-export function ConsumableItemReport({ item, creator, from_date, to_date }: ReportProps) {
+export function ConsumableItemReport({ item, creator, from_date, to_date, recommendation }: ReportProps) {
   const procurementEntries = item.entries.filter(entry => entry.quantity >= 0);
   const consumptionEntries = item.entries.filter(entry => entry.quantity < 0);
 
@@ -68,10 +71,13 @@ export function ConsumableItemReport({ item, creator, from_date, to_date }: Repo
             </View>
           </View>
         </View>
-        <View style={{ marginTop: 16 }}>
-          <HeadingOne>Recommendation Report</HeadingOne>
-          <Text>Based on the historical and current usage of the [ITEM NAME], it is recommended that the procurement of the item be made from [PREDICTED DATE] with the quantity of [PREDICTED QUANTITY] to ensure uninterrupted use without inventory problems.</Text>
-        </View>
+
+        {item.model_identifier && (
+          <View style={{ marginTop: 16 }}>
+            <HeadingOne>Recommendation Report</HeadingOne>
+            <Text>Based on the historical and current usage of the <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>, it is recommended that the procurement of the item be made for {dayjs().format("MMMM YYYY")} with the quantity of <Text style={{fontWeight: 'bold'}}>{recommendation}</Text> to ensure uninterrupted use without inventory problems.</Text>
+          </View>
+        )}
       </Page>
       <Page size="LETTER" style={styles.page}>
         <HeadingOne>Summary</HeadingOne>

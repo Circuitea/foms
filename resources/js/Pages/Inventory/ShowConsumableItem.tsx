@@ -1,6 +1,7 @@
 import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConsumableItemReport } from "@/Documents/ConsumableItemReport";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
@@ -14,6 +15,7 @@ import dayjs from "dayjs";
 import { MapPin, MoveLeft, Package } from "lucide-react";
 import { useState } from "react";
 import { CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis } from "recharts";
+import ConsumableReport from "./Partials/ConsumableReportDialog";
 
 interface YearWeekTotal {
   running_total: string;
@@ -153,11 +155,7 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
             </div>
           </div>
           <div className="pt-4 flex justify-end">
-            <Button asChild>
-              <PDFDownloadLink fileName={`consumable_${item.id}_${dayjs(startDate, "YYYY-MM").format("YYYYMM")}-${dayjs(endDate, "YYYY-MM").format("YYYYMM")}`} document={<ConsumableItemReport item={item} creator={user} from_date={startDate} to_date={endDate} />}>
-                Generate Report
-              </PDFDownloadLink>
-            </Button>
+            <ConsumableReport creator={user} item={item} startDate={startDate} endDate={endDate} />
           </div>
         </div>
       </div>
