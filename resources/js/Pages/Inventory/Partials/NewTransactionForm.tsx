@@ -15,7 +15,7 @@ import { FormEventHandler, useState } from "react";
 type NewTransactionEntry = {
   type: 'equipment' | 'consumable' | null;
   item_id?: number;
-  quantity?: number;
+  quantity?: string;
 };
 
 type EquipmentEntry = EquipmentGroup & { items: EquipmentItem[] };
@@ -147,12 +147,15 @@ export default function NewTransactionForm() {
                             {entry.type === 'consumable' && (
                               <Input
                                 id="title"
-                                value={data.title}
+                                value={data.entries[index].quantity}
                                 type="number"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Amount"
-                                onChange={(e) => setData('title', e.target.value)}
-                                onBlur={() => validate('title')}
+                                onChange={(e) => {
+                                  const entries = data.entries;
+                                  entries[index].quantity = e.target.value
+                                  setData('entries', entries);  
+                                }}
                               />
                             )}
                           </>

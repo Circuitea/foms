@@ -34,7 +34,6 @@ class NewTransactionRequest extends FormRequest
             'entries.*.quantity' => [
                 'required_if:entries.*.type,consumable',
                 'integer',
-                'min:1',
             ],
         ];
     }

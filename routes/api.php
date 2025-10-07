@@ -5,13 +5,16 @@ use App\Models\ActivityDetail;
 use App\Models\CancelTaskActivity;
 use App\Models\ChangeStatusActivity;
 use App\Models\FinishTaskActivity;
+use App\Models\Inventory\ConsumableItem;
 use App\Models\Personnel;
 use App\Models\StartTaskActivity;
 use App\Models\Task\Task;
+use App\Services\AnalyticsService;
 use App\Status;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
@@ -201,6 +204,45 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'task' => [
                 ... $task->toArray(),
                 'pivot' => $task->personnel()->where('personnel.id', $user->id)->first()?->pivot,
+            ],
+        ]);
+    });
+
+    Route::get('/inventory/consumable/{id}/recommendation', function (Request $request, string $id, AnalyticsService $analytics) {
+        $item = ConsumableItem::findOr($id, function () { abort(404); });
+
+        if (is_null($item->model_identifier)) {
+            return response([
+                'message' => 'This item does not have a trained model and cannot generate recommendations.',
+            ], 422);
+        }
+
+        $date = Date::now();
+        $start_date = $date->copy()->subMonths(6)->startOfMonth();
+
+        $monthlyData = DB::table('consumable_transaction_entries')
+        ->join('transactions', 'consumable_transaction_entries.transaction_id', '=', 'transactions.id')
+        ->where('consumable_transaction_entries.item_id', $item->id)
+        ->where('consumable_transaction_entries.quantity', '>', 0) // Only procurement (positive quantity)
+        ->where('transactions.created_at', '>=', $start_date)
+        ->select(
+            DB::raw('YEAR(transactions.created_at) as year'),
+            DB::raw('MONTH(transactions.created_at) as month'),
+            DB::raw('SUM(consumable_transaction_entries.quantity) as total_quantity')
+        )
+        ->groupBy(DB::raw('YEAR(transactions.created_at), MONTH(transactions.created_at)'))
+        ->orderBy('year', 'desc')
+        ->orderBy('month', 'desc')
+        ->get()
+        ->map(fn ($entry) => (int) $entry->total_quantity)
+        ->pad(6, 0);
+
+        $prediction = $analytics->getRecommendation($id, $item->model_identifier, $date, $monthlyData);
+
+        return response()->json([
+            'prediction' => [
+                'raw' => $prediction,
+                'formatted' => round($prediction),
             ],
         ]);
     });

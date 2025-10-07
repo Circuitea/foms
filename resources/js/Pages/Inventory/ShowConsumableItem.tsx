@@ -1,6 +1,7 @@
 import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConsumableItemReport } from "@/Documents/ConsumableItemReport";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
@@ -12,8 +13,9 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { MapPin, MoveLeft, Package } from "lucide-react";
-import { MutableRefObject, Ref, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis } from "recharts";
+import ConsumableReport from "./Partials/ConsumableReportDialog";
 
 interface YearWeekTotal {
   running_total: string;
@@ -54,11 +56,11 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
             <p className="text-sm text-gray-600 capitalize">{item.type.name}</p>
           </div>
         </div>
-        <Button
+        {/* <Button
           className="px-8 bg-[#1B2560] text-white rounded-md hover:bg-[#2A3B70] transition-colors font-medium"
         >
           Edit Equipment
-        </Button>
+        </Button> */}
       </div>
 
       <div className="flex-1 overflow-y-auto p-6">
@@ -75,7 +77,7 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
           </div>
 
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Package className="w-5 h-5" />
                 Basic Information
@@ -105,11 +107,11 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
             </div>
           </div>
         </div>
-        <div className="p-4    gap-2 shadow-lg rounded-lg w-full mt-4">
+        <div className="p-4 gap-2 shadow-lg rounded-lg w-full mt-4">
           <div className="flex justify-between items-baseline mb-4">
             <h3 className="font-bold text-lg flex items-center gap-2">
               <LineChart className="w-5 h-5" />
-              Equipment Statistics
+              Item Statistics
             </h3>
             <div className="flex gap-2 items-baseline">
               <span>From</span>
@@ -141,7 +143,6 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
               <Button className="bg-[#1B2560]" onClick={() => router.reload({ data: {start_date: startDate, end_date: endDate}, only: ['totals'] })}>Apply</Button>
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-2">
             <div id="chart" className="bg-white pr-8 rounded-lg shadow-lg">
               <QuantityGraph data={totals.map(total => ({
@@ -154,11 +155,7 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
             </div>
           </div>
           <div className="pt-4 flex justify-end">
-            <Button asChild>
-              <PDFDownloadLink fileName={`consumable_${item.id}_${dayjs(startDate, "YYYY-MM").format("YYYYMM")}-${dayjs(endDate, "YYYY-MM").format("YYYYMM")}`} document={<ConsumableItemReport item={item} creator={user} from_date={startDate} to_date={endDate} />}>
-                Generate Report
-              </PDFDownloadLink>
-            </Button>
+            <ConsumableReport creator={user} item={item} startDate={startDate} endDate={endDate} />
           </div>
         </div>
       </div>
