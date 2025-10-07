@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ConsumableTransactionEntry extends Model
 {
+  protected $fillable = ['item_id', 'transaction_id', 'quantity'];
+
   public $timestamps = false;
 
   public function item(): BelongsTo

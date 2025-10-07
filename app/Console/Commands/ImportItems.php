@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Inventory\EquipmentItem;
 use App\Models\Inventory\ConsumableItem;
 use App\Models\Inventory\ItemType;
+use Illuminate\Support\Facades\Date;
 
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
@@ -96,6 +97,7 @@ class ImportItems extends Command
                         'name' => $data['name'],
                         'group_id' => (int) $data['group_id'] + (int) $groupIDOffset,
                         'description' => $data['description'],
+                        'created_at' => Date::createFromFormat('Y-m-d H:i:s', $data['created_at']),
                     ]);
                 }
 
