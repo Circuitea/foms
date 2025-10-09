@@ -31,6 +31,10 @@ export function StatusSelector() {
     {
       value: 'emergency',
       label: 'In Emergency',  
+    },
+    {
+      value: 'on break',
+      label: 'On Break',
     }
   ];
 

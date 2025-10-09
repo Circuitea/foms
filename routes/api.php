@@ -8,13 +8,11 @@ use App\Models\FinishTaskActivity;
 use App\Models\Inventory\ConsumableItem;
 use App\Models\Personnel;
 use App\Models\StartTaskActivity;
-use App\Models\Task\Task;
 use App\Services\AnalyticsService;
-use App\Status;
+use App\StatusEnum;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
@@ -45,7 +43,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/status', function (Request $request) {
         $validated = $request->validate([
-            'status' => ['nullable', 'string', Rule::enum(Status::class)],
+            'status' => ['nullable', 'string', Rule::enum(StatusEnum::class)],
         ]);
         
         $user = $request->user();
@@ -53,13 +51,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
         $oldStatus = $user->status;
         
-        $newStatus = Status::from($validated['status']);
+        $newStatus = StatusEnum::from($validated['status']);
         
         $user->status = $newStatus;
         $user->save();
 
         $changeStatusActivity = ChangeStatusActivity::create([
-            'old_status' => $oldStatus,
+            'old_status' => is_null($oldStatus) ? StatusEnum::ON_LEAVE : $oldStatus ,
             'new_status' => $newStatus,
         ]);
         
@@ -159,7 +157,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => Date::now(),
             ]);
-            $user->status = Status::ASSIGNED;
+            $user->status = StatusEnum::ASSIGNED;
             $user->save();
             $activity = new StartTaskActivity();
             $activity->task()->associate($task);
@@ -168,7 +166,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => null,
             ]);
-            $user->status = Status::AVAILABLE;
+            $user->status = StatusEnum::AVAILABLE;
             $user->save();
             $activity = new CancelTaskActivity();
             $activity->task()->associate($task);
@@ -178,7 +176,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 'finished_at' => Date::now(),
                 'additional_notes' => $request->input('additional_notes'),
             ]);
-            $user->status = Status::AVAILABLE;
+            $user->status = StatusEnum::AVAILABLE;
             $user->save();
 
             $activity = new FinishTaskActivity();

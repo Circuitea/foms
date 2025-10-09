@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('personnel', function (Blueprint $table) {
-            $table->enum('status', array_map(fn (StatusEnum $status) => $status->value, StatusEnum::cases()))->nullable();
+            $table->dropColumn('status');
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('personnel', function (Blueprint $table) {
-            $table->dropColumn('status');
+            $table->enum('status', array_map(fn (StatusEnum $status) => $status->value, StatusEnum::cases()))->nullable();
         });
     }
 };

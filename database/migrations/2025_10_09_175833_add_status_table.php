@@ -1,6 +1,5 @@
 <?php
 
-use App\StatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('personnel', function (Blueprint $table) {
-            $table->enum('status', array_map(fn (StatusEnum $status) => $status->value, StatusEnum::cases()))->nullable();
+        Schema::create('statuses', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('label');
         });
     }
 
@@ -22,8 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('personnel', function (Blueprint $table) {
-            $table->dropColumn('status');
-        });
+        Schema::dropIfExists('statuses');
     }
 };

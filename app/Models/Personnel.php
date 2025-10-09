@@ -7,9 +7,9 @@ namespace App\Models;
 use App\Models\Inventory\Transaction;
 use App\Models\Task\PersonnelTask;
 use App\Models\Task\Task;
-use App\Status;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -125,7 +125,6 @@ class Personnel extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'first_time_login' => 'boolean',
-            'status' => Status::class,
         ];
     }
 
@@ -188,5 +187,10 @@ class Personnel extends Authenticatable
     public function locationHistory(): HasMany
     {
         return $this->hasMany(LocationHistory::class, 'personnel_id');
+    }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(Status::class, 'status_id');
     }
 }

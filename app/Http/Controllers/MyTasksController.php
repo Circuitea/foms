@@ -8,7 +8,7 @@ use App\Models\FinishTaskActivity;
 use App\Models\StartTaskActivity;
 use App\Models\Task\Task;
 use App\Models\Task\TaskReport;
-use App\Status;
+use App\StatusEnum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
@@ -48,7 +48,7 @@ class MyTasksController extends Controller
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => Date::now(),
             ]);
-            $user->status = Status::ASSIGNED;
+            $user->status = StatusEnum::ASSIGNED;
             $user->save();
             $activity = new StartTaskActivity();
             $activity->task()->associate($task);
@@ -57,7 +57,7 @@ class MyTasksController extends Controller
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => null,
             ]);
-            $user->status = Status::AVAILABLE;
+            $user->status = StatusEnum::AVAILABLE;
             $user->save();
             $activity = new CancelTaskActivity();
             $activity->task()->associate($task);
@@ -67,7 +67,7 @@ class MyTasksController extends Controller
                 'finished_at' => Date::now(),
                 'additional_notes' => $request->input('additional_notes'),
             ]);
-            $user->status = Status::AVAILABLE;
+            $user->status = StatusEnum::AVAILABLE;
             $user->save();
 
             $activity = new FinishTaskActivity();
