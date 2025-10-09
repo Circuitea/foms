@@ -1,0 +1,46 @@
+
+   PASS  Tests\Feature\AuthenticationTest
+  ✓ user can access login page                                           4.75s  
+  ✓ user can login with valid credentials                                0.07s  
+  ✓ user cannnot login without valid credentials                         0.23s  
+
+   PASS  Tests\Feature\DashboardTest
+  ✓ authenticated user can access dashboard                              0.40s  
+  ✓ guest cannot access dashboard                                        0.02s  
+
+   PASS  Tests\Feature\InventoryTest
+  ✓ authenticated user can access inventory                              0.45s  
+  ✓ guest cannot access inventory                                        0.04s  
+
+   PASS  Tests\Feature\MapTest
+  ✓ authenticated user can access map                                    0.55s  
+  ✓ guest cannot access map routes                                       0.03s  
+
+   PASS  Tests\Feature\MeetingsTest
+  ✓ authenticated user can access meetings list                          0.43s  
+  ✓ authenticated user can access new meeting form                       0.40s  
+  ✓ guest cannot access meeting routes                                   0.02s  
+
+   PASS  Tests\Feature\MyTasksTest
+  ✓ authenticated user can access my tasks                               0.44s  
+  ✓ guest cannot access my tasks                                         0.03s  
+
+   PASS  Tests\Feature\PersonnelTest
+  ✓ authenticated user can access personnel list                         0.61s  
+  ✓ authenticated user can access new personnel form                     0.67s  
+  ✓ authenticated user can access personnel import page                  0.65s  
+  ✓ authenticated user can view personnel details                        0.53s  
+  ✓ guest cannot access personnel routes                                 0.03s  
+
+   PASS  Tests\Feature\ProfileTest
+  ✓ authenticated user can access profile                                0.40s  
+  ✓ guest cannot access profile                                          0.02s  
+
+   PASS  Tests\Feature\TasksTest
+  ✓ authenticated user can access tasks list                             0.04s  
+  ✓ authenticated user can access new task form                          0.04s  
+  ✓ guest cannot access task routes                                      0.02s  
+
+  Tests:    24 passed (48 assertions)
+  Duration: 10.99s
+
