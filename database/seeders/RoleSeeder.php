@@ -32,7 +32,6 @@ class RoleSeeder extends Seeder
 
     Role::findOrCreate(RolesEnum::PERSONNEL->value)->syncPermissions(collect([
       PermissionsEnum::INVENTORY_READ,
-      PermissionsEnum::MAP_READ,
       PermissionsEnum::MEETINGS_READ_SELF,
       PermissionsEnum::PERSONNEL_READ,
       PermissionsEnum::PERSONNEL_STATUS_UPDATE_SELF,
@@ -49,6 +48,7 @@ class RoleSeeder extends Seeder
     ])->map($mapToPermission));
 
     Role::findOrCreate(RolesEnum::OPERATOR->value)->syncPermissions(collect([
+      PermissionsEnum::MAP_ALL,
       PermissionsEnum::TASKS_ALL,
       PermissionsEnum::MEETINGS_ALL,
       PermissionsEnum::PERSONNEL_DEPLOY,
