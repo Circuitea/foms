@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell, CheckCheck, ClipboardCheck, LayoutDashboard, LogOut, LucideIcon, Map, Phone, Settings, UserPen } from "lucide-react"
+import { Bell, CheckCheck, ClipboardCheck, LayoutDashboard, LogOut, LucideIcon, Map, Phone, Settings, User, UserPen } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -150,8 +150,8 @@ export function AppSidebar() {
               asChild
             >
               <Link href="/profile">
-                <Settings />
-                <span>Settings</span>
+                <User />
+                <span>Profile</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
