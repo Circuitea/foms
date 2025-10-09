@@ -151,7 +151,11 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
             {userHasPermission(/inventory\.(?:create|\*)/) && (
               <AddItemForm />
             )}
-            <NewTransactionForm />
+            {
+              userHasPermission(/^inventory\.(\*|transaction\.(\*|create))$/) && (
+                <NewTransactionForm />
+              )
+            }
           </div>
         </div>
 
