@@ -9,13 +9,14 @@ import { useState } from "react";
 
 const getStatusColor = (status?: Status) => {
     if (!status) {
-      return 'bg-gray-200 text-gray-800';
+      return 'bg-gray-100 text-gray-800';
     }
     const colors: Record<Status, string> = {
-      'available': "bg-green-200 text-green-800",
-      'assigned': "bg-blue-200 text-blue-800",
-      'on leave': "bg-yellow-200 text-yellow-800",
-      'emergency': 'bg-red-200 text-red-800',
+      'available': "bg-green-100 text-green-800",
+      'assigned': "bg-blue-100 text-blue-800",
+      'on break': "bg-orange-100 text-orange-800",
+      'emergency': "bg-red-100 text-red-800",
+      'on leave': "bg-gray-100 text-gray-800",
     }
     return colors[status];
   }
