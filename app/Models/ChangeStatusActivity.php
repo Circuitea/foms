@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Status;
+use App\StatusEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class ChangeStatusActivity extends Model
@@ -14,8 +14,8 @@ class ChangeStatusActivity extends Model
     protected function casts(): array
     {
         return [
-            'old_status' => Status::class,
-            'new_status' => Status::class,
+            'old_status' => StatusEnum::class,
+            'new_status' => StatusEnum::class,
         ];
     }
 }

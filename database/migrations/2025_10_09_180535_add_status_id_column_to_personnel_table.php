@@ -13,7 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('personnel', function (Blueprint $table) {
-            $table->enum('status', array_map(fn (StatusEnum $status) => $status->value, StatusEnum::cases()))->nullable();
+            $table->string('status')->nullable();
+
+            $table->foreign('status')->references('id')->on('statuses');
         });
     }
 
@@ -23,6 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('personnel', function (Blueprint $table) {
+            $table->dropForeign('personnel_status_foreign');
             $table->dropColumn('status');
         });
     }

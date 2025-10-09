@@ -23,23 +23,6 @@ export default function Overview() {
     }
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800"
-      case "in-progress":
-        return "bg-blue-100 text-blue-800"
-      case "on-hold":
-        return "bg-orange-100 text-orange-800"
-      case "completed":
-        return "bg-green-100 text-green-800"
-      case "cancelled":
-        return "bg-red-100 text-red-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
-
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
@@ -104,12 +87,7 @@ export default function Overview() {
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-medium text-gray-900">Ongoing Tasks</h3>
           <div className="flex gap-2">
-            <button
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center gap-2"
-            >
-              <AlertTriangle className="w-4 h-4" />
-              Emergency Task
-            </button>
+            
             <Link
               href="/tasks/new"
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"

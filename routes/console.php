@@ -17,6 +17,8 @@ Artisan::command('inspire', function () {
 
 Schedule::call(function () {
     DB::transaction(function () {
+        PersonnelLocation::where('updated_at', '<', now()->subMinutes(5))->delete();
+
         PersonnelLocation::all()->each(function (PersonnelLocation $location) {
             LocationHistory::create([
                 'personnel_id' => $location->personnel->id,
@@ -24,12 +26,6 @@ Schedule::call(function () {
                 'longitude' => $location->longitude,
             ]);
         });
-    });
-})->everyFifteenMinutes();
-
-Schedule::call(function () {
-    DB::transaction(function () {
-        PersonnelLocation::where('updated_at', '<', now()->subMinutes(5))->delete();
     });
 
     $locations = PersonnelLocation::with([

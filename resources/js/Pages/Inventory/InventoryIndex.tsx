@@ -108,7 +108,7 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
 
   return (
     <div className="mx-auto px-6 py-8">
-      <div className={`grid grid-cols-2 md:grid-cols-${types.length/2} gap-6 mb-8`}>
+      <div className={`grid grid-cols-2 md:grid-cols-3 gap-6 mb-8`}>
         {types.map((type) => (
           <Link
             key={type.id}
@@ -151,7 +151,11 @@ export default function InventoryIndex({ types, items, totalCount }: PageProps<{
             {userHasPermission(/inventory\.(?:create|\*)/) && (
               <AddItemForm />
             )}
-            <NewTransactionForm />
+            {
+              userHasPermission(/^inventory\.(\*|transaction\.(\*|create))$/) && (
+                <NewTransactionForm />
+              )
+            }
           </div>
         </div>
 

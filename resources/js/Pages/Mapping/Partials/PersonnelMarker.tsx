@@ -9,13 +9,14 @@ import { useState } from "react";
 
 const getStatusColor = (status?: Status) => {
     if (!status) {
-      return 'bg-gray-200 text-gray-800';
+      return 'bg-gray-100 text-gray-800';
     }
     const colors: Record<Status, string> = {
-      'available': "bg-green-200 text-green-800",
-      'assigned': "bg-blue-200 text-blue-800",
-      'on leave': "bg-yellow-200 text-yellow-800",
-      'emergency': 'bg-red-200 text-red-800',
+      'available': "bg-green-100 text-green-800",
+      'assigned': "bg-blue-100 text-blue-800",
+      'on break': "bg-orange-100 text-orange-800",
+      'emergency': "bg-red-100 text-red-800",
+      'on leave': "bg-gray-100 text-gray-800",
     }
     return colors[status];
   }
@@ -38,7 +39,7 @@ export default function PersonnelMarker({ marker, isClickable, selected }: { mar
               <User className="w-6 h-6 text-blue-600" />
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{marker.personnel.first_name} {marker.personnel.surname}</h3>
-                <p className="text-sm text-gray-600">POSITION</p>
+                <p className="text-sm text-gray-600">{marker.personnel.position ?? 'CDRRMO Personnel'}</p>
               </div>
             </DialogTitle>
           </DialogHeader>

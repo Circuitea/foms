@@ -12,21 +12,18 @@ import {
   X,
   MoreHorizontal,
   Eye,
-  Edit,
-  Trash2,
   Import,
   UserPen,
 } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { Button } from "@/components/ui/button"
-import { Link, usePage } from "@inertiajs/react"
+import { Link } from "@inertiajs/react"
 import { DataTable } from "@/components/data-table"
 import { ColumnDef } from "@tanstack/react-table"
 import { PageProps, Personnel, Section, Status } from "@/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Select from 'react-select';
 import { toProperCase, userHasPermission } from "@/lib/utils"
-import Paginator from "@/types/paginator"
 import { useRealTimeClock } from "@/hooks/use-clock"
 
 type RoleLabels = { [key: string]: string };
@@ -38,8 +35,9 @@ const getStatusColor = (status: Status | null) => {
     const colors: Record<Status, string> = {
       'available': "bg-green-100 text-green-800",
       'assigned': "bg-blue-100 text-blue-800",
-      'on leave': "bg-yellow-100 text-yellow-800",
-      'emergency': 'bg-red-100 text-red-800',
+      'on break': "bg-orange-100 text-orange-800",
+      'emergency': "bg-red-100 text-red-800",
+      'on leave': "bg-gray-100 text-gray-800",
     }
     return colors[status];
   }
@@ -59,33 +57,18 @@ const columns:ColumnDef<Personnel>[] = [
   {
     id: 'position',
     accessorFn: person => person.position ?? 'CDRRMO Personnel',
+    cell: ({ row }) => (
+      <div className="flex justify-center">
+        <span className="w-full text-center">{row.getValue('position')}</span>
+      </div>
+    )
   },
-  // {
-  //   accessorKey: 'roles',
-  //   header: 'ROLES',
-  //   cell: (props) => {
-  //     const { roles } = usePage<PageProps<{ roles: RoleLabels }>>().props;
-
-  //     return (
-  //       <div className="flex flex-col space-y-2 md:inline md:space-x-2">
-  //         {props.row.original.roles?.map((role) => (
-  //           <span
-  //             key={role.id}
-  //             className="text-center px-2 py-1 md:text-xs font-semibold rounded-xl bg-blue-200"
-  //           >
-  //             {roles[role.name]}
-  //           </span>
-  //         ))}
-  //       </div>
-  //     )
-  //   },
-  // },
   {
     id: 'status',
     header: 'STATUS',
     accessorKey: 'status',
     cell: ({ row }) => (
-      <div className="whitespace-nowrap">
+      <div className="flex justify-center whitespace-nowrap">
         <span className={getStatusColor(row.getValue('status')) + ' inline-flex px-2 py-1 text-xs font-semibold rounded-full'}>{row.getValue('status') ? toProperCase(row.getValue('status')) : 'Unavailable'}</span>
       </div>
     )
@@ -94,33 +77,35 @@ const columns:ColumnDef<Personnel>[] = [
     id: 'actions',
     header: 'ACTIONS',
     cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem asChild>
-            <Link href={`/personnel/${row.original.id}`}>
-              <Eye className="h-4 w-4" />
-              View Profile
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={`/personnel/${row.original.id}/activity`}>
-              <Clock className="h-4 w-4" />
-              View Activity
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={`/personnel/${row.original.id}/location-history`}>
-              <Clock className="h-4 w-4" />
-              View Location History
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex justify-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md flex items-center justify-center">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem asChild>
+              <Link href={`/personnel/${row.original.id}`}>
+                <Eye className="h-4 w-4" />
+                View Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/personnel/${row.original.id}/activity`}>
+                <Clock className="h-4 w-4" />
+                View Activity
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/personnel/${row.original.id}/location-history`}>
+                <Clock className="h-4 w-4" />
+                View Location History
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     ),
   },
 ]
@@ -223,7 +208,7 @@ export default function ListPersonnel({ personnel, sections }: PageProps<{ perso
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
                   type="text"
-                  placeholder="Search by name, email, or position..."
+                  placeholder="Search by name"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"

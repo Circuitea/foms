@@ -143,7 +143,7 @@ class TasksController extends Controller
         $consumableItem = ConsumableItem::find($item['id']);
 
         $entry = new ConsumableTransactionEntry();
-        $entry->quantity = $item['count'];
+        $entry->quantity = -abs($item['count']);
 
         $entry->item()->associate($consumableItem);
         $entry->transaction()->associate($itemTransaction);
