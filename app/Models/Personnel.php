@@ -8,6 +8,7 @@ use App\Models\Inventory\Transaction;
 use App\Models\Task\PersonnelTask;
 use App\Models\Task\Task;
 use App\Status;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -131,6 +133,25 @@ class Personnel extends Authenticatable
     // {
     //     return $this->belongsToMany(Role::class, 'personnel_role');
     // }
+
+    protected function firstName(): Attribute
+    {
+        return Attribute::make(
+            get: fn(string $value) => Str::title($value),
+        );
+    }
+    protected function middleName(): Attribute
+    {
+        return Attribute::make(
+            get: fn(?string $value) => $value ? Str::title($value) : $value
+        );
+    }
+    protected function surname(): Attribute
+    {
+        return Attribute::make(
+            get: fn(string $value) => Str::title($value),
+        );
+    }
 
     public function sections(): BelongsToMany
     {
