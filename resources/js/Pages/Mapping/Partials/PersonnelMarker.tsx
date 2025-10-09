@@ -38,7 +38,7 @@ export default function PersonnelMarker({ marker, isClickable, selected }: { mar
               <User className="w-6 h-6 text-blue-600" />
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{marker.personnel.first_name} {marker.personnel.surname}</h3>
-                <p className="text-sm text-gray-600">POSITION</p>
+                <p className="text-sm text-gray-600">{marker.personnel.position ?? 'CDRRMO Personnel'}</p>
               </div>
             </DialogTitle>
           </DialogHeader>
