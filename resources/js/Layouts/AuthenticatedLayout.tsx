@@ -49,9 +49,9 @@ export default function Authenticated({
         <Head title={pageTitle} />
         <AppSidebar />
         <main className='w-full bg-gray-50'>
-          <div className='bg-[#1B2560] text-white w-full flex items-center gap-2 p-4 border-b-4 border-red-500'>
-            <ApplicationLogo className='h-20 w-20 rounded-full ml-2' />
-            <p className='font-black tracking-wide w-full' style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '39px', textAlign: 'center'}} >
+          <div className='bg-[#1B2560] text-white w-full flex items-center gap-2 px-4 py-2 border-b-4 border-red-500'>
+            <ApplicationLogo className='h-16 w-16 rounded-full ml-2' />
+            <p className='font-black tracking-wide w-full text-4xl' style={{ fontFamily: 'Montserrat, sans-serif', textAlign: 'center'}} >
               CITY RISK REDUCTION AND MANAGEMENT OFFICE
             </p>
           </div>
