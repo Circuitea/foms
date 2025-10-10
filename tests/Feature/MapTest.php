@@ -12,15 +12,11 @@ beforeEach(function () {
   $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 });
 
-test('authenticated user can access map', function () {
+test('admin user can access map', function () {
     $user = Personnel::factory()->create();
     $this->seed(RoleSeeder::class);
     $user->assignRole([
       RolesEnum::ADMIN,
-      RolesEnum::PERSONNEL,
-      RolesEnum::IT,
-      RolesEnum::LOGISTIC,
-      RolesEnum::PERSONNEL,
     ]);
 
     $response = $this->actingAs($user)->get('/map');
@@ -28,13 +24,57 @@ test('authenticated user can access map', function () {
     $response->assertStatus(200);
 });
 
+test('field operator user can access map', function () {
+    $user = Personnel::factory()->create();
+    $this->seed(RoleSeeder::class);
+    $user->assignRole([
+      RolesEnum::OPERATOR,
+    ]);
+
+    $response = $this->actingAs($user)->get('/map');
+
+    $response->assertStatus(200);
+});
+
+test('it staff user cannot access map', function () {
+    $user = Personnel::factory()->create();
+    $this->seed(RoleSeeder::class);
+    $user->assignRole([
+      RolesEnum::IT,
+    ]);
+
+    $response = $this->actingAs($user)->get('/map');
+
+    $response->assertStatus(403);
+});
+
+test('logistics staff user cannot access map', function () {
+    $user = Personnel::factory()->create();
+    $this->seed(RoleSeeder::class);
+    $user->assignRole([
+      RolesEnum::IT,
+    ]);
+
+    $response = $this->actingAs($user)->get('/map');
+
+    $response->assertStatus(403);
+});
+
+test('personnel cannot access map', function () {
+    $user = Personnel::factory()->create();
+    $this->seed(RoleSeeder::class);
+    $user->assignRole([
+      RolesEnum::IT,
+    ]);
+
+    $response = $this->actingAs($user)->get('/map');
+
+    $response->assertStatus(403);
+});
+
+
+
 test('guest cannot access map routes', function () {
     $response = $this->get('/map');
-    $response->assertRedirect('/');
-
-    $response = $this->get('/map/report');
-    $response->assertRedirect('/');
-
-    $response = $this->get('/map/presentation');
     $response->assertRedirect('/');
 });

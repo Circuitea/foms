@@ -18,12 +18,14 @@ use App\Models\Task\Task;
 use App\Models\Task\TaskPriority;
 use App\Models\Task\TaskType;
 use App\Notifications\TaskAssignedNotification;
+use App\PermissionsEnum;
 use App\RolesEnum;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
@@ -31,6 +33,7 @@ use Inertia\Inertia;
 class TasksController extends Controller
 {
   public function list() {
+    Gate::authorize(PermissionsEnum::TASKS_READ);
     return Inertia::render('Tasks/ListTasks', [
       'tasks' => Task::with(['priority', 'type', 'personnel'])->get(),
       'personnel' => Personnel::with(['assignedTasks', 'roles'])
@@ -46,6 +49,7 @@ class TasksController extends Controller
   }
 
   public function show(Request $request, int $id) {
+    Gate::authorize(PermissionsEnum::TASKS_READ);
     $task = Task::with(['priority', 'type', 'personnel', 'creator', 'transaction' => ['equipment.item.group.type', 'consumables.item.type']])
       ->findOr($id, function () {
         abort(404);
@@ -56,6 +60,7 @@ class TasksController extends Controller
   }
 
   public function new() {
+    Gate::authorize(PermissionsEnum::TASKS_CREATE);
     $equipmentGroups = EquipmentGroup::with([
         'items' => function ($query) {
             $query->withCount([

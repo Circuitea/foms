@@ -120,6 +120,7 @@ class PersonnelController extends Controller
   }
 
   public function listActivity(Request $request, int $id) {
+    Gate::authorize(PermissionsEnum::PERSONNEL_READ);
     $personnel = Personnel::with(['activities' => function (Builder $query) {
       $query->orderBy('created_at', 'desc');
     }])->findOr($id, ['id', 'first_name', 'middle_name', 'surname', 'name_extension'], function () {
@@ -132,6 +133,7 @@ class PersonnelController extends Controller
   }
 
   public function listLocationHistory(Request $request, int $id, ?string $date = null) {
+    Gate::authorize(PermissionsEnum::PERSONNEL_READ);
     $user = Personnel::findOr($id, function () {
       abort(404);
     });
@@ -157,6 +159,7 @@ class PersonnelController extends Controller
   }
 
   public function show(Request $request, int $id) {
+    Gate::authorize(PermissionsEnum::PERSONNEL_READ);
     $personnel = Personnel::findOr($id, function () {
       abort(404);
     });

@@ -257,13 +257,6 @@ export default function ListPersonnel({ personnel, sections }: PageProps<{ perso
                       <Plus className="w-4 h-4" />
                       Add Personnel
                     </Link>
-                    <Link
-                      href='/personnel/import'
-                      className="bg-[#1B2560] hover:bg-[#1B2560]/90 text-white flex items-center gap-2 px-4 py-2.5 rounded-md"
-                    >
-                      <Import className="w-4 h-4" />
-                      Import Personnel
-                    </Link>
                   </div>
                 )}
               </div>
@@ -281,7 +274,7 @@ export default function ListPersonnel({ personnel, sections }: PageProps<{ perso
               <p className="text-sm">Add your first team member to get started</p>
             </div>  
           )}
-        ></DataTable>
+        />
 
         {/* Pagination */}
         {/* <div className="mt-6 flex justify-between items-center">

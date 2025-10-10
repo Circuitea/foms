@@ -38,3 +38,11 @@ test('user cannnot login without valid credentials', function () {
   $response->assertSessionHasErrors();
   $this->assertGuest();
 });
+
+test('user can logout', function () {
+  $user = Personnel::factory()->create();
+
+  $response = $this->actingAs($user)->post('/logout');
+
+  $response->assertRedirect('/');
+});

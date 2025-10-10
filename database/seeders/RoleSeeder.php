@@ -31,12 +31,7 @@ class RoleSeeder extends Seeder
     $mapToPermission = fn (PermissionsEnum $permission) => Permission::firstWhere('name', $permission->value);
 
     Role::findOrCreate(RolesEnum::PERSONNEL->value)->syncPermissions(collect([
-      PermissionsEnum::INVENTORY_READ,
       PermissionsEnum::MEETINGS_READ_SELF,
-      PermissionsEnum::PERSONNEL_READ,
-      PermissionsEnum::PERSONNEL_STATUS_UPDATE_SELF,
-      PermissionsEnum::TASKS_CREATE,
-      PermissionsEnum::TASKS_CREATE_EMERGENCY,
     ])->map($mapToPermission));
 
     Role::findOrCreate(RolesEnum::IT->value)->syncPermissions(collect([
@@ -51,15 +46,14 @@ class RoleSeeder extends Seeder
       PermissionsEnum::MAP_ALL,
       PermissionsEnum::TASKS_ALL,
       PermissionsEnum::MEETINGS_ALL,
-      PermissionsEnum::PERSONNEL_DEPLOY,
     ])->map($mapToPermission));
 
     Role::findOrCreate(RolesEnum::ADMIN->value)->syncPermissions(collect([
       PermissionsEnum::MAP_ALL,
-      PermissionsEnum::LOCATIONS_ALL,
-      PermissionsEnum::PERSONNEL_DEPLOY,
+      PermissionsEnum::PERSONNEL_READ,
       PermissionsEnum::TASKS_ALL,
       PermissionsEnum::MEETINGS_ALL,
+      PermissionsEnum::INVENTORY_ALL,
     ])->map($mapToPermission));
 
     if (!app()->environment('development')) return;

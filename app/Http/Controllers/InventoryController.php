@@ -12,17 +12,20 @@ use App\Models\Inventory\EquipmentItem;
 use App\Models\Inventory\EquipmentTransactionEntry;
 use App\Models\Inventory\ItemType;
 use App\Models\Inventory\Transaction;
+use App\PermissionsEnum;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class InventoryController extends Controller
 {
     public function index() {
+        Gate::authorize(PermissionsEnum::INVENTORY_READ);
         return Inertia::render('Inventory/InventoryIndex', [
             'types' => ItemType::all(),
             'items' => [
@@ -33,6 +36,7 @@ class InventoryController extends Controller
     }
 
     public function list(Request $request, string $typeID) {
+        Gate::authorize(PermissionsEnum::INVENTORY_READ);
         $type = ItemType::findOrFail($typeID);
         return Inertia::render('Inventory/ListInventory', [
             'type' => $type,
@@ -44,6 +48,7 @@ class InventoryController extends Controller
     }
 
     public function createConsumable(NewConsumableItemRequest $request) {
+        Gate::authorize(PermissionsEnum::INVENTORY_CREATE);
         DB::transaction(function() use ($request) {
             $validated = $request->validated();
             $type = ItemType::find($validated['type_id']);
@@ -79,6 +84,7 @@ class InventoryController extends Controller
     }
 
     public function createEquipment(NewEquipmentItemRequest $request) {
+        Gate::authorize(PermissionsEnum::INVENTORY_CREATE);
         DB::transaction(function() use ($request) {
             $validated = $request->validated();
             $group = null;
@@ -106,6 +112,7 @@ class InventoryController extends Controller
     }
 
     public function createTransaction(NewTransactionRequest $request) {
+        Gate::authorize(PermissionsEnum::INVENTORY_TRANSACTION_CREATE);
         DB::transaction(function () use ($request) {
             $validated = $request->validated();
             $user = Auth::user();
@@ -139,6 +146,7 @@ class InventoryController extends Controller
     }
 
     public function showEquipment(Request $request, string $id) {
+        Gate::authorize(PermissionsEnum::INVENTORY_READ);
         $group = EquipmentGroup::with(['type'])->findOrFail($id);
 
         // Get available year-months from transaction entries for all items in this group
@@ -207,6 +215,7 @@ class InventoryController extends Controller
     }
 
     public function showConsumable(Request $request, string $id) {
+        Gate::authorize(PermissionsEnum::INVENTORY_READ);
         $item = ConsumableItem::with(['type'])->findOrFail($id);
 
         $rawMonths = $item->entries()

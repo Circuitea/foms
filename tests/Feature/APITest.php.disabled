@@ -1,0 +1,292 @@
+<?php
+// tests/Feature/ApiRoutesTest.php
+
+use App\Facades\Geoapify;
+use App\Models\Personnel;
+use App\Models\Task\Task;
+use App\Models\Inventory\ConsumableItem;
+use App\Models\PersonnelLocation;
+use App\Services\GeoapifyService;
+use App\StatusEnum;
+use Database\Seeders\StatusSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Laravel\Sanctum\Sanctum;
+use Mockery\MockInterface;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->user = Personnel::factory()->create([
+        'password' => Hash::make('password'),
+    ]);
+});
+
+test('user can get their profile', function () {
+    Sanctum::actingAs($this->user);
+
+    $response = $this->getJson('/api/user');
+
+    $response->assertStatus(200)
+             ->assertJson([
+                 'id' => $this->user->id,
+                 'email' => $this->user->email,
+             ]);
+});
+
+test('user can login with valid credentials', function () {
+    $response = $this->postJson('/api/login', [
+        'email' => $this->user->email,
+        'password' => 'password',
+        'device_name' => 'test-device',
+    ]);
+
+    $response->assertStatus(200)
+             ->assertJsonStructure(['token']);
+});
+
+test('user cannot login with invalid credentials', function () {
+    $response = $this->postJson('/api/login', [
+        'email' => $this->user->email,
+        'password' => 'wrong-password',
+        'device_name' => 'test-device',
+    ]);
+
+    $response->assertStatus(422)
+             ->assertJsonValidationErrors(['email']);
+});
+
+test('user can update their status', function () {
+    $this->seed(StatusSeeder::class);
+
+    Sanctum::actingAs($this->user);
+
+    $response = $this->postJson('/api/status', [
+        'status' => StatusEnum::AVAILABLE->value,
+    ]);
+
+    $response->assertStatus(200)
+             ->assertJson([
+                 'status' => StatusEnum::AVAILABLE->value,
+             ]);
+
+    $this->assertDatabaseHas('personnel', [
+        'id' => $this->user->id,
+        'status' => StatusEnum::AVAILABLE->value,
+    ]);
+});
+
+test('user can store location', function () {
+    Event::fake();
+    Geoapify::expects('reverseGeocode')
+        ->with('40.7128', '-74.00600')
+        ->once()
+        ->andReturn('Test Street, Brgy. Test');
+
+    Sanctum::actingAs($this->user);
+
+    $response = $this->postJson('/api/location', [
+        'latitude' => 40.7128,
+        'longitude' => -74.0060,
+    ]);
+
+    $response->assertStatus(200);
+
+    $this->assertDatabaseHas('personnel_locations', [
+        'id' => $this->user->id,
+        'latitude' => 40.7128,
+        'longitude' => -74.0060,
+    ]);
+});
+
+test('user can register expo token', function () {
+    Sanctum::actingAs($this->user);
+
+    $response = $this->postJson('/api/expo-token', [
+        'token' => 'ExponentPushToken[test-token-123]',
+    ]);
+
+    $response->assertStatus(200)
+             ->assertJson(['status' => 'ok']);
+});
+
+test('user can logout', function () {
+    $token = $this->user->createToken('test-device');
+    Sanctum::actingAs($this->user, ['*'], $token->accessToken);
+
+    $response = $this->deleteJson('/api/logout');
+
+    $response->assertStatus(200)
+             ->assertJson(['status' => 'OK']);
+
+    $this->assertDatabaseMissing('personal_access_tokens', [
+        'id' => $token->accessToken->id,
+    ]);
+});
+
+test('user can get their assigned tasks', function () {
+    Sanctum::actingAs($this->user);
+    
+    $task = Task::factory()->create();
+    $this->user->assignedTasks()->attach($task);
+
+    $response = $this->getJson('/api/tasks');
+
+    $response->assertStatus(200)
+             ->assertJsonStructure([
+                 'tasks' => [
+                     '*' => ['id', 'title', 'priority', 'type', 'creator']
+                 ]
+             ]);
+});
+
+test('user can get specific task details', function () {
+    Sanctum::actingAs($this->user);
+    
+    $task = Task::factory()->create();
+    $this->user->assignedTasks()->attach($task);
+
+    $response = $this->getJson("/api/task/{$task->id}");
+
+    $response->assertStatus(200)
+             ->assertJson([
+                 'task' => [
+                     'id' => $task->id,
+                     'title' => $task->title,
+                 ]
+             ]);
+});
+
+test('user cannot access task they are not assigned to', function () {
+    Sanctum::actingAs($this->user);
+    
+    $task = Task::factory()->create();
+
+    $response = $this->getJson("/api/task/{$task->id}");
+
+    $response->assertStatus(404);
+});
+
+test('user can start a task', function () {
+    Sanctum::actingAs($this->user);
+    
+    $task = Task::factory()->create();
+    $this->user->assignedTasks()->attach($task);
+
+    $response = $this->postJson("/api/task/{$task->id}/status", [
+        'status' => 'started',
+    ]);
+
+    $response->assertStatus(200);
+
+    $this->assertDatabaseHas('task_personnel', [
+        'task_id' => $task->id,
+        'personnel_id' => $this->user->id,
+    ]);
+    
+    $this->user->refresh();
+    expect($this->user->status)->toBe(StatusEnum::ASSIGNED);
+});
+
+test('user can finish a task', function () {
+    Sanctum::actingAs($this->user);
+    
+    $task = Task::factory()->create();
+    $this->user->assignedTasks()->attach($task, ['started_at' => now()]);
+
+    $response = $this->postJson("/api/task/{$task->id}/status", [
+        'status' => 'finished',
+        'additional_notes' => 'Task completed successfully',
+    ]);
+
+    $response->assertStatus(200);
+
+    $this->user->refresh();
+    expect($this->user->status)->toBe(StatusEnum::AVAILABLE);
+});
+
+test('user can cancel a task', function () {
+    Sanctum::actingAs($this->user);
+    
+    $task = Task::factory()->create();
+    $this->user->assignedTasks()->attach($task, ['started_at' => now()]);
+
+    $response = $this->postJson("/api/task/{$task->id}/status", [
+        'status' => 'canceled',
+    ]);
+
+    $response->assertStatus(200);
+
+    $this->user->refresh();
+    expect($this->user->status)->toBe(StatusEnum::AVAILABLE);
+});
+
+test('task status validation fails for invalid status', function () {
+    Sanctum::actingAs($this->user);
+    
+    $task = Task::factory()->create();
+    $this->user->assignedTasks()->attach($task);
+
+    $response = $this->postJson("/api/task/{$task->id}/status", [
+        'status' => 'invalid-status',
+    ]);
+
+    $response->assertStatus(422)
+             ->assertJsonValidationErrors(['status']);
+});
+
+test('user can get location history for specific date', function () {
+    Sanctum::actingAs($this->user);
+    
+    $date = now()->toDateString();
+
+    $response = $this->getJson("/api/location-history/people/{$date}");
+
+    $response->assertStatus(200)
+             ->assertJsonStructure([
+                 '*' => ['id', 'locationHistory']
+             ]);
+});
+
+test('consumable recommendation returns error when item has no model', function () {
+    Sanctum::actingAs($this->user);
+    
+    $item = ConsumableItem::factory()->create([
+        'model_identifier' => null,
+    ]);
+
+    $response = $this->getJson("/api/inventory/consumable/{$item->id}/recommendation");
+
+    $response->assertStatus(422)
+             ->assertJson([
+                 'message' => 'This item does not have a trained model and cannot generate recommendations.',
+             ]);
+});
+
+test('consumable recommendation returns 404 for non-existent item', function () {
+    Sanctum::actingAs($this->user);
+
+    $response = $this->getJson('/api/inventory/consumable/99999/recommendation');
+
+    $response->assertStatus(404);
+});
+
+test('guest cannot access protected routes', function () {
+    $routes = [
+        'GET /api/user',
+        'POST /api/status',
+        'POST /api/location',
+        'POST /api/expo-token',
+        'DELETE /api/logout',
+        'GET /api/tasks',
+    ];
+
+    foreach ($routes as $route) {
+        [$method, $path] = explode(' ', $route);
+        $response = $this->json($method, $path);
+        $response->assertStatus(401);
+    }
+});

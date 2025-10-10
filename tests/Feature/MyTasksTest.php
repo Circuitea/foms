@@ -16,10 +16,6 @@ test('authenticated user can access my tasks', function () {
     $user = Personnel::factory()->create();
     $this->seed(RoleSeeder::class);
     $user->assignRole([
-        RolesEnum::ADMIN,
-        RolesEnum::PERSONNEL,
-        RolesEnum::IT,
-        RolesEnum::LOGISTIC,
         RolesEnum::PERSONNEL,
     ]);
 
