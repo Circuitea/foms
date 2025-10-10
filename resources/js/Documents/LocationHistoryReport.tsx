@@ -1,9 +1,9 @@
-import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import { HeadingOne } from "./components/Heading";
+import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Table, TD, TH, TR } from "@ag-media/react-pdf-table";
 import { PersonnelWithLocationHistory } from "@/Pages/Mapping/Partials/GenerateLocationHistoryReportDialog";
 import dayjs from "dayjs";
 import { formatName } from "@/lib/utils";
+import Background from './doc-bg.png';
 
 const styles = StyleSheet.create({
   page: {
@@ -12,11 +12,10 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   header: {
-    height: '2in',
+    height: '1.5in',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    border: '1 solid #6b7280',
     marginBottom: 16,
   },
   title: {
@@ -43,9 +42,8 @@ export function LocationHistoryReport({ personnel, date }: { personnel: Personne
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
-        <View style={styles.header}>
-          <Text style={{ textAlign: 'center', color: '#6b7280' }}>{"{HEADER PLACEHOLDER}"}</Text>
-        </View>
+        <Image src={Background} style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0 }} />
+        <View style={styles.header} />
         <View style={styles.title}>
           <Text style={{ fontWeight: 'bold', fontSize: 14 }}>Location History</Text>
           <Text style={{ textAlign: 'right' }}>{dayjs(date).format('MMMM DD, YYYY')}</Text>
