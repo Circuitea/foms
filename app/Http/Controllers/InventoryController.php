@@ -147,7 +147,7 @@ class InventoryController extends Controller
 
     public function showEquipment(Request $request, string $id) {
         Gate::authorize(PermissionsEnum::INVENTORY_READ);
-        $group = EquipmentGroup::with(['type'])->findOrFail($id);
+        $group = EquipmentGroup::with(['items', 'type'])->findOrFail($id);
 
         // Get available year-months from transaction entries for all items in this group
         $rawMonths = DB::table('equipment_transaction_entries')
@@ -194,6 +194,14 @@ class InventoryController extends Controller
                 });
                 $q->with(['transaction' => ['personnel', 'task.personnel']]);
             }]);
+
+            $query->withCount([
+                'entries as unfinished_tasks_count' => function ($q) {
+                    $q->join('transactions as t', 'equipment_transaction_entries.transaction_id', '=', 't.id')
+                      ->join('tasks', 't.task_id', '=', 'tasks.id')
+                      ->whereNull('tasks.finished_at');
+                }
+            ]);
         }]);
 
         // Build monthsByYear structure

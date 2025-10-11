@@ -63,7 +63,7 @@ export default function ShowEquipmentItem({
   months
 }: PageProps<{
   item: EquipmentGroup & {
-    items: (EquipmentItem & { entries: EquipmentTransactionEntry[] })[];
+    items: (EquipmentItem & { entries: EquipmentTransactionEntry[], unfinished_tasks_count: number })[];
   };
   months: Record<number, number[]>; // year and months[]
   start_date: string;
@@ -83,6 +83,9 @@ export default function ShowEquipmentItem({
     console.log(item);
   }, []);
 
+  const availableCount = item.items.reduce((total, equipment) => equipment.unfinished_tasks_count < 1 ? total + 1 : total, 0);
+  const inUseCount = item.items.reduce((total, equipment) => equipment.unfinished_tasks_count >= 1 ? total + 1 : total, 0);
+
   return (
     <>
       <div className="sticky top-0 flex items-center justify-between p-6 border-b border-gray-200 shrink-0 bg-white">
@@ -99,34 +102,50 @@ export default function ShowEquipmentItem({
             <p className="text-sm text-gray-600 capitalize">{item.type.name}</p>
           </div>
         </div>
-        <Button
+        {/* <Button
           className="px-8 bg-[#1B2560] text-white rounded-md hover:bg-[#2A3B70] transition-colors font-medium"
         >
           Edit Equipment
-        </Button>
+        </Button> */}
       </div>
 
       <div className="flex-1 overflow-y-auto p-6">
         <div className="space-y-6">
-          <div className="bg-blue-50 rounded-lg p-4 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Package className="w-5 h-5" />
-              Quantity & Availability
-            </h3>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{item.items.length}</div>
-                <div className="text-sm text-gray-600">Total</div>
+          <div className="flex gap-2">
+            <div className="flex-1 w-full h-80 border-2 border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+              {!!item.image_path ? (
+                <img src={`/storage/${item.image_path}`} />
+              ) : (
+                <div className="text-center flex flex-col justify-center items-center">
+                  <div className="text-8xl mb-4">
+                    <Package className="w-6 h-6" />
+                  </div>
+                  <div className="text-sm text-gray-500">Equipment Image</div>
+                </div>
+              )}
+            </div>
+            <div className="flex-[3] flex flex-col">
+              <div className="bg-blue-50 rounded-lg p-4 shadow-lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Package className="w-5 h-5" />
+                  Quantity & Availability
+                </h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{item.items.length}</div>
+                    <div className="text-sm text-gray-600">Total</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{availableCount}</div>
+                    <div className="text-sm text-gray-600">Available</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">{inUseCount}</div>
+                    <div className="text-sm text-gray-600">In Use</div>
+                  </div>
+                  
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{-1}</div>
-                <div className="text-sm text-gray-600">Available</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">{-1}</div>
-                <div className="text-sm text-gray-600">In Use</div>
-              </div>
-              
             </div>
           </div>
 

@@ -5,13 +5,13 @@ export interface EquipmentGroup {
   id: number;
   name: string;
   type: ItemType;
+  image_path?: string;
 }
 
 export interface EquipmentItem {
   id: number;
   name: string;
   description: string;
-  image_path?: string;
   location: string;
   created_at?: string;
   updated_at?: string;

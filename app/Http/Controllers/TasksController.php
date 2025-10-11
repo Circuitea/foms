@@ -70,10 +70,9 @@ class TasksController extends Controller
                       ->whereNull('tasks.finished_at');
                 }
             ]);
-        }
+        } 
     ])->get();
 
-    // Mark each item as available if unfinished_tasks_count === 0
     foreach ($equipmentGroups as $group) {
         foreach ($group->items as $item) {
             $item->is_available = ($item->unfinished_tasks_count === 0);

@@ -16,6 +16,8 @@ enum PermissionsEnum: string
   case PERSONNEL_STATUS_ALL = 'personnel.status.*';
   case PERSONNEL_ALL = 'personnel.*';
 
+  case PERSONNEL_ACTIVITY_READ = 'activity.read';
+
   case NOTIFICATIONS_CREATE = 'notifications.create';
   case NOTIFICATIONS_READ = 'notifications.read';
   case NOTIFICATIONS_READ_SELF = 'notifications.read.self';
