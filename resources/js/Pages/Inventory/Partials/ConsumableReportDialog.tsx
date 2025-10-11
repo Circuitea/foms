@@ -16,6 +16,7 @@ interface ReportProps {
 }
 
 export default function ConsumableReport({ item, creator, startDate, endDate }: ReportProps ) {
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recommendation, setRecommendation] = useState(0);
 
@@ -31,11 +32,14 @@ export default function ConsumableReport({ item, creator, startDate, endDate }: 
     }
     
     setLoading(true);
-    getRecommendation();
-  }, [item])
+
+    if (open) {
+      getRecommendation();
+    }
+  }, [open])
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>Generate Report</Button>
       </DialogTrigger>

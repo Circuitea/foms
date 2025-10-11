@@ -254,19 +254,25 @@ class InventoryController extends Controller
         $startDate = Date::createFromFormat('Y-m', $startMonth)->startOfMonth()->toDateString();
         $endDate = Date::createFromFormat('Y-m', $endMonth)->endOfMonth()->toDateString();
 
-        $item->load(['entries' => function (Builder $query) use($startDate, $endDate) {
-            $query->whereHas('transaction', function ($q) use ($startDate, $endDate) {
-                $q->whereBetween('created_at', [$startDate, $endDate]);
-            });
-            $query->with(['transaction' => ['personnel', 'task.personnel']]);
-            // Add running total for each entry
-            $query->selectRaw('
+        // Get ALL entries with running totals (not filtered by date)
+        $allEntriesWithRunningTotals = $item->entries()
+            ->with(['transaction' => ['personnel', 'task.personnel']])
+            ->selectRaw('
                 consumable_transaction_entries.*,
                 SUM(consumable_transaction_entries.quantity) OVER (
                     ORDER BY consumable_transaction_entries.id
                 ) AS running_total
-            ');
-        }]);
+            ')
+            ->get();
+
+        // Filter entries by date range for display but keep running totals from all data
+        $filteredEntries = $allEntriesWithRunningTotals->filter(function ($entry) use ($startDate, $endDate) {
+            $entryDate = $entry->transaction->created_at->toDateString();
+            return $entryDate >= $startDate && $entryDate <= $endDate;
+        })->values();
+
+        // Set the filtered entries as a collection on the item
+        $item->setRelation('entries', $filteredEntries);
 
         $totals = $item->entries()
             ->join('transactions as t', 'consumable_transaction_entries.transaction_id', '=', 't.id')
@@ -284,6 +290,10 @@ class InventoryController extends Controller
         return Inertia::render('Inventory/ShowConsumableItem', [
             'start_date' => Inertia::always($startMonth),
             'end_date' => Inertia::always($endMonth),
+            // 'item' => Inertia::always([
+            //     ... $item->toArray(),
+            //     'entries' => $filteredEntries->values(),
+            // ]),
             'item' => Inertia::always($item),
             'totals' => fn () => $totals,
             'months' => $months,
