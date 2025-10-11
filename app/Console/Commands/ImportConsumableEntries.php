@@ -53,12 +53,16 @@ class ImportConsumableEntries extends Command
         }
 
         $header = str_getcsv(array_shift($lines));
+
+        $header[0] = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header[0]);
+
         $progress = progress(label: 'Importing Consumable Entries', steps: count($lines));
         $progress->start();
 
         DB::transaction(function () use ($lines, $header, $progress, $personnelID) {
             foreach ($lines as $line) {
                 $data = array_combine($header, str_getcsv($line));
+
                 $progress->hint('Processing item_id: ' . $data['item_id'] . ', qty: ' . $data['quantity']);
 
                 foreach ($data as $key => $value) {
@@ -77,7 +81,7 @@ class ImportConsumableEntries extends Command
                 $transaction = Transaction::create([
                     'title' => 'Imported Transaction',
                     'description' => 'Imported via CSV',
-                    'created_at' => Date::createFromFormat('Y-m-d', $data['created_at'])->startOfDay(),
+                    'created_at' => Date::createFromFormat('m/d/Y', $data['created_at'])->startOfDay(),
                     'personnel_id' => $personnelID,
                 ]);
 
