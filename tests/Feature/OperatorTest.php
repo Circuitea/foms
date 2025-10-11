@@ -68,13 +68,13 @@ test('field operators cannot access new personnel form', function () {
   $response->assertStatus(403);
 });
 
-test('operators cannot access inventory', function () {
+test('field operators cannot access inventory', function () {
     $response = $this->actingAs($this->user)->get('/inventory');
 
     $response->assertStatus(403);
 });
 
-test('operators cannot view inventory list by type', function () {
+test('field operators cannot view inventory list by type', function () {
   $type = ItemType::first();
 
   $response = $this->actingAs($this->user)->get('/inventory/' . $type->id);
@@ -82,7 +82,7 @@ test('operators cannot view inventory list by type', function () {
   $response->assertStatus(403);
 });
 
-test('operators cannot view consumable item details', function () {
+test('field operators cannot view consumable item details', function () {
   $type = ItemType::first();
 
   $item = ConsumableItem::create([
@@ -96,7 +96,7 @@ test('operators cannot view consumable item details', function () {
   $response->assertStatus(403);
 });
 
-test('operators cannot view equipment item details', function () {
+test('field operators cannot view equipment item details', function () {
   $type = ItemType::first();
   $group = EquipmentGroup::create([
     'name' => 'Test Group',

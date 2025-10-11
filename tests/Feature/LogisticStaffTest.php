@@ -37,6 +37,12 @@ test('logistic staff can access my tasks', function () {
   $response->assertStatus(200);
 });
 
+test('logistic staff cannot access tasks list', function () {
+  $response = $this->actingAs($this->user)->get('/tasks');
+
+  $response->assertStatus(403);
+});
+
 test('logistic staff cannot access new task form', function () {
   $response = $this->actingAs($this->user)->get('/tasks/new');
 
