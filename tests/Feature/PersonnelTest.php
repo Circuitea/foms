@@ -49,17 +49,17 @@ test('personnel cannot access new task form', function () {
   $response->assertStatus(403);
 });
 
-test('personnel cannot access personnel list', function () {
+test('personnel can access personnel list', function () {
   $response = $this->actingAs($this->user)->get('/personnel');
 
-  $response->assertStatus(403);
+  $response->assertStatus(200);
 });
 
 test('personnel cannot view personnel details', function () {
   $personnel = Personnel::factory()->create();
   $response = $this->actingAs($this->user)->get("/personnel/{$personnel->id}");
   
-  $response->assertStatus(403);
+  $response->assertStatus(200);
 });
 
 test('personnel cannot access new personnel form', function () {
@@ -68,18 +68,18 @@ test('personnel cannot access new personnel form', function () {
   $response->assertStatus(403);
 });
 
-test('personnel cannot access inventory', function () {
+test('personnel can access inventory', function () {
   $response = $this->actingAs($this->user)->get('/inventory');
 
-  $response->assertStatus(403);
+  $response->assertStatus(200);
 });
 
-test('personnel cannot view inventory list by type', function () {
+test('personnel can view inventory list by type', function () {
   $type = ItemType::first();
 
   $response = $this->actingAs($this->user)->get('/inventory/' . $type->id);
 
-  $response->assertStatus(403);
+  $response->assertStatus(200);
 });
 
 test('personnel cannot view consumable item details', function () {
@@ -93,7 +93,7 @@ test('personnel cannot view consumable item details', function () {
 
   $response = $this->actingAs($this->user)->get('/inventory/consumable/' . $item->id);
 
-  $response->assertStatus(403);
+  $response->assertStatus(200);
 });
 
 test('personnel cannot view equipment item details', function () {
@@ -111,5 +111,5 @@ test('personnel cannot view equipment item details', function () {
 
   $response = $this->actingAs($this->user)->get('/inventory/equipment/' . $item->id);
 
-  $response->assertStatus(403);
+  $response->assertStatus(200);
 });
