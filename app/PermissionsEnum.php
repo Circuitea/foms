@@ -6,6 +6,7 @@ enum PermissionsEnum: string
 {
   case PERSONNEL_CREATE = 'personnel.create';
   case PERSONNEL_READ = 'personnel.read';
+  case PERSONNEL_READ_DETAILS = 'personnel.read.details';
   case PERSONNEL_UPDATE = 'personnel.update';
   case PERSONNEL_DELETE = 'personnel.delete';
   case PERSONNEL_DEPLOY = 'personnel.deploy';
@@ -34,6 +35,7 @@ enum PermissionsEnum: string
   
   case INVENTORY_CREATE = 'inventory.create';
   case INVENTORY_READ = 'inventory.read';
+  case INVENTORY_READ_DETAILS = 'inventory.read.details';
   case INVENTORY_UPDATE = 'inventory.update';
   case INVENTORY_DELETE = 'inventory.delete';
   case INVENTORY_DEPLOY = 'inventory.deploy';

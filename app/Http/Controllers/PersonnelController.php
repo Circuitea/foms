@@ -159,7 +159,7 @@ class PersonnelController extends Controller
   }
 
   public function show(Request $request, int $id) {
-    Gate::authorize(PermissionsEnum::PERSONNEL_READ);
+    Gate::authorize(PermissionsEnum::PERSONNEL_READ_DETAILS);
     $personnel = Personnel::findOr($id, function () {
       abort(404);
     });

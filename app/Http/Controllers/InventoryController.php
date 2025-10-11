@@ -146,7 +146,7 @@ class InventoryController extends Controller
     }
 
     public function showEquipment(Request $request, string $id) {
-        Gate::authorize(PermissionsEnum::INVENTORY_READ);
+        Gate::authorize(PermissionsEnum::INVENTORY_READ_DETAILS);
         $group = EquipmentGroup::with(['items', 'type'])->findOrFail($id);
 
         // Get available year-months from transaction entries for all items in this group
@@ -223,7 +223,7 @@ class InventoryController extends Controller
     }
 
     public function showConsumable(Request $request, string $id) {
-        Gate::authorize(PermissionsEnum::INVENTORY_READ);
+        Gate::authorize(PermissionsEnum::INVENTORY_READ_DETAILS);
         $item = ConsumableItem::with(['type'])->findOrFail($id);
 
         $rawMonths = $item->entries()
