@@ -67,12 +67,16 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
             <div className="w-full h-80 border-2 border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-              <div className="text-center flex flex-col justify-center items-center">
-                <div className="text-8xl mb-4">
-                  <Package className="w-6 h-6" />
+              {!!item.image_path ? (
+                <img src={`/storage/${item.image_path}`} />
+              ) : (
+                <div className="text-center flex flex-col justify-center items-center">
+                  <div className="text-8xl mb-4">
+                    <Package className="w-6 h-6" />
+                  </div>
+                  <div className="text-sm text-gray-500">Equipment Image</div>
                 </div>
-                <div className="text-sm text-gray-500">Equipment Image</div>
-              </div>
+              )}
             </div>
           </div>
 
