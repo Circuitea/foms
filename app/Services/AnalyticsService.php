@@ -19,9 +19,7 @@ class AnalyticsService
     $url = $this->serviceURL . "/recommendations/" . $model_ident . "/make";
     $response = Http::acceptJson()
       ->post($url, [
-        'year' => $date->year,
         'month' => $date->month,
-        'quarter' => $date->quarter,
         'quantities' => $quantities,
       ]);
 

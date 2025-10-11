@@ -221,7 +221,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         $monthlyData = DB::table('consumable_transaction_entries')
         ->join('transactions', 'consumable_transaction_entries.transaction_id', '=', 'transactions.id')
         ->where('consumable_transaction_entries.item_id', $item->id)
-        ->where('consumable_transaction_entries.quantity', '>', 0) // Only procurement (positive quantity)
+        ->where('consumable_transaction_entries.quantity', '<', 0)
         ->where('transactions.created_at', '>=', $start_date)
         ->select(
             DB::raw('YEAR(transactions.created_at) as year'),
@@ -232,8 +232,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->orderBy('year', 'desc')
         ->orderBy('month', 'desc')
         ->get()
-        ->map(fn ($entry) => (int) $entry->total_quantity)
-        ->pad(6, 0);
+        ->map(fn ($entry) => abs((int) $entry->total_quantity))
+        ->pad(3, 0);
 
         $prediction = $analytics->getRecommendation($id, $item->model_identifier, $date, $monthlyData);
 
