@@ -15,101 +15,95 @@ beforeEach(function () {
 
   $this->user = Personnel::factory()->create();
   $this->user->assignRole([
-    RolesEnum::PERSONNEL,
+    RolesEnum::LOGISTIC,
   ]);
 });
 
-test('personnel can access dashboard', function () {
+test('logistic staff can access dashboard', function () {
   $response = $this->actingAs($this->user)->get('/dashboard');
 
   $response->assertStatus(200);
 });
 
-test('personnel cannot access map', function () {
+test('logistics staff user cannot access map', function () {
   $response = $this->actingAs($this->user)->get('/map');
 
   $response->assertStatus(403);
 });
 
-test('personnel can access my tasks', function () {
+test('logistic staff can access my tasks', function () {
   $response = $this->actingAs($this->user)->get('/my-tasks');
 
   $response->assertStatus(200);
 });
 
-test('personnel cannot access tasks list', function () {
-  $response = $this->actingAs($this->user)->get('/tasks');
-
-  $response->assertStatus(403);
-});
-
-test('personnel cannot access new task form', function () {
+test('logistic staff cannot access new task form', function () {
   $response = $this->actingAs($this->user)->get('/tasks/new');
 
   $response->assertStatus(403);
 });
 
-test('personnel cannot access personnel list', function () {
+test('logistic staff cannot access personnel list', function () {
   $response = $this->actingAs($this->user)->get('/personnel');
 
   $response->assertStatus(403);
 });
 
-test('personnel cannot view personnel details', function () {
+test('logistic staff cannot view personnel details', function () {
   $personnel = Personnel::factory()->create();
   $response = $this->actingAs($this->user)->get("/personnel/{$personnel->id}");
   
   $response->assertStatus(403);
 });
 
-test('personnel cannot access new personnel form', function () {
+test('logistic staff cannot access new personnel form', function () {
   $response = $this->actingAs($this->user)->get('/personnel/new');
   
   $response->assertStatus(403);
 });
 
-test('personnel cannot access inventory', function () {
+test('logistic staff can access inventory', function () {
   $response = $this->actingAs($this->user)->get('/inventory');
 
-  $response->assertStatus(403);
+  $response->assertStatus(200);
 });
 
-test('personnel cannot view inventory list by type', function () {
+test('logistic staff can view inventory list by type', function () {
   $type = ItemType::first();
 
   $response = $this->actingAs($this->user)->get('/inventory/' . $type->id);
 
-  $response->assertStatus(403);
+  $response->assertStatus(200);
 });
 
-test('personnel cannot view consumable item details', function () {
+test('logistic staff can view consumable item details', function () {
   $type = ItemType::first();
 
   $item = ConsumableItem::create([
-  'name' => 'Test Item',
-  'description' => 'Test Item',
-  'type_id' => $type->id,
+    'name' => 'Test Item',
+    'description' => 'Test Item',
+    'type_id' => $type->id,
   ]);
 
   $response = $this->actingAs($this->user)->get('/inventory/consumable/' . $item->id);
 
-  $response->assertStatus(403);
+  $response->assertStatus(200);
 });
 
-test('personnel cannot view equipment item details', function () {
+test('logistic staff can view equipment item details', function () {
   $type = ItemType::first();
   $group = EquipmentGroup::create([
-  'name' => 'Test Group',
-  'type_id' => $type->id,
+    'name' => 'Test Group',
+    'type_id' => $type->id,
   ]);
 
   $item = EquipmentItem::create([
-  'name' => 'Test Item',
-  'description' => 'Test Item',
-  'group_id' => $group->id,
+    'name' => 'Test Item',
+    'description' => 'Test Item',
+    'group_id' => $group->id,
   ]);
 
   $response = $this->actingAs($this->user)->get('/inventory/equipment/' . $item->id);
 
-  $response->assertStatus(403);
+  $response->assertStatus(200);
 });
