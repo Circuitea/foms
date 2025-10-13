@@ -12,7 +12,7 @@ export const StatusDispatchContext = createContext<Dispatch<DispatchAction> | nu
 
 export function StatusProvider({ children }: PropsWithChildren) {
   const { status: userStatus } = usePage().props.auth.user;
-  const [status, dispatch] = useReducer(statusReducer, userStatus ?? 'on leave');
+  const [status, dispatch] = useReducer(statusReducer, userStatus ?? 'unavailable');
 
   return (
     <StatusContext.Provider value={status}>
