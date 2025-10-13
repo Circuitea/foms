@@ -157,8 +157,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => Date::now(),
             ]);
-            $user->status = StatusEnum::ASSIGNED;
-            $user->save();
             $activity = new StartTaskActivity();
             $activity->task()->associate($task);
             $activity->save();

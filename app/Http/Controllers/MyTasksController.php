@@ -48,8 +48,6 @@ class MyTasksController extends Controller
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => Date::now(),
             ]);
-            $user->status = StatusEnum::ASSIGNED;
-            $user->save();
             $activity = new StartTaskActivity();
             $activity->task()->associate($task);
             $activity->save();
