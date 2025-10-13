@@ -12,7 +12,7 @@ import { Task, TaskPriority, TaskType } from "@/types/tasks";
 import { Link } from "@inertiajs/react";
 import dayjs from "dayjs";
 import { useForm } from "laravel-precognition-react-inertia";
-import { AlertCircle, ArrowLeft, CheckCheck, ChevronDown, Clipboard, Info, MinusCircle, Plus, PlusCircle, Truck, Users, XCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft, CalendarIcon, CheckCheck, ChevronDown, Clipboard, Info, MinusCircle, Plus, PlusCircle, Truck, Users, XCircle } from "lucide-react";
 import { FormEventHandler, useState } from "react";
 import Select from 'react-select';
 import { InventoryItems, ItemSelection, ItemSelectionDialog } from "@/components/ItemSelectionDialog";
@@ -213,7 +213,7 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
           <Card className="border-gray-200 shadow-xs">
             <CardHeader className="bg-gray-50/50">
               <CardTitle className="flex items-end gap-2 text-[#1B2560]">
-                <Truck className="w-5 h-5" />
+                <CalendarIcon className="w-5 h-5" />
                 Task Due Date
               </CardTitle>
             </CardHeader>
