@@ -14,6 +14,10 @@ import {
   Eye,
   Import,
   UserPen,
+  ShieldAlert,
+  Coffee,
+  AlarmClockOff,
+  CircleCheck,
 } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { Button } from "@/components/ui/button"
@@ -136,15 +140,16 @@ export default function ListPersonnel({ personnel, sections }: PageProps<{ perso
   const stats = {
     total: personnel.length,
     available: personnel.filter(person => person.status === 'available').length,
-    assigned: personnel.filter(person => person.status === 'assigned').length,
-    'on leave': personnel.filter(person => person.status === 'on leave' || !person.status).length,
+    onbreak: personnel.filter(person => person.status === 'on break').length,
+    unavailable: personnel.filter(person => person.status === 'unavailable').length,
+    emergency: personnel.filter(person => person.status === 'emergency' || !person.status).length,
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto px-6 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-4">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -161,7 +166,7 @@ export default function ListPersonnel({ personnel, sections }: PageProps<{ perso
           <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-4">
             <div className="flex items-center">
               <div className="p-2 bg-green-100 rounded-lg">
-                <UserCheck className="h-6 w-6 text-green-600" />
+                <CircleCheck className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Available</p>
@@ -173,11 +178,11 @@ export default function ListPersonnel({ personnel, sections }: PageProps<{ perso
           <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-4">
             <div className="flex items-center">
               <div className="p-2 bg-yellow-100 rounded-lg">
-                <Clock className="h-6 w-6 text-yellow-600" />
+                <Coffee className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Assigned to Task</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.assigned}</p>
+                <p className="text-sm font-medium text-gray-600">On Break</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.onbreak}</p>
               </div>
             </div>
           </div>
@@ -185,11 +190,23 @@ export default function ListPersonnel({ personnel, sections }: PageProps<{ perso
           <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-4">
             <div className="flex items-center">
               <div className="p-2 bg-purple-100 rounded-lg">
-                <MapPin className="h-6 w-6 text-purple-600" />
+                <AlarmClockOff className="h-6 w-6 text-purple-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">On Leave / Unavailable</p>
-                <p className="text-2xl font-bold text-gray-900">{stats['on leave']}</p>
+                <p className="text-sm font-medium text-gray-600">Off Duty</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.unavailable}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-4">
+            <div className="flex items-center">
+              <div className="p-2 bg-red-100 rounded-lg">
+                <ShieldAlert className="h-6 w-6 text-red-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Emergency</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.emergency}</p>
               </div>
             </div>
           </div>
@@ -220,29 +237,6 @@ export default function ListPersonnel({ personnel, sections }: PageProps<{ perso
                     <X className="w-4 h-4" />
                   </button>
                 )}
-              </div>
-
-              {/* Filters */}
-              <div className="flex gap-2 shrink-0">
-                <div className="flex items-center rounded-lg px-3 py-2 5 bg-white min-w-[140px]">
-                  <Filter className="w-4 h-4 mr-2 text-gray-400" />
-                  <Select className="w-full border-none"
-                    options={sectionOptions}
-                    defaultValue={sectionOptions[0]}
-                    classNames={{
-                      'input': () => 'border-none',
-                    }}
-                  />
-                </div>
-
-
-                <div className="flex items-center rounded-lg px-3 py-2.5 bg-white min-w-[120px]">
-                  
-                  <Select className="w-full"
-                    options={statusOptions}
-                    defaultValue={statusOptions[0]}
-                  />
-                </div>
               </div>
 
               {/* Action Buttons */}
