@@ -33,11 +33,10 @@ const getStatusColor = (status: Status | null) => {
       return 'bg-gray-100 text-gray-800';
     }
     const colors: Record<Status, string> = {
-      'available': "bg-green-100 text-green-800",
-      'assigned': "bg-blue-100 text-blue-800",
+      'available': "bg-green-200 text-green-800",
       'on break': "bg-orange-100 text-orange-800",
+      'unavailable': "bg-gray-300 text-gray-800",
       'emergency': "bg-red-100 text-red-800",
-      'on leave': "bg-gray-100 text-gray-800",
     }
     return colors[status];
   }
