@@ -2,12 +2,33 @@ import { icon, Marker as LeafletMarker } from "leaflet";
 import { useEffect, useRef } from "react";
 import MarkerIcon from './marker-generic.png';
 import MarkerAvailable from './marker-available.png';
-import MarkerAssigned from './marker-assigned.png';
-import MarkerOnLeave from './marker-on-leave.png';
+import MarkerOnBreak from './marker-on-break.png';
+import MarkerUnavailable from './marker-unavailable.png';
 import MarkerEmergency from './marker-emergency.png';
 import { Marker, Tooltip } from "react-leaflet";
 import dayjs from "dayjs";
-import { Personnel } from "@/types";
+import { Personnel, Status } from "@/types";
+
+const iconSize: [number, number] = [25, 25];
+const hoveredIconSize: [number, number] = [20, 20];
+
+
+function getMarkerImage(status?: Status | 'generic', hovered = false) {
+  const iconDetails = { iconSize: hovered ? hoveredIconSize : iconSize };
+  switch (status) {
+    case 'available':
+      return icon({ ...iconDetails, iconUrl: MarkerAvailable });
+    case 'on break':
+      return icon({ ...iconDetails, iconUrl: MarkerOnBreak });
+    case 'unavailable':
+      return icon({ ...iconDetails, iconUrl: MarkerUnavailable });
+    case 'emergency':
+      return icon({ ...iconDetails, iconUrl: MarkerEmergency });
+    case 'generic':
+    default:
+      return icon({ ...iconDetails, iconUrl: MarkerIcon });
+  }
+}
 
 export function LocationMarker({
   location,
@@ -21,34 +42,6 @@ export function LocationMarker({
   isGeneric?: boolean;
 }) {
   const ref = useRef<LeafletMarker>(null);
-
-  const iconSize: [number, number] = [18, 18];
-  const genericMarkerIcon = icon({
-    iconUrl: MarkerIcon,
-    iconSize,
-  });
-
-  const availableMarkerIcon = icon({
-    iconUrl: MarkerAvailable,
-    iconSize,
-  });
-  const assignedMarkerIcon = icon({
-    iconUrl: MarkerAssigned,
-    iconSize,
-  });
-  const onLeaveMarkerIcon = icon({
-    iconUrl: MarkerOnLeave,
-    iconSize,
-  });
-  const emergencyMarkerIcon = icon({
-    iconUrl: MarkerEmergency,
-    iconSize,
-  });
-
-  const hoveredMarkerIcon = icon({
-    iconUrl: MarkerIcon,
-    iconSize: [25, 25],
-  });
   
   useEffect(() => {
     if (ref.current) {
@@ -60,17 +53,7 @@ export function LocationMarker({
     }
   }, [visible]);
 
-  const iconToUse = isGeneric
-    ? ref.current?.isTooltipOpen() ? hoveredMarkerIcon : genericMarkerIcon
-    : location.personnel?.status === 'assigned'
-      ?  assignedMarkerIcon
-      : location.personnel?.status === 'available'
-        ? availableMarkerIcon
-        : location.personnel?.status === 'on leave'
-          ? onLeaveMarkerIcon
-          : location.personnel?. status === 'emergency'
-            ? emergencyMarkerIcon
-            : genericMarkerIcon;
+  const iconToUse = getMarkerImage(isGeneric ? 'generic' : location.personnel?.status, ref.current?.isTooltipOpen())
 
   return (
     <Marker
