@@ -63,10 +63,6 @@ function TaskList({ tasks }: { tasks: Task[] }) {
 
   const changeTaskStatus = (id: number, status: 'started' | 'finished' | 'canceled') => {
     if (status !== 'finished') router.post(`/my-tasks/${id}/status`, { status });
-    dispatch({
-      type: 'set',
-      status: status === 'finished' || status === 'canceled' ? 'available' : 'assigned',
-    });
   }
 
   return (
