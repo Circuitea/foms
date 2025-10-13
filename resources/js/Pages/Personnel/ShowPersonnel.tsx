@@ -30,10 +30,11 @@ export default function ShowPersonnel({ personnel, tasks }: ShowPersonnelProps) 
     switch(status) {
       case 'available':
         return 'bg-green-500';
-      case 'assigned':
-        return 'bg-blue-500';
-      case 'on leave':
+      case 'emergency':
+        return 'bg-red-500';
+      case 'on break':
         return 'bg-yellow-500';
+      case 'unavailable':
       default:
         return 'bg-gray-500';
     }
