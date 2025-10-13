@@ -15,7 +15,7 @@ export interface Personnel {
     profile_picture_filename: string | null;
 }
 
-export type Status = 'available' | 'assigned' | 'on leave' | 'emergency' | 'on break';
+export type Status = 'available' | 'unavailable' | 'emergency' | 'on break';
 
 export interface Role {
     id: number;

@@ -14,7 +14,7 @@ enum StatusEnum: string
         return match($this) {
             static::AVAILABLE => 'Available',
             static::ON_BREAK => 'On Break',
-            static::UNAVAILABLE => 'Unavailable',
+            static::UNAVAILABLE => 'Off Duty',
             static::EMERGENCY => 'In Emergency',
         };
     }
