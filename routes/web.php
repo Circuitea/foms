@@ -90,8 +90,6 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::get('/unread', [NotificationsController::class, 'listUnread'])->name('notifications.list.unread');
         Route::patch('/{id}/read', [NotificationsController::class, 'markAsRead']);
         Route::patch('/{id}/unread', [NotificationsController::class, 'markAsUnread']);
-        
-
     });
 });
                             

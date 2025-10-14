@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonnelLocationController;
 use App\Models\ActivityDetail;
 use App\Models\CancelTaskActivity;
@@ -264,4 +265,11 @@ Route::post('/login', function (Request $request) {
     return response()->json([
         'token' => $token,
     ]);
+
+    Route::prefix('notifications')->group(function () {
+        Route::get('/all', [NotificationsController::class, 'listAll']);
+        Route::get('/unread', [NotificationsController::class, 'listUnread']);
+        Route::patch('/{id}/read', [NotificationsController::class, 'markAsRead']);
+        Route::patch('/{id}/unread', [NotificationsController::class, 'markAsUnread']);
+    });
 });
