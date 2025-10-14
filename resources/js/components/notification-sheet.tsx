@@ -6,6 +6,8 @@ import axios from "axios";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemTitle } from "./ui/item";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { Link } from "@inertiajs/react";
+import { Spinner } from "./ui/spinner";
 
 type Notification = TaskAssignedNotification;
 
@@ -65,65 +67,111 @@ export function NotificationSheet() {
           </SheetHeader>
           <div className="py-2 flex flex-col items-stretch justify-start">
             {loading ? (
-              <h2>Fetching Notifications</h2>
-            ) : notifications.map((notification, index) => (
-              <Item variant="outline" key={index}>
-                <ItemContent>
-                  <ItemTitle>New Task Assignment: 'TASK NAME'</ItemTitle>
-                  <ItemDescription>You have been assigned to task 'TASK NAME'</ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <Button>My Tasks</Button>
-                </ItemActions>
-                <ItemFooter className="flex justify-end">
-                  {notification.read_at ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          onClick={async () => {
-                            const response = await axios.patch<{ notification: Notification }>(`/notifications/${notification.id}/unread`);
+              <div className="flex justify-center p-10">
+                <Spinner />
+              </div>
+            ) : notifications.length > 0
+              ? notifications.map((notification, index) => (
+                  <Item variant="outline" key={index} className={
+                    !!notification.read_at ? '' : 'outline-2 outline-solid outline-offset-2 outline-blue-600'
+                  }>
+                    <NotificationDetails notification={notification} />
+                    <ItemFooter className="flex justify-end">
+                      {notification.read_at ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              onClick={async () => {
+                                const response = await axios.patch<{ notification: Notification }>(`/notifications/${notification.id}/unread`);
 
-                            if (response.status === 200) {
-                              const notifs = [... notifications];
-                              notifs[index] = response.data.notification;
-                              setNotifications(notifs);
-                            }
-                          }}
-                        >
-                          <Mail />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Mark As Unread</TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          onClick={async () => {
-                            const response = await axios.patch<{ notification: Notification }>(`/notifications/${notification.id}/read`);
+                                if (response.status === 200) {
+                                  const notifs = [... notifications];
+                                  notifs[index] = response.data.notification;
+                                  setNotifications(notifs);
+                                }
+                              }}
+                            >
+                              <Mail />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Mark As Unread</TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              onClick={async () => {
+                                const response = await axios.patch<{ notification: Notification }>(`/notifications/${notification.id}/read`);
 
-                            if (response.status === 200) {
-                              const notifs = [... notifications];
-                              notifs[index] = response.data.notification;
-                              setNotifications(notifs);
-                            }
-                          }}
-                        >
-                          <MailOpen />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Mark As Read</TooltipContent>
-                    </Tooltip>
-                  )}
-                </ItemFooter>
-              </Item>
-            ))}
+                                if (response.status === 200) {
+                                  const notifs = [... notifications];
+                                  notifs[index] = response.data.notification;
+                                  setNotifications(notifs);
+                                }
+                              }}
+                            >
+                              <MailOpen />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Mark As Read</TooltipContent>
+                        </Tooltip>
+                      )}
+                    </ItemFooter>
+                  </Item>
+                ))
+              : (
+                <div className="flex justify-center">
+                  <span>No {activeTab === 'unread' ? 'unread ' : ''}notifications.</span>
+                </div>
+              )
+            }
           </div>
 
         </SheetContent>
       </Sheet>
     </Tabs>
+  )
+}
+
+function NotificationDetails({ notification }: { notification: Notification }) {
+  switch(notification.type) {
+    case 'task-assigned':
+      return <TaskAssigned notification={notification} />
+    default:
+      return (
+        <>
+          <ItemContent>
+            <ItemTitle>Notification</ItemTitle>
+            <ItemDescription>{JSON.stringify(notification.data)}</ItemDescription>
+          </ItemContent>
+          <ItemActions>
+            <Button asChild>
+              <Link href="/my-tasks">
+                My Tasks
+              </Link>
+            </Button>
+          </ItemActions>
+        </>
+      )
+  }
+}
+
+function TaskAssigned({ notification }: { notification: TaskAssignedNotification }) {
+  return (
+    <>
+      <ItemContent>
+        <ItemTitle>New Task Assignment: '{notification.data.task.title}'</ItemTitle>
+        <ItemDescription>You have been assigned to task '{notification.data.task.title}'</ItemDescription>
+      </ItemContent>
+      <ItemActions>
+        <Button asChild>
+          <Link href="/my-tasks">
+            My Tasks
+          </Link>
+        </Button>
+      </ItemActions>
+    </>
   )
 }

@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Task\Task;
+use App\NotificationTypeEnum;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -34,6 +35,11 @@ class TaskAssignedNotification extends Notification
     public function via(object $notifiable): array
     {
         return [ExpoNotificationsChannel::class, 'broadcast', 'database'];
+    }
+
+    public function databaseType(): string
+    {
+        return NotificationTypeEnum::TASK_ASSIGNED->value;
     }
 
     public function toExpoNotification($notifiable): ExpoMessage
