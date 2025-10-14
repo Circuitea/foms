@@ -33,7 +33,7 @@ class TaskAssignedNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return [ExpoNotificationsChannel::class, 'broadcast'];
+        return [ExpoNotificationsChannel::class, 'broadcast', 'database'];
     }
 
     public function toExpoNotification($notifiable): ExpoMessage
@@ -72,7 +72,11 @@ class TaskAssignedNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'task' => [
+                'id' => $this->task->id,
+                'title' => $this->task->title,
+                'description' => $this->task->description,
+            ],
         ];
     }
 }
