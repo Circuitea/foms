@@ -7,16 +7,11 @@ import { useEcho, useEchoNotification } from '@laravel/echo-react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import toast from '@/components/toast';
 import { useRealTimeClock } from '@/hooks/use-clock';
-import { LucideIcon, Users } from 'lucide-react';
+import { Bell, LucideIcon, Users } from 'lucide-react';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { StatusProvider } from '@/context/status-context';
 import { Task } from '@/types/tasks';
-import { TaskReport } from '@/Documents/TaskReport';
-
-interface Notification {
-  title: string;
-  message: string;
-}
+import { NotificationSheet } from '@/components/notification-sheet';
 
 interface BreadcrumbEntry {
   value: string;
@@ -49,11 +44,12 @@ export default function Authenticated({
         <Head title={pageTitle} />
         <AppSidebar />
         <main className='w-full bg-gray-50'>
-          <div className='bg-[#1B2560] text-white w-full flex items-center gap-2 px-4 py-2 border-b-4 border-red-500'>
+          <div className='bg-[#1B2560] text-white w-full flex justify-between items-center gap-2 px-4 py-2 border-b-4 border-red-500'>
             <ApplicationLogo className='h-16 w-16 rounded-full ml-2' />
             <p className='font-black tracking-wide w-full text-4xl' style={{ fontFamily: 'Montserrat, sans-serif', textAlign: 'center'}} >
               CITY RISK REDUCTION AND MANAGEMENT OFFICE
             </p>
+            <NotificationSheet />
           </div>
           
           <div className="sticky top-0 h-16 bg-[#1B2560] shadow-xs z-50">
@@ -93,7 +89,7 @@ export default function Authenticated({
           {children}
         </main>
         <Toaster
-          position='top-right'
+          position='bottom-right'
           richColors={true}
         />
       </StatusProvider>

@@ -4,6 +4,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\MeetingsController;
 use App\Http\Controllers\MyTasksController;
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TasksController;
@@ -82,6 +83,15 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile/token/{id}', [ProfileController::class, 'revokeToken']);
+    });
+
+    Route::prefix('notifications')->group(function () {
+        Route::get('/all', [NotificationsController::class, 'listAll'])->name('notifications.list.all');
+        Route::get('/unread', [NotificationsController::class, 'listUnread'])->name('notifications.list.unread');
+        Route::patch('/{id}/read', [NotificationsController::class, 'markAsRead']);
+        Route::patch('/{id}/unread', [NotificationsController::class, 'markAsUnread']);
+        
+
     });
 });
                             
