@@ -297,207 +297,112 @@ export default function Dashboard() {
     <div>
       <div className="min-h-screen bg-gray-50">
         {/* Dashboard Content */}
-        <div className="flex flex-col lg:flex-row gap-6 px-6 py-6">
+        <div className="flex flex-col gap-6 px-6 py-6">
           {/* Summary Cards */}
-          <div className="flex-[3]">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Active Personnel</p>
-                    <p className="text-2xl font-bold text-gray-900">51</p>
-                  </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-blue-600" />
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Active Personnel</p>
+                  <p className="text-2xl font-bold text-gray-900">51</p>
                 </div>
-                <div className="mt-4">
-                  <span className="text-green-600 text-sm font-medium">+12%</span>
-                  <span className="text-gray-600 text-sm ml-1">from last month</span>
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Users className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
-
-              <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Response Rate</p>
-                    <p className="text-2xl font-bold text-gray-900">94.2%</p>
-                  </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <span className="text-green-600 text-sm font-medium">+2.1%</span>
-                  <span className="text-gray-600 text-sm ml-1">from last month</span>
-                </div>
+              <div className="mt-4">
+                <span className="text-green-600 text-sm font-medium">+12%</span>
+                <span className="text-gray-600 text-sm ml-1">from last month</span>
               </div>
-
-              
             </div>
 
-            <div>
-              {/* Main Content Area */}
-              <div className="space-y-6">
-                {/* Personnel Tracking Section */}
-                <div className="bg-white rounded-lg shadow-xs border border-gray-200">
-                  <div className="p-6 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">PERSONNEL TRACKING</h3>
-                      </div>
-                      
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <div
-                      className="relative bg-linear-to-br from-blue-50 to-green-50 rounded-lg h-64 cursor-pointer hover:shadow-md transition-all"
-                    >
-                      <Link href="/map">
-                        <MapContainer className='min-h-full h-64 z-0 border-2 border-dashed border-gray-300 rounded-lg' center={[14.6034363, 121.0389469]} zoom={14} scrollWheelZoom={false} dragging={false} zoomControl={false}>
-                          <TileLayer
-                              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                          />
-                          <GeoJSON
-                              style={{color: '#0000CC', weight: 4}}
-                              // @ts-ignore
-                              data={SanJuanBoundary}
-                          />
-                        </MapContainer>
-                      </Link>
-                    </div>
-                  </div>
+            <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Response Rate</p>
+                  <p className="text-2xl font-bold text-gray-900">94.2%</p>
                 </div>
-
-                {/* Analytics Charts */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InteractiveBarChart
-                    data={requestOverviewData}
-                    dataKey={selectedPeriod === "Week" ? "week" : selectedPeriod === "Month" ? "monthData" : "year"}
-                    title="Request Overview"
-                    stats={{
-                      value1: 789,
-                      label1: "Total Requests",
-                      value2: 658,
-                      label2: "Approved Requests",
-                    }}
-                    chartId="bar"
-                  />
-
-                  <InteractiveBarChart
-                    data={incidentReportData}
-                    dataKey={selectedPeriod === "Week" ? "week" : selectedPeriod === "Month" ? "monthData" : "year"}
-                    title="Incident Reports"
-                    stats={{
-                      value1: 1221,
-                      label1: "Total Incidents",
-                      value2: 1120,
-                      label2: "Resolved Cases",
-                    }}
-                    chartId="bar"
-                  />
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
               </div>
-
-              
+              <div className="mt-4">
+                <span className="text-green-600 text-sm font-medium">+2.1%</span>
+                <span className="text-gray-600 text-sm ml-1">from last month</span>
+              </div>
             </div>
 
+            
           </div>
-          <div className="flex-1 h-full space-y-6">
-            {/* Upcoming Events */}
-            <div className="bg-white h-full rounded-lg shadow-xs border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Upcoming Events
-                  </h3>
+
+          <div>
+            {/* Main Content Area */}
+            <div className="space-y-6">
+              {/* Personnel Tracking Section */}
+              <div className="bg-white rounded-lg shadow-xs border border-gray-200">
+                <div className="p-6 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">PERSONNEL TRACKING</h3>
+                    </div>
+                    
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <div
+                    className="relative bg-linear-to-br from-blue-50 to-green-50 rounded-lg h-64 cursor-pointer hover:shadow-md transition-all"
+                  >
+                    <Link href="/map">
+                      <MapContainer className='min-h-full h-64 z-0 border-2 border-dashed border-gray-300 rounded-lg' center={[14.6034363, 121.0389469]} zoom={14} scrollWheelZoom={false} dragging={false} zoomControl={false}>
+                        <TileLayer
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        <GeoJSON
+                            style={{color: '#0000CC', weight: 4}}
+                            // @ts-ignore
+                            data={SanJuanBoundary}
+                        />
+                      </MapContainer>
+                    </Link>
+                  </div>
                 </div>
               </div>
-              <div className="p-6 space-y-4">
-                {isEventsExpanded ? (
-                  // Expanded Events View
-                  <div className="space-y-4 max-h-96 overflow-y-auto">
-                    {upcomingEvents.map((event) => (
-                      <div
-                        key={event.id}
-                        className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] ${
-                          event.id === 1 || event.id === 5
-                            ? "bg-red-50 text-red-700 border-red-100 hover:bg-red-100"
-                            : event.id === 2
-                              ? "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100"
-                              : event.id === 3
-                                ? "bg-green-50 text-green-700 border-green-100 hover:bg-green-100"
-                                : event.id === 4
-                                  ? "bg-yellow-50 text-yellow-700 border-yellow-100 hover:bg-yellow-100"
-                                  : event.id === 6
-                                    ? "bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-100"
-                                    : event.id === 7
-                                      ? "bg-indigo-50 text-indigo-700 border-indigo-100 hover:bg-indigo-100"
-                                      : "bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100"
-                        }`}
-                        onClick={() => handleEventClick(event)}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <p className="font-medium text-sm leading-tight">{event.title}</p>
-                              <span
-                                className={`px-2 py-1 text-xs rounded-full ${
-                                  event.status === "confirmed"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-yellow-100 text-yellow-700"
-                                }`}
-                              >
-                                {event.status}
-                              </span>
-                            </div>
-                            <div className="space-y-1 text-xs opacity-75">
-                              <p>
-                                📅 {event.date} at {event.time}
-                              </p>
-                              <p>📍 {event.location}</p>
-                              <p>👥 {event.attendees} attendees</p>
-                            </div>
-                          </div>
-                          <Calendar className="w-4 h-4 opacity-75 ml-3 shrink-0" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  // Summary Events View (first 5 events)
-                  upcomingEvents
-                    .slice(0, 5)
-                    .map((event) => (
-                      <div
-                        key={event.id}
-                        className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] ${
-                          event.id === 1 || event.id === 5
-                            ? "bg-red-50 text-red-700 border-red-100 hover:bg-red-100"
-                            : event.id === 2
-                              ? "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100"
-                              : event.id === 3
-                                ? "bg-green-50 text-green-700 border-green-100 hover:bg-green-100"
-                                : "bg-yellow-50 text-yellow-700 border-yellow-100 hover:bg-yellow-100"
-                        }`}
-                        onClick={() => handleEventClick(event)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <p className="font-medium text-sm leading-tight">{event.title}</p>
-                            <p className="text-xs opacity-75 mt-1">{event.time}</p>
-                          </div>
-                          <Calendar className="w-4 h-4 opacity-75 ml-3 shrink-0" />
-                        </div>
-                      </div>
-                    ))
-                )}
+
+              {/* Analytics Charts */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InteractiveBarChart
+                  data={requestOverviewData}
+                  dataKey={selectedPeriod === "Week" ? "week" : selectedPeriod === "Month" ? "monthData" : "year"}
+                  title="Request Overview"
+                  stats={{
+                    value1: 789,
+                    label1: "Total Requests",
+                    value2: 658,
+                    label2: "Approved Requests",
+                  }}
+                  chartId="bar"
+                />
+
+                <InteractiveBarChart
+                  data={incidentReportData}
+                  dataKey={selectedPeriod === "Week" ? "week" : selectedPeriod === "Month" ? "monthData" : "year"}
+                  title="Incident Reports"
+                  stats={{
+                    value1: 1221,
+                    label1: "Total Incidents",
+                    value2: 1120,
+                    label2: "Resolved Cases",
+                  }}
+                  chartId="bar"
+                />
               </div>
             </div>
 
+            
           </div>
+
         </div>
       </div>
     </div>
