@@ -74,9 +74,6 @@ export function EquipmentItemReport({ group, selectedItems, creator }: ReportPro
                 <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Item ID:</Text> {item.id}</Text>
                 <Text style={styles.text}><Text style={{ fontWeight: 'bold' }}>Number of Usage:</Text> {item.entries.length}</Text>
               </View>
-              <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', border: '1px solid black' }}>
-                <Text>Image here</Text>
-              </View>
             </View>
           </View>
         ))}
