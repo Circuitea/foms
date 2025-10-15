@@ -45,6 +45,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return response()->json($personnel);
     });
 
+    Route::get('/status', function (Request $request) {
+        return response()->json([
+            'status' => $request->user()->status,
+        ]);
+    });
+
     Route::post('/status', function (Request $request) {
         $validated = $request->validate([
             'status' => ['nullable', 'string', Rule::enum(StatusEnum::class)],
@@ -61,7 +67,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         $user->save();
 
         $changeStatusActivity = ChangeStatusActivity::create([
-            'old_status' => is_null($oldStatus) ? StatusEnum::ON_LEAVE : $oldStatus ,
+            'old_status' => is_null($oldStatus) ? StatusEnum::UNAVAILABLE : $oldStatus ,
             'new_status' => $newStatus,
         ]);
         
