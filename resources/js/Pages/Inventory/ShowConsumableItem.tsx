@@ -147,7 +147,7 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
               <Button className="bg-[#1B2560]" onClick={() => router.reload({ data: {start_date: startDate, end_date: endDate}, only: ['totals'] })}>Apply</Button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-rows-2 gap-2">
             <div id="chart" className="bg-white pr-8 rounded-lg shadow-lg">
               <QuantityGraph data={totals.map(total => ({
                 year_week: `${total.year}-W${total.week}`,
@@ -155,7 +155,7 @@ export default function ShowConsumableItem({ item, totals, months, start_date, e
               }))} />
             </div>
             <div>
-              <DataTable columns={columns} data={item.entries} />
+              <DataTable columns={columns} data={item.entries} defaultSorting={[{ id: 'date', desc: true }]} />
             </div>
           </div>
           <div className="pt-4 flex justify-end">
@@ -204,6 +204,16 @@ const columns: ColumnDef<ConsumableTransactionEntry>[] = [
     cell: ({ row }) => (
       <div className="flex justify-end">
         <span className="w-full text-right">{row.getValue('running_total')}</span>
+      </div>
+    ),
+  },
+  {
+    id: 'date',
+    accessorFn: (entry) => entry.transaction.created_at,
+    header: 'Date',
+    cell: ({ row }) => (
+      <div>
+        <span>{dayjs(row.getValue('date')).format('YYYY/MM/DD hh:mm A')}</span>
       </div>
     )
   }
