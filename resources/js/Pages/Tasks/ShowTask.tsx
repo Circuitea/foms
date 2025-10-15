@@ -8,6 +8,7 @@ import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { cn, formatName } from "@/lib/utils"
 import { PageProps } from "@/types"
 import { PersonnelWithPivot, Task } from "@/types/tasks"
+import { Link } from "@inertiajs/react"
 import { PDFDownloadLink, PDFViewer, usePDF } from "@react-pdf/renderer"
 import dayjs from "dayjs"
 import { ArrowDown, ArrowUp, Clock, Dot, FileText, Flame, MapPin, Minus, User, Users, Wrench } from "lucide-react"
@@ -151,11 +152,14 @@ function PersonnelEntry({ person }: { person: PersonnelWithPivot }) {
   return (
     <div className="flex gap-2 items-center outline-2 outline-gray-200 rounded-lg shadow-lg">
       <div className="px-2 py-6 flex justify-between items-center gap-4 w-full">
-        <div className="rounded-full bg-gray-200 p-4 flex items-center justify-center">
-          <User />
-        </div>
+        <Link href={`/personnel/${person.id}`}>
+          <div className="rounded-full bg-gray-200 p-4 flex items-center justify-center">
+            <User />
+          </div>
+        </Link>
         <div className="flex flex-col justify-center items-start flex-1">
-          <p className="text-xl font-bold">{formatName(person)}</p>
+          {/* <p className="text-xl font-bold">{formatName(person)}</p> */}
+          <Link className="text-xl font-bold hover:text-[#1B2560] transition" href={`/personnel/${person.id}`}>{formatName(person)}</Link>
           <span>{person.position ?? 'CDRRMO Personnel'}</span>
         </div>
         <div className="flex flex-col gap-2">
