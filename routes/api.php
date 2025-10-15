@@ -9,10 +9,12 @@ use App\Models\FinishTaskActivity;
 use App\Models\Inventory\ConsumableItem;
 use App\Models\Personnel;
 use App\Models\StartTaskActivity;
+use App\PermissionsEnum;
 use App\Services\AnalyticsService;
 use App\StatusEnum;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +27,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::get('/location-history/people/{date?}', function (Request $request, ?string $date = null) {
+        Gate::authorize(PermissionsEnum::LOCATION_HISTORY_GENERATE);
         $targetDate = $date ?? now()->toDateString();
 
         $personnel = Personnel::with(['locationHistory' => function (Builder $query) use ($targetDate) {

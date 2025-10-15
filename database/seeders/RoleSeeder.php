@@ -54,12 +54,13 @@ class RoleSeeder extends Seeder
       PermissionsEnum::MAP_ALL,
       PermissionsEnum::PERSONNEL_READ,
       PermissionsEnum::PERSONNEL_READ_DETAILS,
+      PermissionsEnum::LOCATION_HISTORY_GENERATE,
       PermissionsEnum::TASKS_ALL,
       PermissionsEnum::MEETINGS_ALL,
       PermissionsEnum::INVENTORY_ALL,
     ])->map($mapToPermission));
 
-    if (!app()->environment('development')) return;
+    if (!app()->environment('local')) return;
     
     $shouldCreateDummyAccounts = confirm(
       label: 'Do you want to create dummy accounts?',

@@ -10,7 +10,7 @@ import { useSidebar } from "@/components/ui/sidebar"
 import { usePage } from "@inertiajs/react"
 import { PageProps, Personnel, PersonnelLocation } from "@/types"
 import { useEcho } from "@laravel/echo-react"
-import { formatName } from "@/lib/utils"
+import { formatName, userHasPermission } from "@/lib/utils"
 import { GenerateLocationHistoryReportDialog } from "./Partials/GenerateLocationHistoryReportDialog"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -99,7 +99,9 @@ export default function MapPage () {
                     <div className="font-medium text-gray-900">Active Personnel</div>
                     <div className="text-sm text-gray-600 font-medium">Count: {personnel.length}</div>
                   </div>
-                  <GenerateLocationHistoryReportDialog />
+                  {userHasPermission(/history\.read/) && (
+                    <GenerateLocationHistoryReportDialog />
+                  )}
                 </div>
 
                 <div className="flex-1 overflow-y-auto">

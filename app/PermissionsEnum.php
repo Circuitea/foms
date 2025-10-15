@@ -5,6 +5,8 @@ namespace App;
 enum PermissionsEnum: string
 {
   case PERSONNEL_CREATE = 'personnel.create';
+  case PERSONNEL_ACTIVITY_READ = 'personnel.activity.read';
+  case PEROSNNEL_HISTORY_READ = 'personnel.history.read';
   case PERSONNEL_READ = 'personnel.read';
   case PERSONNEL_READ_DETAILS = 'personnel.read.details';
   case PERSONNEL_UPDATE = 'personnel.update';
@@ -16,8 +18,8 @@ enum PermissionsEnum: string
   case PERSONNEL_STATUS_UPDATE_SELF = 'personnel.status.update.self';
   case PERSONNEL_STATUS_ALL = 'personnel.status.*';
   case PERSONNEL_ALL = 'personnel.*';
-
-  case PERSONNEL_ACTIVITY_READ = 'activity.read';
+  
+  case LOCATION_HISTORY_GENERATE = 'history.read';
 
   case NOTIFICATIONS_CREATE = 'notifications.create';
   case NOTIFICATIONS_READ = 'notifications.read';
