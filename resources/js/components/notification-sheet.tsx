@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { Link } from "@inertiajs/react";
 import { Spinner } from "./ui/spinner";
+import dayjs from "dayjs";
 
 type Notification = TaskAssignedNotification;
 
@@ -60,12 +61,12 @@ export function NotificationSheet() {
         <SheetContent>
           <SheetHeader>
             <SheetTitle>Notifications</SheetTitle>
-            <TabsList>
-              <TabsTrigger value="unread">Unread</TabsTrigger>
-              <TabsTrigger value="all">All</TabsTrigger>
+            <TabsList className="justify-center">
+              <TabsTrigger className="w-full" value="unread">Unread</TabsTrigger>
+              <TabsTrigger className="w-full" value="all">All Notifications</TabsTrigger>
             </TabsList>
           </SheetHeader>
-          <div className="py-2 flex flex-col items-stretch justify-start">
+          <div className="py-2 flex flex-col items-stretch justify-start gap-4">
             {loading ? (
               <div className="flex justify-center p-10">
                 <Spinner />
@@ -76,7 +77,8 @@ export function NotificationSheet() {
                     !!notification.read_at ? '' : 'outline-2 outline-solid outline-offset-2 outline-blue-600'
                   }>
                     <NotificationDetails notification={notification} />
-                    <ItemFooter className="flex justify-end">
+                    <ItemFooter className="flex justify-between">
+                      <span className="text-xs text-gray-400">{dayjs(notification.created_at).format('MMM DD, YYYY hh:mm A')}</span>
                       {notification.read_at ? (
                         <Tooltip>
                           <TooltipTrigger asChild>
