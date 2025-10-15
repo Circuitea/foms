@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { LocationHistoryReport } from "@/Documents/LocationHistoryReport";
 import { cn, formatName } from "@/lib/utils";
 import { Location, Personnel } from "@/types";
+import { usePage } from "@inertiajs/react";
 import { pdf, PDFDownloadLink, usePDF } from "@react-pdf/renderer";
 import axios, { AxiosResponse } from "axios";
 import dayjs from "dayjs";
@@ -22,6 +23,7 @@ export function GenerateLocationHistoryReportDialog() {
   const [selectedPersonnel, setSelectedPersonnel] = useState<number[]>([]);
   const [selectionDisabled, setSelectionDisabled] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { user } = usePage().props.auth;
 
 
   return (
@@ -105,7 +107,7 @@ export function GenerateLocationHistoryReportDialog() {
                 onClick={() => setDialogOpen(false)}
                 asChild
               >
-                <PDFDownloadLink document={<LocationHistoryReport date={selectedDate} personnel={personnelList.filter(person => selectedPersonnel.includes(person.id))} />} fileName={
+                <PDFDownloadLink document={<LocationHistoryReport date={selectedDate} personnel={personnelList.filter(person => selectedPersonnel.includes(person.id))} creator={user} />} fileName={
                   `location-history-${dayjs(selectedDate).format('YYYY-MM-DD')}-ids-${[...selectedPersonnel].sort((a, b) => a - b).join('_')}`
                 }>
                   {({ loading }) => loading 
