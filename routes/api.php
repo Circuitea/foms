@@ -114,6 +114,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'status' => 'OK',
         ]);
     });
+
+    Route::get('/active-task', function (Request $request) {
+        $user = $request->user();
+
+        return response()->json([
+            'task' => $user
+                ->assignedTasks()
+                ->wherePivotNull('finished_at')
+                ->orderByDesc('created_at')
+                ->first()
+                ->load(['creator', 'type', 'priority'])
+            // 'task' => null,
+        ]);
+    });
     
     Route::get('/tasks', function (Request $request) {
         $user = $request->user();
