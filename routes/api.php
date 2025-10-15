@@ -266,6 +266,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ],
         ]);
     });
+
+    
+    Route::prefix('notifications')->group(function () {
+        Route::get('/all', [NotificationsController::class, 'listAll']);
+        Route::get('/unread', [NotificationsController::class, 'listUnread']);
+        Route::patch('/{id}/read', [NotificationsController::class, 'markAsRead']);
+        Route::patch('/{id}/unread', [NotificationsController::class, 'markAsUnread']);
+    });
 });
 
 Route::post('/login', function (Request $request) {
@@ -289,10 +297,4 @@ Route::post('/login', function (Request $request) {
         'token' => $token,
     ]);
 
-    Route::prefix('notifications')->group(function () {
-        Route::get('/all', [NotificationsController::class, 'listAll']);
-        Route::get('/unread', [NotificationsController::class, 'listUnread']);
-        Route::patch('/{id}/read', [NotificationsController::class, 'markAsRead']);
-        Route::patch('/{id}/unread', [NotificationsController::class, 'markAsUnread']);
-    });
 });
