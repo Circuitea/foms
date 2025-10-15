@@ -46,7 +46,9 @@ export default function ShowPersonnel({ personnel, tasks }: ShowPersonnelProps) 
 
         <div className="p-4 bg-gray-100 flex items-center gap-2 shadow-lg rounded-lg">
           <div className="w-40 h-40 bg-white flex justify-center items-center">
-            {!!personnel.profile_picture_filename ? 'has profile picture' : (
+            {!!personnel.profile_picture_filename ? (
+              <img src={`/storage/${personnel.profile_picture_filename}`} />
+            ) : (
               <User className="w-32 h-32 text-gray-500" />
             )}
           </div>
