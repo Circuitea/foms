@@ -1,6 +1,6 @@
 "use client"
 
-import { type ColumnDef, flexRender, getCoreRowModel, getExpandedRowModel, getPaginationRowModel, GroupingState, PaginationState, Row, RowSelectionState, useReactTable } from "@tanstack/react-table"
+import { type ColumnDef, flexRender, getCoreRowModel, getExpandedRowModel, getPaginationRowModel, getSortedRowModel, GroupingState, PaginationState, Row, RowSelectionState, SortingState, useReactTable } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dispatch, ReactNode, SetStateAction, useState } from "react"
 import { Button } from "./ui/button";
@@ -15,9 +15,11 @@ interface DataTableProps<TData, TValue> {
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
   selectedRows?: RowSelectionState;
   setSelectedRows?: Dispatch<SetStateAction<RowSelectionState>>;
+  defaultSorting?: SortingState;
 }
 
-export function DataTable<TData, TValue>({ columns, data, className, noData, selectedRows, setSelectedRows, getRowId }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, className, noData, selectedRows, setSelectedRows, getRowId, defaultSorting }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>(defaultSorting ?? []);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10
@@ -34,13 +36,18 @@ export function DataTable<TData, TValue>({ columns, data, className, noData, sel
 
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
 
+    
+    
+    onSortingChange: setSorting,
     onPaginationChange: setPagination,
     onRowSelectionChange: setSelectedRows ?? setRowSelection,
 
     state: {
       pagination,
       rowSelection: selectedRows ?? rowSelection,
+      sorting,
     },
 
   });
