@@ -48,7 +48,7 @@ class TasksController extends Controller
     ]);
   }
 
-  public function show(Request $request, int $id) {
+  public function show(Request $request, string $id) {
     Gate::authorize(PermissionsEnum::TASKS_READ);
     $task = Task::with(['priority', 'type', 'personnel', 'creator', 'transaction' => ['equipment.item.group.type', 'consumables.item.type']])
       ->findOr($id, function () {
@@ -59,7 +59,7 @@ class TasksController extends Controller
     ]);
   }
 
-  public function new() {
+  public function new(Request $request) {
     Gate::authorize(PermissionsEnum::TASKS_CREATE);
     $equipmentGroups = EquipmentGroup::with([
         'items' => function ($query) {
@@ -86,17 +86,27 @@ class TasksController extends Controller
         ->get(),
     ];
 
+    $personnel = Personnel::all();
+    $isAdmin = $request->user()->hasRole(RolesEnum::ADMIN);
+
+    
+    if (!$isAdmin) {
+      $personnel = $personnel->reject(fn ($person) => $person->hasRole(RolesEnum::ADMIN));
+    }
+    
+    Log::info('user', [
+      'is_admin' => $isAdmin,
+    ]);
+
     return Inertia::render('Tasks/NewTask', [
       'types' => TaskType::all(),
       'priorities' => TaskPriority::all(),
-      'personnel' => Personnel::all(),
+      'personnel' => $personnel->values(),
       'items' => $items,
     ]);
   }
 
   public function create(NewTaskRequest $request) {
-    $newTask = null;
-    
     DB::transaction(function () use ($request) {
       $validated = $request->validated();
       $type = TaskType::find($validated['type_id']);
