@@ -2,30 +2,27 @@
 
 namespace App\Notifications;
 
-use App\Models\Task\Task;
+use App\Models\Inventory\ConsumableItem;
 use App\NotificationTypeEnum;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Log;
 use YieldStudio\LaravelExpoNotifier\Dto\ExpoMessage;
 use YieldStudio\LaravelExpoNotifier\ExpoNotificationsChannel;
 
-class TaskAssignedNotification extends Notification
+class ConsumableItemLowNotification extends Notification
 {
     use Queueable;
-
-    protected Task $task;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-    }
+    public function __construct(
+        protected ConsumableItem $item,
+        protected int $level,
+    ) { }
 
     /**
      * Get the notification's delivery channels.
@@ -39,12 +36,12 @@ class TaskAssignedNotification extends Notification
 
     public function databaseType(): string
     {
-        return NotificationTypeEnum::TASK_ASSIGNED->value;
+        return NotificationTypeEnum::CONSUMABLE_ITEM_LOW->value;
     }
 
     public function broadcastType(): string
     {
-        return 'broadcast.' . NotificationTypeEnum::TASK_ASSIGNED->value;
+        return 'broadcast.' . NotificationTypeEnum::CONSUMABLE_ITEM_LOW->value;
     }
 
     public function toExpoNotification($notifiable): ExpoMessage
@@ -53,24 +50,15 @@ class TaskAssignedNotification extends Notification
             return $token->expoTokens->pluck('value');
         })->toArray();
 
-        $taskTitle = $this->task->title;
+        $itemName = $this->item->name;
+        $level = $this->level;
 
         return (new ExpoMessage())
             ->to($tokens)
-            ->title("New Task Assigned")
-            ->body("You have been assigned to task '$taskTitle'.")
-            ->channelId('default')
-            ->jsonData([
-                'url' => '/(home)/task/' . $this->task->id,
-            ]);
-            // ->shouldBatch();
-    }
-
-    public function toBroadcast($notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage([
-            'task' => $this->task,
-        ]);
+            ->title("Item '$itemName' is low.")
+            ->body("Consumable item $itemName's quantity is below the recommended level (< $level).")
+            ->channelId('default');
+            // ->shouldBatch()
     }
 
     /**
@@ -81,10 +69,11 @@ class TaskAssignedNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'task' => [
-                'id' => $this->task->id,
-                'title' => $this->task->title,
-                'description' => $this->task->description,
+            'item' => [
+                'id' => $this->item->id,
+                'name' => $this->item->name,
+                'quantity' => $this->item->loadSum('entries as total', 'quantity')->total,
+                'level' => $this->level,
             ],
         ];
     }

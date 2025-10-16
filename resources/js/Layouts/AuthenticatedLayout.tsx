@@ -12,6 +12,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { StatusProvider } from '@/context/status-context';
 import { Task } from '@/types/tasks';
 import { NotificationSheet } from '@/components/notification-sheet';
+import { Item } from '@radix-ui/react-select';
 
 interface BreadcrumbEntry {
   value: string;
@@ -33,7 +34,21 @@ export default function Authenticated({
     `App.Models.Personnel.${user.id}`,
     (notification) => {
       toast('task', 'New Task Assigned', `You have been assigned to Task '${notification.task.title}'`, notification.task.id)
-    }
+    },
+    'broadcast.task-assigned',
+  )
+
+  useEchoNotification<{ item: {
+    id: number;
+    name: string;
+    quantity: number;
+    level: number;
+  }}>(
+    `App.Models.Personnel.${user.id}`,
+    (notification) => {
+      toast('warning', `Item ${notification.item.name} is low.`, `Item quantity is below recommended level. (${notification.item.quantity} < ${notification.item.level})'`)
+    },
+    'broadcast.consumable-item-low',
   )
 
   const currentTime = useRealTimeClock();

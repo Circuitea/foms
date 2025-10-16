@@ -10,7 +10,7 @@ import { Link } from "@inertiajs/react";
 import { Spinner } from "./ui/spinner";
 import dayjs from "dayjs";
 
-type Notification = TaskAssignedNotification;
+type Notification = TaskAssignedNotification | ConsumableItemLevelLowNotification;
 
 interface TaskAssignedNotification {
   id: string;
@@ -20,6 +20,23 @@ interface TaskAssignedNotification {
       id: number;
       title: string;
       description: string;
+    };
+  };
+
+  read_at?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface ConsumableItemLevelLowNotification {
+  id: string;
+  type: 'consumable-item-low';
+  data: {
+    item: {
+      id: number;
+      name: string;
+      quantity: number;
+      level: number;
     };
   };
 
@@ -141,11 +158,15 @@ function NotificationDetails({ notification }: { notification: Notification }) {
   switch(notification.type) {
     case 'task-assigned':
       return <TaskAssigned notification={notification} />
+    case 'consumable-item-low':
+      return <ConsumableItemLevelLow notification={notification} />
     default:
       return (
         <>
           <ItemContent>
             <ItemTitle>Notification</ItemTitle>
+            {/* 
+            //@ts-ignore */}
             <ItemDescription>{JSON.stringify(notification.data)}</ItemDescription>
           </ItemContent>
           <ItemActions>
@@ -171,6 +192,24 @@ function TaskAssigned({ notification }: { notification: TaskAssignedNotification
         <Button asChild>
           <Link href="/my-tasks">
             My Tasks
+          </Link>
+        </Button>
+      </ItemActions>
+    </>
+  )
+}
+
+function ConsumableItemLevelLow({ notification } : { notification: ConsumableItemLevelLowNotification }) {
+  return (
+    <>
+      <ItemContent>
+        <ItemTitle>Item '{notification.data.item.name}' is low.</ItemTitle>
+        <ItemDescription>Item's quantity ({notification.data.item.quantity} {'<'} {notification.data.item.level}) is below the recommended level.</ItemDescription>
+      </ItemContent>
+      <ItemActions>
+        <Button asChild>
+          <Link href={`/inventory/consumable/${notification.data.item.id}`}>
+            View Item
           </Link>
         </Button>
       </ItemActions>
