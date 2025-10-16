@@ -10,7 +10,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TasksController;
 use App\Models\Barangay;
 use App\Models\Incident;
+use App\Models\Personnel;
+use App\Models\Task\Task;
 use App\Models\Task\TaskType;
+use App\StatusEnum;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -41,6 +44,8 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         return Inertia::render('Dashboard', [
             'types' => TaskType::all()->pluck('name', 'id'),
             'incidents' => $grouped,
+            'availablePersonnel' => Personnel::where('status', StatusEnum::AVAILABLE)->count(),
+            'ongoingTasks' => Task::whereNull('finished_at')->count(),
         ]);
     })->name('dashboard');
 
@@ -58,11 +63,6 @@ Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
         Route::get('/presentation', function () {
             return Inertia::render('Mapping/Presentation');
         });
-    });
-
-    Route::get('/test', function () {
-        return Inertia::render('TestPage');
-        // return Inertia::render('MyTasks/OldListMyTasks');
     });
 
     Route::prefix('personnel')->group(function () {

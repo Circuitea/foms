@@ -4,7 +4,7 @@ import React from "react"
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
 import { Head, Link } from "@inertiajs/react"
 import { useState, useEffect } from "react"
-import { Users, MapPin, Calendar, Maximize2, AlertTriangle, CheckCircle, X, ChevronLeft, RefreshCw, LayoutDashboard } from "lucide-react"
+import { Users, MapPin, Calendar, Maximize2, AlertTriangle, CheckCircle, X, ChevronLeft, RefreshCw, LayoutDashboard, Clipboard } from "lucide-react"
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet"
 import PersonnelMarkersLayer from "./Mapping/Partials/PersonnelMarkersLayer"
 import SanJuanBoundary from './Mapping/sanjuan-boundary.json';
@@ -19,9 +19,8 @@ interface IncidentData {
   [id: number]: number;
 }
 
-type BarangayNames = Record<number, string>;
 
-export default function Dashboard({ incidents, barangays }: PageProps<{ incidents: IncidentData[], barangays: BarangayNames }>) {
+export default function Dashboard({ incidents, availablePersonnel, ongoingTasks }: PageProps<{ incidents: IncidentData[], availablePersonnel: number, ongoingTasks: number }>) {
   return (
     <div>
       <div className="min-h-screen bg-gray-50">
@@ -32,32 +31,24 @@ export default function Dashboard({ incidents, barangays }: PageProps<{ incident
             <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Active Personnel</p>
-                  <p className="text-2xl font-bold text-gray-900">51</p>
+                  <p className="text-sm font-medium text-gray-600">Available Personnel</p>
+                  <p className="text-2xl font-bold text-gray-900">{availablePersonnel}</p>
                 </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <Users className="w-6 h-6 text-green-600" />
                 </div>
-              </div>
-              <div className="mt-4">
-                <span className="text-green-600 text-sm font-medium">+12%</span>
-                <span className="text-gray-600 text-sm ml-1">from last month</span>
               </div>
             </div>
 
             <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Response Rate</p>
-                  <p className="text-2xl font-bold text-gray-900">94.2%</p>
+                  <p className="text-sm font-medium text-gray-600">Ongoing Tasks</p>
+                  <p className="text-2xl font-bold text-gray-900">{ongoingTasks}</p>
                 </div>
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                  <Clipboard className="w-6 h-6 text-orange-600" />
                 </div>
-              </div>
-              <div className="mt-4">
-                <span className="text-green-600 text-sm font-medium">+2.1%</span>
-                <span className="text-gray-600 text-sm ml-1">from last month</span>
               </div>
             </div>
 
