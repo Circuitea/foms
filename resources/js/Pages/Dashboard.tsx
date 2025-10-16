@@ -10,289 +10,18 @@ import PersonnelMarkersLayer from "./Mapping/Partials/PersonnelMarkersLayer"
 import SanJuanBoundary from './Mapping/sanjuan-boundary.json';
 
 import 'leaflet/dist/leaflet.css';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts"
+import { PageProps } from "@/types"
 
+interface IncidentData {
+  barangay: string;
+  [id: number]: number;
+}
 
-// Mock data for charts
-const requestOverviewData = [
-  { month: "Apr", week: 45, monthData: 65, year: 85 },
-  { month: "May", week: 52, monthData: 72, year: 92 },
-  { month: "Jun", week: 48, monthData: 68, year: 88 },
-  { month: "Jul", week: 61, monthData: 81, year: 95 },
-  { month: "Aug", week: 55, monthData: 75, year: 90 },
-  { month: "Sep", week: 67, monthData: 87, year: 98 },
-  { month: "Oct", week: 59, monthData: 79, year: 94 },
-  { month: "Nov", week: 63, monthData: 83, year: 96 },
-  { month: "Dec", week: 58, monthData: 78, year: 93 },
-  { month: "Jan", week: 71, monthData: 91, year: 102 },
-  { month: "Feb", week: 66, monthData: 86, year: 99 },
-  { month: "Mar", week: 69, monthData: 89, year: 101 },
-]
+type BarangayNames = Record<number, string>;
 
-const incidentReportData = [
-  { month: "Apr", week: 12, monthData: 25, year: 45 },
-  { month: "May", week: 18, monthData: 32, year: 52 },
-  { month: "Jun", week: 15, monthData: 28, year: 48 },
-  { month: "Jul", week: 22, monthData: 38, year: 58 },
-  { month: "Aug", week: 19, monthData: 35, year: 55 },
-  { month: "Sep", week: 25, monthData: 42, year: 62 },
-  { month: "Oct", week: 21, monthData: 39, year: 59 },
-  { month: "Nov", week: 27, monthData: 45, year: 65 },
-  { month: "Dec", week: 23, monthData: 41, year: 61 },
-  { month: "Jan", week: 29, monthData: 48, year: 68 },
-  { month: "Feb", week: 26, monthData: 44, year: 64 },
-  { month: "Mar", week: 31, monthData: 51, year: 71 },
-]
-
-const responseTimeData = [
-  { month: "Apr", value: 24, trend: "down" as const },
-  { month: "May", value: 18, trend: "down" as const },
-  { month: "Jun", value: 22, trend: "up" as const },
-  { month: "Jul", value: 15, trend: "down" as const },
-  { month: "Aug", value: 19, trend: "up" as const },
-  { month: "Sep", value: 12, trend: "down" as const },
-  { month: "Oct", value: 16, trend: "up" as const },
-  { month: "Nov", value: 11, trend: "down" as const },
-  { month: "Dec", value: 14, trend: "up" as const },
-]
-
-const personnelDistribution = [
-  { label: "Management", value: 12, color: "#3B82F6" },
-  { label: "Monitoring", value: 8, color: "#10B981" },
-  { label: "Planning", value: 10, color: "#F59E0B" },
-  { label: "Operations", value: 15, color: "#EF4444" },
-  { label: "Support", value: 6, color: "#8B5CF6" },
-]
-
-export default function Dashboard() {
-  const [selectedPeriod, setSelectedPeriod] = useState("Month")
-  const [isEventsExpanded, setIsEventsExpanded] = useState(false)
-  const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(null)
-  const [hoveredLineIndex, setHoveredLineIndex] = useState<number | null>(null)
-  const [hoveredPieIndex, setHoveredPieIndex] = useState<number | null>(null)
-
-  const handleEventClick = (event: any) => {
-    console.log("Event clicked:", event.title)
-    // Add event detail logic here - could open event details modal
-    alert(`Event Details: ${event.title} at ${event.time}`)
-  }
-
-  const upcomingEvents = [
-    {
-      id: 1,
-      title: "Emergency Planning",
-      time: "9:00 AM",
-      date: "Today",
-      location: "Conference Room A",
-      attendees: 12,
-      status: "confirmed",
-      color: "bg-red-100 text-red-800 border-red-200",
-    },
-    {
-      id: 2,
-      title: "Training and Seminar",
-      time: "2:00 PM",
-      date: "Today",
-      location: "Training Hall",
-      attendees: 25,
-      status: "confirmed",
-      color: "bg-blue-100 text-blue-800 border-blue-200",
-    },
-    {
-      id: 3,
-      title: "PTV Procurement Meeting",
-      time: "4:00 PM",
-      date: "Tomorrow",
-      location: "Meeting Room B",
-      attendees: 8,
-      status: "pending",
-      color: "bg-green-100 text-green-800 border-green-200",
-    },
-    {
-      id: 4,
-      title: "Emergency vs Contingency",
-      time: "6:00 PM",
-      date: "Tomorrow",
-      location: "Main Hall",
-      attendees: 30,
-      status: "confirmed",
-      color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    },
-    {
-      id: 5,
-      title: "Development Planning",
-      time: "8:00 PM",
-      date: "Dec 15",
-      location: "Conference Room C",
-      attendees: 15,
-      status: "confirmed",
-      color: "bg-red-100 text-red-800 border-red-200",
-    },
-    {
-      id: 6,
-      title: "Risk Assessment Workshop",
-      time: "10:00 AM",
-      date: "Dec 16",
-      location: "Workshop Area",
-      attendees: 20,
-      status: "pending",
-      color: "bg-purple-100 text-purple-800 border-purple-200",
-    },
-    {
-      id: 7,
-      title: "Community Outreach Program",
-      time: "1:00 PM",
-      date: "Dec 17",
-      location: "Community Center",
-      attendees: 50,
-      status: "confirmed",
-      color: "bg-indigo-100 text-indigo-800 border-indigo-200",
-    },
-    {
-      id: 8,
-      title: "Equipment Maintenance Check",
-      time: "3:00 PM",
-      date: "Dec 18",
-      location: "Equipment Bay",
-      attendees: 6,
-      status: "confirmed",
-      color: "bg-gray-100 text-gray-800 border-gray-200",
-    },
-  ]
-
-  // Interactive Bar Chart Component
-  const InteractiveBarChart = ({
-    data,
-    dataKey,
-    title,
-    stats,
-    chartId,
-  }: {
-    data: any[]
-    dataKey: string
-    title: string
-    stats: { value1: number; label1: string; value2: number; label2: string }
-    chartId: string
-  }) => {
-    const maxValue = Math.max(...data.map((item) => item[dataKey]))
-
-    const getBarColor = (period: string) => {
-      switch (period) {
-        case "Week":
-          return "bg-blue-500"
-        case "Month":
-          return "bg-green-500"
-        case "Year":
-          return "bg-red-500"
-        default:
-          return "bg-gray-500"
-      }
-    }
-
-    const getHoverColor = (period: string) => {
-      switch (period) {
-        case "Week":
-          return "bg-blue-600"
-        case "Month":
-          return "bg-green-600"
-        case "Year":
-          return "bg-red-600"
-        default:
-          return "bg-gray-600"
-      }
-    }
-
-    return (
-      <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          <div className="flex gap-1">
-            {["Week", "Month", "Year"].map((period) => (
-              <button
-                key={period}
-                onClick={() => setSelectedPeriod(period)}
-                className={`px-3 py-1 text-xs rounded transition-all duration-200 ${
-                  selectedPeriod === period
-                    ? period === "Week"
-                      ? "bg-blue-500 text-white shadow-md"
-                      : period === "Month"
-                        ? "bg-green-500 text-white shadow-md"
-                        : "bg-red-500 text-white shadow-md"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {period}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-8 mb-6">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">{stats.value1.toLocaleString()}</p>
-            <p className="text-sm text-gray-600">{stats.label1}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">{stats.value2.toLocaleString()}</p>
-            <p className="text-sm text-gray-600">{stats.label2}</p>
-          </div>
-        </div>
-
-        {/* Fixed Chart Container */}
-        <div className="relative h-48 bg-gray-50 rounded-lg p-4">
-          <div className="h-full flex items-end justify-between gap-1">
-            {data.map((item, index) => {
-              const value = item[dataKey]
-              const heightPercentage = maxValue > 0 ? (value / maxValue) * 100 : 0
-              const barHeight = Math.max((heightPercentage / 100) * 160, 4) // 160px is the available height
-              const isHovered = hoveredBarIndex === index
-
-              return (
-                <div key={index} className="flex flex-col items-center flex-1 h-full justify-end">
-                  {/* Tooltip */}
-                  {isHovered && (
-                    <div className="absolute bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 mb-2 transform -translate-y-full">
-                      {item.month}: {value}
-                    </div>
-                  )}
-
-                  {/* Bar */}
-                  <div
-                    className={`w-full max-w-8 rounded-t transition-all duration-300 cursor-pointer ${
-                      isHovered ? getHoverColor(selectedPeriod) : getBarColor(selectedPeriod)
-                    } ${isHovered ? "shadow-lg transform scale-105" : ""}`}
-                    style={{
-                      height: `${barHeight}px`,
-                      minHeight: "4px",
-                    }}
-                    onMouseEnter={() => setHoveredBarIndex(index)}
-                    onMouseLeave={() => setHoveredBarIndex(null)}
-                  ></div>
-
-                  {/* Month label */}
-                  <span
-                    className={`text-xs mt-2 transition-colors duration-200 ${
-                      isHovered ? "text-gray-900 font-medium" : "text-gray-600"
-                    }`}
-                  >
-                    {item.month}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="flex items-center justify-center mt-4 gap-4">
-          <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded ${getBarColor(selectedPeriod)}`}></div>
-            <span className="text-xs text-gray-600">{selectedPeriod}ly Data</span>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
+export default function Dashboard({ incidents, barangays }: PageProps<{ incidents: IncidentData[], barangays: BarangayNames }>) {
   return (
     <div>
       <div className="min-h-screen bg-gray-50">
@@ -371,36 +100,32 @@ export default function Dashboard() {
               </div>
 
               {/* Analytics Charts */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InteractiveBarChart
-                  data={requestOverviewData}
-                  dataKey={selectedPeriod === "Week" ? "week" : selectedPeriod === "Month" ? "monthData" : "year"}
-                  title="Request Overview"
-                  stats={{
-                    value1: 789,
-                    label1: "Total Requests",
-                    value2: 658,
-                    label2: "Approved Requests",
-                  }}
-                  chartId="bar"
-                />
-
-                <InteractiveBarChart
-                  data={incidentReportData}
-                  dataKey={selectedPeriod === "Week" ? "week" : selectedPeriod === "Month" ? "monthData" : "year"}
-                  title="Incident Reports"
-                  stats={{
-                    value1: 1221,
-                    label1: "Total Incidents",
-                    value2: 1120,
-                    label2: "Resolved Cases",
-                  }}
-                  chartId="bar"
-                />
+              <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Incidents (per Barangay)</h3>
+                <ChartContainer config={chartConfig}>
+                  <BarChart
+                    width={500}
+                    data={incidents}
+                  >
+                    <CartesianGrid />
+                    <XAxis
+                      dataKey="barangay"
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={false}
+                      angle={270}
+                      height={150}
+                      textAnchor="end"
+                    />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey={1} stackId="a" fill="var(--color-1)" />
+                    <Bar dataKey={9} stackId="a" fill="var(--color-9)" />
+                    <Bar dataKey={11} stackId="a" fill="var(--color-11)" />
+                  </BarChart>
+                </ChartContainer>
               </div>
             </div>
-
-            
           </div>
 
         </div>
@@ -410,3 +135,18 @@ export default function Dashboard() {
 }
 
 Dashboard.layout = (e: React.ReactElement) => <AuthenticatedLayout PageIcon={LayoutDashboard} pageTitle="Dashboard" children={e} />
+
+const chartConfig = {
+  1: {
+    label: 'General Incident',
+    color: '#2563eb',
+  },
+  9: {
+    label: 'Vehicular Accident',
+    color: '#60a5fa',
+  },
+  11: {
+    label: 'Medical Response',
+    color: '#1B2560',
+  }
+}

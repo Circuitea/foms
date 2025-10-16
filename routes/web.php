@@ -8,13 +8,40 @@ use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TasksController;
+use App\Models\Barangay;
+use App\Models\Incident;
+use App\Models\Task\TaskType;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
     Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+        $incidentData = DB::table('incidents')
+            ->join('barangays', 'incidents.barangay_id', '=', 'barangays.id')
+            ->select('barangays.name as barangay', 'type_id', DB::raw('COUNT(*) as incidents_count'))
+            ->groupBy('barangays.name', 'type_id')
+            ->get();
+
+        // Transform to: [{ barangay: 'Addition Hills', 9: 2, 5: 1 }, ...]
+        $grouped = [];
+
+        foreach ($incidentData as $row) {
+            $barangayName = $row->barangay;
+            $typeId = $row->type_id;
+            $count = $row->incidents_count;
+
+            if (!isset($grouped[$barangayName])) {
+                $grouped[$barangayName] = ['barangay' => $barangayName];
+            }
+            $grouped[$barangayName][$typeId] = $count;
+        }
+
+        $grouped = array_values($grouped);
+        return Inertia::render('Dashboard', [
+            'types' => TaskType::all()->pluck('name', 'id'),
+            'incidents' => $grouped,
+        ]);
     })->name('dashboard');
 
     Route::get('/map', function () {
