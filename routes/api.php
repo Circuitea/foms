@@ -9,7 +9,9 @@ use App\Models\FinishTaskActivity;
 use App\Models\Inventory\ConsumableItem;
 use App\Models\Personnel;
 use App\Models\StartTaskActivity;
+use App\Notifications\PersonnelEmergency;
 use App\PermissionsEnum;
+use App\RolesEnum;
 use App\Services\AnalyticsService;
 use App\StatusEnum;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -17,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -65,6 +68,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
         $user->status = $newStatus;
         $user->save();
+
+        if ($newStatus === StatusEnum::EMERGENCY) {
+            $personnel = Personnel::all()
+                ->filter(fn ($person) => $person->hasRole([RolesEnum::ADMIN, RolesEnum::OPERATOR]));
+            Notification::send($personnel, new PersonnelEmergency($user));
+        }
 
         $changeStatusActivity = ChangeStatusActivity::create([
             'old_status' => is_null($oldStatus) ? StatusEnum::UNAVAILABLE : $oldStatus ,

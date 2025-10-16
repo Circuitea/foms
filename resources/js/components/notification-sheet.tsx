@@ -9,8 +9,10 @@ import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { Link } from "@inertiajs/react";
 import { Spinner } from "./ui/spinner";
 import dayjs from "dayjs";
+import { formatName } from "@/lib/utils";
+import { Personnel } from "@/types";
 
-type Notification = TaskAssignedNotification | ConsumableItemLevelLowNotification;
+type Notification = TaskAssignedNotification | ConsumableItemLevelLowNotification | PersonnelEmergencyNotification;
 
 interface TaskAssignedNotification {
   id: string;
@@ -38,6 +40,18 @@ interface ConsumableItemLevelLowNotification {
       quantity: number;
       level: number;
     };
+  };
+
+  read_at?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface PersonnelEmergencyNotification {
+  id: string;
+  type: 'personnel-emergency';
+  data: {
+    personnel: Personnel,
   };
 
   read_at?: string;
@@ -160,6 +174,8 @@ function NotificationDetails({ notification }: { notification: Notification }) {
       return <TaskAssigned notification={notification} />
     case 'consumable-item-low':
       return <ConsumableItemLevelLow notification={notification} />
+    case 'personnel-emergency':
+      return <PersonnelEmergency notification={notification} />
     default:
       return (
         <>
@@ -210,6 +226,24 @@ function ConsumableItemLevelLow({ notification } : { notification: ConsumableIte
         <Button asChild>
           <Link href={`/inventory/consumable/${notification.data.item.id}`}>
             View Item
+          </Link>
+        </Button>
+      </ItemActions>
+    </>
+  )
+}
+
+function PersonnelEmergency({ notification } : { notification: PersonnelEmergencyNotification }) {
+  return (
+    <>
+      <ItemContent>
+        <ItemTitle>{notification.data.personnel.first_name} is in an Emergency.</ItemTitle>
+        <ItemDescription>{formatName(notification.data.personnel)} has set their status to 'In Emergency'.</ItemDescription>
+      </ItemContent>
+      <ItemActions>
+        <Button asChild>
+          <Link href='/map'>
+            Open Map
           </Link>
         </Button>
       </ItemActions>

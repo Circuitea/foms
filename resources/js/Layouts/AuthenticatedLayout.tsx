@@ -13,6 +13,8 @@ import { StatusProvider } from '@/context/status-context';
 import { Task } from '@/types/tasks';
 import { NotificationSheet } from '@/components/notification-sheet';
 import { Item } from '@radix-ui/react-select';
+import { Personnel } from '@/types';
+import { formatName } from '@/lib/utils';
 
 interface BreadcrumbEntry {
   value: string;
@@ -49,6 +51,14 @@ export default function Authenticated({
       toast('warning', `Item ${notification.item.name} is low.`, `Item quantity is below recommended level. (${notification.item.quantity} < ${notification.item.level})'`)
     },
     'broadcast.consumable-item-low',
+  )
+
+  useEchoNotification<{ personnel: Personnel }>(
+    `App.Models.Personnel.${user.id}`,
+    (notification) => {
+      toast('error', `${notification.personnel.first_name} is in an Emergency.`, `${formatName(notification.personnel)} has set their status to Emergency.`)
+    },
+    'broadcast.personnel-emergency',
   )
 
   const currentTime = useRealTimeClock();
