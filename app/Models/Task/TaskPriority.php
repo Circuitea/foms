@@ -21,7 +21,7 @@ class TaskPriority extends Model
 {
     protected $table = 'task_priorities';
 
-    protected $fillable = ['name'];
+    protected $fillable = ['id', 'name'];
 
     public $timestamps = false;
 
