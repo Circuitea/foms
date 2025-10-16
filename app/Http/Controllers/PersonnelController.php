@@ -37,7 +37,7 @@ class PersonnelController extends Controller
     Gate::authorize(PermissionsEnum::PERSONNEL_CREATE);
 
     $roles = Role::all()->map(fn (Role $role) => [
-      'id' => $role->id,
+      'id' => $role->name,
       'name' => RolesEnum::from($role->name)->label(),
     ]);
     $sections = Section::all(['id', 'name']);
@@ -65,6 +65,8 @@ class PersonnelController extends Controller
     ]);
 
     $personnel->sections()->attach($validated['sections']);
+
+    $personnel->syncRoles($validated['roles']);
 
     return redirect('/personnel');
   }

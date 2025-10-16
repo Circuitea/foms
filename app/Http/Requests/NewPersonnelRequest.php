@@ -36,7 +36,7 @@ class NewPersonnelRequest extends FormRequest
             'name_extension' => 'nullable|string|regex:/^[A-Za-z\\s]+$/|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.Personnel::class,
             'mobile_number' => 'nullable|string|size:10',
-            'roles' => ['required', 'list', new ValidRole],
+            'roles' => ['required', 'list'],
             'sections' => ['required', 'list', new ValidSection],
             'password' => ['required', Rules\Password::defaults()],
             'profile_picture' => ['nullable', File::image()->max('100mb')],
