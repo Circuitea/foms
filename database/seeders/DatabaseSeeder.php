@@ -17,11 +17,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            RoleSeeder::class,
+            StatusSeeder::class,
             MeetingTypeSeeder::class,
             InventoryItemTypeSeeder::class,
-            InventoryItemConditionSeeder::class,
-            RoleSeeder::class,
             TaskRelatedSeeder::class,
+            BarangaySeeder::class,
         ]);
 
         // $allDiagnosis = ['141j231', '123'];
