@@ -3,16 +3,19 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { TaskReport } from "@/Documents/TaskReport";
 import { Task } from "@/types/tasks";
 import { router, usePage } from "@inertiajs/react";
-import { pdf, PDFDownloadLink, PDFViewer, usePDF } from "@react-pdf/renderer";
-import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function FinishTaskDialog({ task, onSubmit }: { task: Task, onSubmit: () => void }) {
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState('');
+  const [files, setFiles] = useState<File[]>([]);
+
+  // useEffect(() => {
+  //   setFiles([]);
+  // }, [open])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -34,9 +37,44 @@ export function FinishTaskDialog({ task, onSubmit }: { task: Task, onSubmit: () 
             <Textarea
               id="notes"
               value={notes}
-              rows={10}
+              rows={5}
               onChange={(e) => setNotes(e.target.value)}
             />
+          </div>
+          <div className="py-4 space-y-2">
+            <Label htmlFor="attachments" className="w-full flex justify-center items-center py-2 border-2 rounded-lg">
+              <span>Add Image Attachment/s</span>
+            </Label>
+            <Input
+              className="py-2"
+              id="attachments"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                const newFiles = e.target.files ? Array.from(e.target.files) : [];
+                if (newFiles.length > 0) {
+                  setFiles(prev => [...prev, ...newFiles]);
+                }
+              }}
+              hidden
+            />
+            {files.map((file, index) => (
+              <div className="p-2 flex items-center justify-between border border-gray-200 rounded-lg">
+                <a className="text-[#1B2560] underline" href={URL.createObjectURL(file)} download>{file.name}</a>
+                <Button
+                  className="w-8 h-8"
+                  variant="outline"
+                  onClick={() => {
+                    setFiles([
+                      ...files.filter((_, i) => index !== i),
+                    ]);
+                  }}
+                >
+                  <X />
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
         <DialogFooter>
@@ -47,8 +85,7 @@ export function FinishTaskDialog({ task, onSubmit }: { task: Task, onSubmit: () 
             Cancel
           </Button>
           <Button
-            className="bg-[#1B2560]"
-            onClick={() => {
+              onClick={() => {
               router.post(`/my-tasks/${task.id}/status`, {
                 status: 'finished',
                 additional_notes: notes,
