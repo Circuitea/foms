@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { TaskReport } from "@/Documents/TaskReport"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import { cn, formatName } from "@/lib/utils"
-import { PageProps } from "@/types"
+import { PageProps, Personnel } from "@/types"
 import { PersonnelWithPivot, Task } from "@/types/tasks"
 import { Link } from "@inertiajs/react"
 import { PDFDownloadLink, PDFViewer, usePDF } from "@react-pdf/renderer"
@@ -138,7 +138,7 @@ export default function ShowTask({ task }: PageProps<{ task: Task }>) {
   )
 }
 
-function PersonnelEntry({ person }: { person: PersonnelWithPivot }) {
+function PersonnelEntry({ person }: { person: PersonnelWithPivot  }) {
   function getStatusColor(person: PersonnelWithPivot) {
     if (!!person.pivot.finished_at) {
       return 'bg-green-200 text-green-600';
@@ -182,32 +182,63 @@ function PersonnelEntry({ person }: { person: PersonnelWithPivot }) {
               }
             </TooltipContent>
           </Tooltip>
-          {!!person.pivot.finished_at && !!person.pivot.additional_notes && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="flex items-center justify-center rounded-lg bg-[#1B2560]">
-                  View Note
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>View Note</DialogTitle>
-                  <DialogDescription>Additional note provided by {formatName(person)}.</DialogDescription>
-                </DialogHeader>
-                <div className="h-full relative top-0">
-                  <div className="py-4 space-y-2">
-                    <Label htmlFor="notes">Additional Note</Label>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="flex items-center justify-center rounded bg-[#1B2560]">
+                View Note
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-7xl h-[80vh] flex flex-col">
+              <DialogHeader>
+                <DialogTitle>View Attached Note</DialogTitle>
+                <DialogDescription>Additional note that will be attached to the final task report.</DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden flex-1">
+                <div className="space-y-2 flex flex-col">
+                  <Label htmlFor="notes">Additional Note</Label>
+                  {!!person.pivot.additional_notes ? (
                     <Textarea
                       id="notes"
                       value={person.pivot.additional_notes}
-                      rows={10}
                       readOnly
+                      className="flex-1 m-1"
                     />
-                  </div>
+                  ) : (
+                    <Textarea
+                      id="notes"
+                      value="No additional notes provided."
+                      readOnly
+                      className="flex-1 m-1 italic"
+                    />
+                  )}
+                  {/* <Textarea
+                    id="notes"
+                    value={task.pivot.additional_notes}
+                    readOnly
+                    className="flex-1 m-1"
+                  /> */}
                 </div>
-              </DialogContent>
-            </Dialog>
-          )}
+                {person.attachments.length >= 1 && (
+                  <div className="space-y-2 flex flex-col overflow-hidden">
+                    <Label>Attachments</Label>
+                    <div className="flex-1 overflow-y-auto rounded-md border p-2">
+                      {person.attachments.map((attachment, index) => (
+                        <Tooltip key={index} >
+                          <TooltipTrigger asChild>
+                            <img className="w-full object-contain mx-auto my-2 outline-2  " src={`/storage/${attachment.file_path}`} />
+                          </TooltipTrigger>
+                          <TooltipContent side="left">
+                            <span>{attachment.file_name}</span>
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

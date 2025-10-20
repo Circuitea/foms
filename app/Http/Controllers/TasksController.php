@@ -15,6 +15,7 @@ use App\Models\Inventory\Transaction;
 use App\Models\Inventory\TransactionEntry;
 use App\Models\Personnel;
 use App\Models\Task\Task;
+use App\Models\Task\TaskAttachment;
 use App\Models\Task\TaskPriority;
 use App\Models\Task\TaskType;
 use App\Notifications\TaskAssignedNotification;
@@ -54,8 +55,17 @@ class TasksController extends Controller
       ->findOr($id, function () {
         abort(404);
       });
+
+    $personnel = $task->personnel->map(fn ($person) => [
+      ... $person->toArray(),
+      'attachments' => TaskAttachment::where('personnel_id', $person->id)->where('task_id', $task->id)->get(),
+    ]);
+      
     return Inertia::render('Tasks/ShowTask', [
-      'task' => $task,
+      'task' => [
+        ... $task->toArray(),
+        'personnel' => $personnel,
+      ],
     ]);
   }
 

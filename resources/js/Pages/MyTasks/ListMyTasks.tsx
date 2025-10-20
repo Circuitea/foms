@@ -196,9 +196,9 @@ function TaskList({ tasks }: { tasks: TaskWithAttachments[] }) {
                             {task.attachments.map((attachment, index) => (
                               <Tooltip key={index} >
                                 <TooltipTrigger asChild>
-                                  <img className="w-full object-contain mx-auto my-2" src={`/storage/${attachment.file_path}`} />
+                                  <img className="w-full object-contain mx-auto my-2 outline-2  " src={`/storage/${attachment.file_path}`} />
                                 </TooltipTrigger>
-                                <TooltipContent>
+                                <TooltipContent side="left">
                                   <span>{attachment.file_name}</span>
                                 </TooltipContent>
                               </Tooltip>

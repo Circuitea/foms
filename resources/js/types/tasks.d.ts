@@ -39,6 +39,7 @@ export interface Task {
 }
 
 export type PersonnelWithPivot = Personnel & {
+  attachments: TaskAttachment[];
   pivot: {
     started_at?: string;
     finished_at?: string;
