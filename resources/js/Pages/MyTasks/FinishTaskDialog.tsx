@@ -89,6 +89,7 @@ export function FinishTaskDialog({ task, onSubmit }: { task: Task, onSubmit: () 
               router.post(`/my-tasks/${task.id}/status`, {
                 status: 'finished',
                 additional_notes: notes,
+                attachments: files,
               });
             }}
           >

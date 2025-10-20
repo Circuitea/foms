@@ -4,7 +4,7 @@ import { useStatusDispatch } from "@/context/status-context";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { cn, formatName } from "@/lib/utils";
 import { PageProps } from "@/types";
-import { Task } from "@/types/tasks";
+import { Task, TaskWithAttachments } from "@/types/tasks";
 import { router } from "@inertiajs/react";
 import dayjs from "dayjs";
 import { Bell, Clipboard } from "lucide-react";
@@ -15,12 +15,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PageTabs, PageTabsContent, PageTabsList, PageTabsTrigger } from "@/components/tabs";
 
-export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
+export default function ListMyTasks({ tasks }: PageProps<{ tasks: TaskWithAttachments[] }>) {
 
   const tabs = [
     { value: 'active', label: 'Active Tasks', tasks: tasks.filter(task => !task.pivot.finished_at) },
     { value: 'finished', label: 'Finished Tasks', tasks: tasks.filter(task => !!task.pivot.finished_at) },
-  ]
+  ];
 
   return (
     <div>
@@ -44,8 +44,7 @@ export default function ListMyTasks({ tasks }: PageProps<{ tasks: Task[] }>) {
   );
 }
 
-function TaskList({ tasks }: { tasks: Task[] }) {
-  const dispatch = useStatusDispatch();
+function TaskList({ tasks }: { tasks: TaskWithAttachments[] }) {
   const getPriorityBadgeStyle = (priority: string) => {
     switch (priority) {
       case "urgent":
@@ -55,7 +54,6 @@ function TaskList({ tasks }: { tasks: Task[] }) {
       case "normal":
         return "text-white"
       case "low":
-        return "bg-gray-600 text-white"
       default:
         return "bg-gray-600 text-white"
     }
@@ -75,7 +73,6 @@ function TaskList({ tasks }: { tasks: Task[] }) {
           >
 
           <div className="flex items-start gap-4">
-            {/* Status Dot */}
             <Tooltip>
               <TooltipTrigger>
                 <div
@@ -162,25 +159,43 @@ function TaskList({ tasks }: { tasks: Task[] }) {
                       View Note
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-w-7xl h-[80vh] flex flex-col">
                     <DialogHeader>
                       <DialogTitle>View Attached Note</DialogTitle>
                       <DialogDescription>Additional note that will be attached to the final task report.</DialogDescription>
                     </DialogHeader>
-                    <div className="h-full relative top-0">
-                      <div className="py-4 space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden flex-1">
+                      <div className="space-y-2 flex flex-col">
                         <Label htmlFor="notes">Additional Note</Label>
                         <Textarea
                           id="notes"
                           value={task.pivot.additional_notes}
-                          rows={10}
                           readOnly
+                          className="flex-1 m-1"
                         />
                       </div>
+                      {task.attachments.length >= 1 && (
+                        <div className="space-y-2 flex flex-col overflow-hidden">
+                          <Label>Attachments</Label>
+                          <div className="flex-1 overflow-y-auto rounded-md border p-2">
+                            {task.attachments.map((attachment, index) => (
+                              <Tooltip key={index} >
+                                <TooltipTrigger asChild>
+                                  <img className="w-full object-contain mx-auto my-2" src={`/storage/${attachment.file_path}`} />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <span>{attachment.file_name}</span>
+                                </TooltipContent>
+                              </Tooltip>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
+                    
                   </DialogContent>
                 </Dialog>
-              ) }
+              )}
             </div>
           </div>
         </div>

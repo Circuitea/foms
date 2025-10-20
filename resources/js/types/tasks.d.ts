@@ -55,3 +55,14 @@ export interface TaskPriority {
   id: number,
   name: string,
 }
+
+export interface TaskAttachment {
+  personnel_id: number;
+  task_id: number;
+  file_path: string;
+  file_name: string;
+}
+
+export type TaskWithAttachments = Task & {
+  attachments: TaskAttachment[];
+}

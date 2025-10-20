@@ -172,6 +172,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 Rule::in(['started', 'finished', 'canceled']),
             ],
             'additional_notes' => 'nullable|string|max:65535',
+            'attachments' => 'nullable|list',
+            'attachments.*' => ['image'],
         ]);
 
         $user = $request->user();

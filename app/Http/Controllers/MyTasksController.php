@@ -7,9 +7,11 @@ use App\Models\CancelTaskActivity;
 use App\Models\FinishTaskActivity;
 use App\Models\StartTaskActivity;
 use App\Models\Task\Task;
+use App\Models\Task\TaskAttachment;
 use App\Models\Task\TaskReport;
 use App\StatusEnum;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -21,12 +23,19 @@ class MyTasksController extends Controller
 {
     public function list(Request $request) {
         $user = $request->user();
+        $tasks = $user->assignedTasks->load([
+            'priority',
+            'type',
+            'creator',
+        ]);
+
+        $tasksWithAttachments = $tasks->map(fn ($task) => [
+            ... $task->toArray(),
+            'attachments' => TaskAttachment::where('personnel_id', $user->id)->where('task_id', $task->id)->get(),
+        ]);
+
         return Inertia::render('MyTasks/ListMyTasks', [
-            'tasks' => $user->assignedTasks->load([
-                'priority',
-                'type',
-                'creator',
-            ]),
+            'tasks' => $tasksWithAttachments,
         ]);
     }
 
@@ -37,6 +46,8 @@ class MyTasksController extends Controller
                 Rule::in(['started', 'finished', 'canceled']),
             ],
             'additional_notes' => 'nullable|string|max:65535',
+            'attachments' => 'nullable|list',
+            'attachments.*' => ['image'],
         ]);
         
         $task = Task::findOr($id, function () {
@@ -55,8 +66,6 @@ class MyTasksController extends Controller
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => null,
             ]);
-            $user->status = StatusEnum::AVAILABLE;
-            $user->save();
             $activity = new CancelTaskActivity();
             $activity->task()->associate($task);
             $activity->save();
@@ -65,8 +74,19 @@ class MyTasksController extends Controller
                 'finished_at' => Date::now(),
                 'additional_notes' => $request->input('additional_notes'),
             ]);
-            $user->status = StatusEnum::AVAILABLE;
-            $user->save();
+
+            collect($request->file('attachments'))->each(function (UploadedFile $attachment) use ($task, $user) {
+                if ($attachment->isValid()) {
+                    $file_path = $attachment->store('attachments', 'public');
+                    $file_name = $attachment->getClientOriginalName();
+                    TaskAttachment::create([
+                        'personnel_id' => $user->id,
+                        'task_id' => $task->id,
+                        'file_path' => $file_path,
+                        'file_name' => $file_name,
+                    ]);
+                }
+            });
 
             $activity = new FinishTaskActivity();
             $activity->task()->associate($task);
