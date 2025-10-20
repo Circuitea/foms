@@ -9,6 +9,7 @@ use App\Models\FinishTaskActivity;
 use App\Models\Inventory\ConsumableItem;
 use App\Models\Personnel;
 use App\Models\StartTaskActivity;
+use App\Models\Task\TaskAttachment;
 use App\Notifications\PersonnelEmergency;
 use App\PermissionsEnum;
 use App\RolesEnum;
@@ -16,6 +17,7 @@ use App\Services\AnalyticsService;
 use App\StatusEnum;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -199,8 +201,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             $task->personnel()->updateExistingPivot($user->id, [
                 'started_at' => null,
             ]);
-            $user->status = StatusEnum::AVAILABLE;
-            $user->save();
+            
             $activity = new CancelTaskActivity();
             $activity->task()->associate($task);
             $activity->save();
@@ -209,8 +210,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 'finished_at' => Date::now(),
                 'additional_notes' => $request->input('additional_notes'),
             ]);
-            $user->status = StatusEnum::AVAILABLE;
-            $user->save();
+            
+            collect($request->file('attachments'))->each(function (UploadedFile $attachment) use ($task, $user) {
+                if ($attachment->isValid()) {
+                    $file_path = $attachment->store('attachments', 'public');
+                    $file_name = $attachment->getClientOriginalName();
+                    TaskAttachment::create([
+                        'personnel_id' => $user->id,
+                        'task_id' => $task->id,
+                        'file_path' => $file_path,
+                        'file_name' => $file_name,
+                    ]);
+                }
+            });
 
             $activity = new FinishTaskActivity();
             $activity->task()->associate($task);
