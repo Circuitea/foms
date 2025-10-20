@@ -167,12 +167,27 @@ function TaskList({ tasks }: { tasks: TaskWithAttachments[] }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden flex-1">
                       <div className="space-y-2 flex flex-col">
                         <Label htmlFor="notes">Additional Note</Label>
-                        <Textarea
+                        {!!task.pivot.additional_notes ? (
+                          <Textarea
+                            id="notes"
+                            value={task.pivot.additional_notes}
+                            readOnly
+                            className="flex-1 m-1"
+                          />
+                        ) : (
+                          <Textarea
+                            id="notes"
+                            value="No additional notes provided."
+                            readOnly
+                            className="flex-1 m-1 italic"
+                          />
+                        )}
+                        {/* <Textarea
                           id="notes"
                           value={task.pivot.additional_notes}
                           readOnly
                           className="flex-1 m-1"
-                        />
+                        /> */}
                       </div>
                       {task.attachments.length >= 1 && (
                         <div className="space-y-2 flex flex-col overflow-hidden">
