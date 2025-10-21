@@ -10,7 +10,7 @@ export interface Personnel {
     mobile_number?: string;
     roles: Role[];
     sections: Section[];
-    status?: Status;
+    status: Status;
     position?: string;
     profile_picture_filename: string | null;
 }

@@ -20,7 +20,7 @@ const getStatusColor = (status?: Status) => {
     return colors[status];
   }
 
-export default function PersonnelMarker({ marker, isClickable, selected }: { marker: PersonnelLocation, isClickable: boolean, selected: boolean }) {
+export default function PersonnelMarker({ marker, isClickable }: { marker: PersonnelLocation, isClickable: boolean }) {
   const [ isOpen, setOpen ] = useState(false);
 
   function onMarkerClick() {
@@ -28,7 +28,7 @@ export default function PersonnelMarker({ marker, isClickable, selected }: { mar
       setOpen(true);
     }
   }
-  return selected ? (
+  return  (
     <div>
       <LocationMarker location={marker} visible={false} onClick={onMarkerClick} />
       <Dialog open={isOpen} onOpenChange={setOpen}>
@@ -97,5 +97,5 @@ export default function PersonnelMarker({ marker, isClickable, selected }: { mar
         </DialogContent>
       </Dialog>      
     </div>
-  ) : null;
+  );
 }

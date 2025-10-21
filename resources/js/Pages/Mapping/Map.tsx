@@ -1,57 +1,25 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Users, EyeOff, MapIcon, ChevronRight, ChevronLeft, Eye } from "lucide-react"
+import { Users, EyeOff, MapIcon, ChevronRight, ChevronLeft, Eye, CircleCheck, Coffee, AlarmClockOff, ShieldAlert } from "lucide-react"
 import Authenticated from "@/Layouts/AuthenticatedLayout"
 import type { JSX } from "react"
 import TrackingMap from "./TrackingMap"
 import { Map } from "leaflet"
 import { useSidebar } from "@/components/ui/sidebar"
-import { usePage } from "@inertiajs/react"
-import { PageProps, Personnel, PersonnelLocation } from "@/types"
-import { useEcho } from "@laravel/echo-react"
 import { formatName, userHasPermission } from "@/lib/utils"
 import { GenerateLocationHistoryReportDialog } from "./Partials/GenerateLocationHistoryReportDialog"
-import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { id } from "date-fns/locale"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { Toggle } from "@/components/ui/toggle"
+import { ALL_STATUSES, useMapTracking } from "@/hooks/use-map-tracking"
+import { Status } from "@/types"
 
 export default function MapPage () {
-  const { locations } = usePage<PageProps<{ locations: Record<number, PersonnelLocation> }>>().props;
-  const [markerLocations, setMarkerLocations] = useState<Record<number, PersonnelLocation>>(locations);
-  const [personnel, setPersonnel] = useState<Personnel[]>(Object.entries(locations).map(([id, location]) => location.personnel));
-  useEcho<{ location: PersonnelLocation }>('location', 'LocationUpdated', ({ location }) => {
-    setMarkerLocations({
-      ...markerLocations,
-      [location.id]: location,
-    });
-    if (!personnel.find(person => person.id === location.personnel.id)) {
-      setPersonnel([...personnel, location.personnel])
-    }
-  });
-
-  useEcho<{ locations: PersonnelLocation[] }>('location', 'LocationSynced', ({ locations }) => {
-    // setMarkerLocations(locations);
-    console.log(locations);
-    let newLocations: Record<number, PersonnelLocation> = {};
-
-    locations.forEach(location => {
-      newLocations = {
-        ... newLocations,
-        [location.id]: location,
-      };
-    });
-    setMarkerLocations(newLocations);
-    setPersonnel(locations.map(location => location.personnel))
-  });
-
-  const [hiddenPersonnel, setHiddenPersonnel] = useState<number[]>([]);
-
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const { state } = useSidebar();
-
   const map = useRef<Map>(null);
-
+  const { locations, personnel, selectedStatuses, visiblePersonnel, togglePersonnelHide, setSelectedStatuses } = useMapTracking();
+  
   const toggleSidebar = () => {
     setSidebarExpanded(!sidebarExpanded)
   }
@@ -72,12 +40,22 @@ export default function MapPage () {
     return () => clearTimeout(timer)
   }, [sidebarExpanded, state])
 
+  const allSelected = ALL_STATUSES.every(status => selectedStatuses.includes(status));
+
+  const statusSelectionOptions = [
+    {value: 'available', icon: CircleCheck},
+    {value: 'on break', icon: Coffee},
+    {value: 'unavailable', icon: AlarmClockOff},
+    {value: 'emergency', icon: ShieldAlert},
+
+  ]
+
   return (
     <div className="h-screen w-full bg-gray-50 flex flex-col">
       <div className="flex-1 flex min-h-0">
         <div className="flex-1 min-w-0">
           <div className="w-full h-full bg-gray-100 relative overflow-hidden">
-            <TrackingMap markerLocations={markerLocations} ref={map} hiddenPersonnel={hiddenPersonnel} />
+            <TrackingMap markerLocations={locations} ref={map} />
           </div>
         </div>
 
@@ -106,7 +84,7 @@ export default function MapPage () {
 
                 <div className="flex-1 overflow-y-auto">
                   <div className="flex justify-end gap-2 mb-2">
-                    <Tooltip>
+                    {/* <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
                           variant="outline"
@@ -122,20 +100,29 @@ export default function MapPage () {
                       onClick={() => setHiddenPersonnel(personnel.map(person => person.id))}
                     >
                       <EyeOff className="h-3 w-3 text-[#1B2560]" />
-                    </Button>
+                    </Button> */}
+                    <Toggle variant="outline" pressed={allSelected} onPressedChange={() => {
+                      if (allSelected) {
+                        setSelectedStatuses([]);
+                      } else {
+                        setSelectedStatuses([...ALL_STATUSES]);
+                      }
+                    }}><Eye /></Toggle>
+                    <ToggleGroup type="multiple" variant="outline" value={selectedStatuses} onValueChange={(value) => {
+                      setSelectedStatuses(value as Status[]);
+                    }}>
+                      {statusSelectionOptions.map((option, index) => (
+                        <ToggleGroupItem key={index} value={option.value}><option.icon /></ToggleGroupItem>
+                      ))}
+                    </ToggleGroup>
                   </div>
                   <div className="space-y-2">
-                    {personnel.map((person, index) => (
+                    {personnel.filter(person => selectedStatuses.includes(person.status)).map((person, index) => (
                       <div
                         key={index}
-                        onClick={() => {
-                          setHiddenPersonnel(hiddenPersonnel.includes(person.id)
-                            ? hiddenPersonnel.filter(hiddenPerson => hiddenPerson !== person.id)
-                            : [...hiddenPersonnel, person.id]
-                          );
-                        }}
+                        onClick={() => togglePersonnelHide(person.id)}
                         className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all hover:bg-gray-100 ${
-                          !hiddenPersonnel.includes(person.id)
+                          !!visiblePersonnel.find(visiblePerson => visiblePerson.id === person.id)
                             ? "bg-blue-100 border border-blue-300"
                             : "bg-gray-50 border border-gray-200"
                           // "bg-gray-50 border border-gray-200"
@@ -146,7 +133,7 @@ export default function MapPage () {
                           <div className="text-xs text-gray-600">{person.email}</div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          {!hiddenPersonnel.includes(person.id) ? (
+                          {!!visiblePersonnel.find(visiblePerson => visiblePerson.id === person.id) ? (
                             <Eye className="h-3 w-3 text-[#1B2560]" />
                           ) : (
                             <EyeOff className="h-3 w-3 text-gray-400" />
