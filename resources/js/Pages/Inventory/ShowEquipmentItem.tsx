@@ -9,12 +9,12 @@ import { getMonthName, toProperCase } from "@/lib/utils";
 import { PageProps } from "@/types";
 import { EquipmentGroup, EquipmentItem, EquipmentTransactionEntry } from "@/types/inventory";
 import { Link, router, usePage } from "@inertiajs/react";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink, usePDF } from "@react-pdf/renderer";
 import { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import { table } from "console";
 import dayjs from "dayjs";
 import { Calendar, Clipboard, Info, MapPin, MoveLeft, Package } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const columns: ColumnDef<EquipmentItem>[] = [
   {
@@ -47,11 +47,44 @@ const columns: ColumnDef<EquipmentItem>[] = [
     accessorKey: 'name',
   },
   {
-    id: 'task',
-    accessorFn: () => '',
+    id: 'transaction',
+    accessorFn: (item) => {
+      if (item.entries.length > 0) {
+        return item.entries.toSorted((a, b) => dayjs(a.transaction.created_at).diff(b.transaction.created_at))[0].transaction.title;
+      } else {
+        return null;
+      }
+    },
+    cell: ({ row }) => {
+      if (!!row.getValue('transaction')) {
+        return (
+          <span>{row.getValue('transaction')}</span>
+        )
+      } else {
+        return <span>Never</span>
+      }
+    },
+    header: 'Usage',
   },
-    {
-    accessorFn: () => 'Never',
+  {
+    id: 'last_used',
+    accessorFn: (item) => {
+      if (item.entries.length > 0) {
+        return item.entries.toSorted((a, b) => dayjs(a.transaction.created_at).diff(b.transaction.created_at))[0].transaction.created_at
+      } else {
+        return null;
+      }
+    },
+
+    cell: ({ row }) => {
+      if (!!row.getValue('last_used')) {
+        return (
+          <span>{dayjs(row.getValue('last_used')).format('MMMM DD, YYYY hh:mm a')}</span>
+        )
+      } else {
+        return <span>Never</span>
+      }
+    },
     header: 'Last Used',
   },
 ]
@@ -74,10 +107,24 @@ export default function ShowEquipmentItem({
   const [endDate, setEndDate] = useState(end_date);
   const { user } = usePage().props.auth;
 
+  const report = <EquipmentItemReport group={item} selectedItems={Object.keys(selectedItems)} creator={user} />;
+
   const monthOptions: {value: string, label: string}[] = [];
   
   Object.entries(months).forEach(([year, monthsInYear]) => monthsInYear.forEach(month => monthOptions.push({ value: `${year}-${String(month).padStart(2, '0')}`, label: `${getMonthName(month)} ${year}`})))
 
+  const [instance, update] = usePDF(Object.entries(selectedItems).length > 0 ? { document: report } : undefined);
+
+  useEffect(() => {
+    if (instance.url && !instance.loading) {
+      const link = document.createElement('a');
+      link.href = instance.url;
+      link.download = `equipment_${item.id}_${dayjs(startDate, "YYYY-MM").format("YYYYMM")}-${dayjs(endDate, "YYYY-MM").format("YYYYMM")}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }, [instance.url, instance.loading, item.id]);
 
   useEffect(() => {
     console.log(item);
@@ -181,8 +228,8 @@ export default function ShowEquipmentItem({
                 <Button className="bg-[#1B2560]" onClick={() => router.reload({ data: {start_date: startDate, end_date: endDate}, only: ['i'] })}>Apply</Button>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <div className="bg-white p-4 shadow-lg rounded-lg">
+            <div className="flex justify-between gap-2">
+              <div className="flex-2 bg-white p-4 shadow-lg rounded-lg">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Clipboard className="w-5 h-5" />
                   Equipment List
@@ -195,7 +242,7 @@ export default function ShowEquipmentItem({
                   getRowId={(row) => row.id.toString()}
                 />
               </div>
-              <div className="bg-white p-4 shadow-lg rounded-lg h-full flex flex-col">
+              <div className="flex-1 bg-white p-4 shadow-lg rounded-lg h-full flex flex-col">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Info className="w-5 h-5" />
                   Equipment Item
@@ -218,11 +265,14 @@ export default function ShowEquipmentItem({
                       <div className="mt-auto flex justify-end">
                         <Button
                           className="bg-[#1B2560]"
-                          asChild
+                          disabled={instance.loading}
+                          onClick={() => {
+                            if (Object.entries(selectedItems).length > 0) {
+                              update(report);
+                            }
+                          }}
                         >
-                          <PDFDownloadLink fileName={`equipment_${item.id}_${dayjs(startDate, "YYYY-MM").format("YYYYMM")}-${dayjs(endDate, "YYYY-MM").format("YYYYMM")}`} document={<EquipmentItemReport group={item} selectedItems={Object.keys(selectedItems)} creator={user} />}>
-                            Generate Report
-                          </PDFDownloadLink>
+                          {instance.loading ? 'Generating...' : 'Download Report'}
                         </Button>
                       </div>
                     </div>
