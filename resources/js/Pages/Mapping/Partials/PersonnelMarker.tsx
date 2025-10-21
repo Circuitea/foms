@@ -8,17 +8,17 @@ import { Clock, MapPin, User, X } from "lucide-react";
 import { useState } from "react";
 
 const getStatusColor = (status?: Status) => {
-    if (!status) {
-      return 'bg-gray-100 text-gray-800';
-    }
-    const colors: Record<Status, string> = {
-      'available': "bg-green-100 text-green-800",
-      'on break': "bg-orange-100 text-orange-800",
-      'emergency': "bg-red-100 text-red-800",
-      'unavailable': "bg-gray-200 text-gray-800",
-    }
-    return colors[status];
+  if (!status) {
+    return 'bg-gray-100 text-gray-800';
   }
+  const colors: Record<Status, string> = {
+    'available': "bg-green-100 text-green-800",
+    'on break': "bg-orange-100 text-orange-800",
+    'emergency': "bg-red-100 text-red-800",
+    'unavailable': "bg-gray-200 text-gray-800",
+  }
+  return colors[status];
+}
 
 export default function PersonnelMarker({ marker, isClickable }: { marker: PersonnelLocation, isClickable: boolean }) {
   const [ isOpen, setOpen ] = useState(false);
@@ -30,7 +30,7 @@ export default function PersonnelMarker({ marker, isClickable }: { marker: Perso
   }
   return  (
     <div>
-      <LocationMarker location={marker} visible={false} onClick={onMarkerClick} />
+      <LocationMarker location={marker} visible={false} onClick={onMarkerClick} detailedTooltip />
       <Dialog open={isOpen} onOpenChange={setOpen}>
         <DialogContent className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
           <DialogHeader>
