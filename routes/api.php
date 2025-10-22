@@ -176,7 +176,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'additional_notes' => 'nullable|string|max:65535',
             'attachments' => 'nullable|list',
             'attachments.*' => ['image'],
-            'confirmed' => 'nullable|accepted',
         ]);
 
         $user = $request->user();
