@@ -17,8 +17,9 @@ import { FormEventHandler, useState } from "react";
 import Select from 'react-select';
 import { InventoryItems, ItemSelection, ItemSelectionDialog } from "@/components/ItemSelectionDialog";
 import { Badge } from "@/components/ui/badge";
+import { LocationSelector } from "@/components/location-selector";
 
-type NewTaskEntry = Pick<Task, 'title' | 'description' | 'location' | 'due_date'> & {
+type NewTaskEntry = Pick<Task, 'title' | 'description' | 'location' | 'due_date' | 'location_latitude' | 'location_longitude'> & {
   creator_id?: number;
   type_id?: number;
   priority_id?: number;
@@ -200,12 +201,22 @@ export default function NewTask({ types, priorities, items, personnel }: CreateT
                     onBlur={() => validate('location')}
                     className="border-gray-300 focus:border-[#1B2560] focus:ring-[#1B2560]"
                   />
-                  {invalid('description') && (
+                  {invalid('location') && (
                     <div className="flex items-center gap-1 text-xs text-red-600">
                       <AlertCircle className="h-3 w-3 shrink-0" />
                       <span className="break-words">{errors.description}</span>
                     </div>
                   )}
+                </div>
+
+                <div className="space-y-2 flex flex-col">
+                  <Label htmlFor="location" className="text-gray-700 font-medium">
+                    Location Coordinates
+                  </Label>
+                  <LocationSelector onSetLocation={(loc) => {
+                    setData('location_latitude', loc.lat);
+                    setData('location_longitude', loc.lng);
+                  }} />
                 </div>
               </div>
             </CardContent>

@@ -46,3 +46,40 @@ export function getMonthName(monthNumber: number): string {
 
   return months[monthNumber - 1] ?? "";
 }
+
+export function geojsonToPoints(geojson: any): [number, number][] {
+  const points: [number, number][] = [];
+  if (!geojson || !geojson.features) return points;
+
+  geojson.features.forEach((feature: any) => {
+    const geom = feature.geometry;
+    if (!geom) return;
+    if (geom.type === "LineString") {
+      geom.coordinates.forEach((coord: [number, number]) => {
+        points.push([coord[1], coord[0]]);
+      });
+    } else if (geom.type === "Polygon") {
+      geom.coordinates.forEach((ring: [number, number][]) => {
+        ring.forEach((coord: [number, number]) => {
+          points.push([coord[1], coord[0]]);
+        });
+      });
+    } else if (geom.type === "MultiLineString") {
+      geom.coordinates.forEach((line: [number, number][]) => {
+        line.forEach((coord: [number, number]) => {
+          points.push([coord[1], coord[0]]);
+        });
+      });
+    } else if (geom.type === "MultiPolygon") {
+      geom.coordinates.forEach((polygon: [number, number][][]) => {
+        polygon.forEach((ring: [number, number][]) => {
+          ring.forEach((coord: [number, number]) => {
+            points.push([coord[1], coord[0]]);
+          });
+        });
+      });
+    }
+  });
+
+  return points;
+}

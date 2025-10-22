@@ -103,10 +103,6 @@ class TasksController extends Controller
     if (!$isAdmin) {
       $personnel = $personnel->reject(fn ($person) => $person->hasRole(RolesEnum::ADMIN));
     }
-    
-    Log::info('user', [
-      'is_admin' => $isAdmin,
-    ]);
 
     return Inertia::render('Tasks/NewTask', [
       'types' => TaskType::all(),

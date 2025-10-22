@@ -7,6 +7,8 @@ export interface Task {
   title: string
   description: string
   location: string
+  location_latitude?: number
+  location_longitude?: number
   
   due_date: string
   finished_at: string;
