@@ -7,12 +7,25 @@ import type { JSX } from "react"
 import TrackingMap from "./TrackingMap"
 import { Map } from "leaflet"
 import { useSidebar } from "@/components/ui/sidebar"
-import { formatName, userHasPermission } from "@/lib/utils"
+import { cn, formatName, toProperCase, userHasPermission } from "@/lib/utils"
 import { GenerateLocationHistoryReportDialog } from "./Partials/GenerateLocationHistoryReportDialog"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Toggle } from "@/components/ui/toggle"
 import { ALL_STATUSES, useMapTracking } from "@/hooks/use-map-tracking"
 import { Status } from "@/types"
+
+const getStatusColor = (status?: Status) => {
+  if (!status) {
+    return 'bg-gray-100 text-gray-800';
+  }
+  const colors: Record<Status, string> = {
+    'available': "bg-green-100 text-green-800",
+    'on break': "bg-orange-100 text-orange-800",
+    'emergency': "bg-red-100 text-red-800",
+    'unavailable': "bg-gray-200 text-gray-800",
+  }
+  return colors[status];
+}
 
 export default function MapPage () {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
@@ -131,6 +144,9 @@ export default function MapPage () {
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-gray-900 text-sm">{formatName(person)}</div>
                           <div className="text-xs text-gray-600">{person.email}</div>
+                          <span className="text-xs text-gray-600">Status:  </span>
+                          <span className={cn("inline-flex px-2 py-1 text-xs font-semibold rounded-full shadow-md", getStatusColor(person.status))}>{toProperCase(person.status ?? 'Unavailable')}</span>
+
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           {!!visiblePersonnel.find(visiblePerson => visiblePerson.id === person.id) ? (
