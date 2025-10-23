@@ -97,7 +97,10 @@ class ImportItems extends Command
                         'name' => $data['name'],
                         'group_id' => (int) $data['group_id'] + (int) $groupIDOffset,
                         'description' => $data['description'],
-                        'created_at' => Date::createFromFormat('Y-m-d H:i:s', $data['created_at']),
+                        'created_at' => Date::createFromFormat('d/m/Y H:i', $data['Date']),
+                        'use_before_maintenance' => $data['maintenance'],
+                        'use_before_disposal' => $data['disposal'],
+                        'years_life_expectancy' => $data['life_expectancy'],
                     ]);
                 }
 
