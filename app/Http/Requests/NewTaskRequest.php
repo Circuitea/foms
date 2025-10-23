@@ -39,8 +39,8 @@ class NewTaskRequest extends FormRequest
             'items.consumables.*.id' => ['required_with:items.consumables', 'integer', 'exists:consumable_items,id'],
             'items.consumables.*.count' => ['required_with:items.consumables', 'integer', 'min:1'],
             'personnel' => 'nullable|list',
-            'location_latitude' => 'nullable|number',
-            'location_longitude' => 'nullable|number',
+            'location_latitude' => 'nullable|numeric',
+            'location_longitude' => 'nullable|numeric',
         ];
     }
 }
