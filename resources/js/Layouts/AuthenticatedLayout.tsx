@@ -15,6 +15,7 @@ import { NotificationSheet } from '@/components/notification-sheet';
 import { Item } from '@radix-ui/react-select';
 import { Personnel } from '@/types';
 import { formatName } from '@/lib/utils';
+import { EquipmentItem } from '@/types/inventory';
 
 interface BreadcrumbEntry {
   value: string;
@@ -59,6 +60,14 @@ export default function Authenticated({
       toast('error', `${notification.personnel.first_name} is in an Emergency.`, `${formatName(notification.personnel)} has set their status to Emergency.`)
     },
     'broadcast.personnel-emergency',
+  )
+
+  useEchoNotification<{ item: EquipmentItem }>(
+    `App.Models.Personnel.${user.id}`,
+    (notification) => {
+      toast('warning', `Item ${notification.item.name} Maintenance Needed`, `'${notification.item.name}' equipment item is in need of maintenance.`)
+    },
+    'broadcast.equipment-maintenance',
   )
 
   const currentTime = useRealTimeClock();

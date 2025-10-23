@@ -11,8 +11,9 @@ import { Spinner } from "./ui/spinner";
 import dayjs from "dayjs";
 import { formatName } from "@/lib/utils";
 import { Personnel } from "@/types";
+import { EquipmentItem } from "@/types/inventory";
 
-type Notification = TaskAssignedNotification | ConsumableItemLevelLowNotification | PersonnelEmergencyNotification;
+type Notification = TaskAssignedNotification | ConsumableItemLevelLowNotification | PersonnelEmergencyNotification | EquipmentMaintenanceNotification;
 
 interface TaskAssignedNotification {
   id: string;
@@ -52,6 +53,19 @@ interface PersonnelEmergencyNotification {
   type: 'personnel-emergency';
   data: {
     personnel: Personnel,
+  };
+
+  read_at?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface EquipmentMaintenanceNotification {
+  id: string;
+  type: 'equipment-maintenance';
+  data: {
+    item: EquipmentItem;
+    transactions_count: number;
   };
 
   read_at?: string;
@@ -176,6 +190,8 @@ function NotificationDetails({ notification }: { notification: Notification }) {
       return <ConsumableItemLevelLow notification={notification} />
     case 'personnel-emergency':
       return <PersonnelEmergency notification={notification} />
+    case 'equipment-maintenance':
+      return <EquipmentMaintenance notification={notification} />
     default:
       return (
         <>
@@ -247,6 +263,17 @@ function PersonnelEmergency({ notification } : { notification: PersonnelEmergenc
           </Link>
         </Button>
       </ItemActions>
+    </>
+  )
+}
+
+function EquipmentMaintenance({ notification } : { notification: EquipmentMaintenanceNotification }) {
+  return (
+    <>
+      <ItemContent>
+        <ItemTitle>Item {notification.data.item.name} Maintenance Needed</ItemTitle>
+        <ItemDescription>'{notification.data.item.name}' equipment item is in need of maintenance.</ItemDescription>
+      </ItemContent>
     </>
   )
 }
