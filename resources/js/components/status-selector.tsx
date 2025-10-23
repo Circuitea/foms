@@ -77,6 +77,7 @@ export function StatusSelector() {
         });
       }
     } catch (e) {
+      // @ts-ignore
       toast('error', 'Status Change Error', e.response.data.message ?? '')
     }
 
