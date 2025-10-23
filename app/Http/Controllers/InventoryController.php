@@ -202,7 +202,39 @@ class InventoryController extends Controller
                       ->whereNull('tasks.finished_at');
                 }
             ]);
+
+            $query->addSelect([
+                'transactions_since_maintenance' => function ($subQuery) {
+                    $subQuery->selectRaw('
+                        CASE 
+                            WHEN EXISTS (
+                                SELECT 1 FROM equipment_transaction_entries as ete_check
+                                WHERE ete_check.item_id = equipment_items.id
+                                AND ete_check.is_maintenance = true
+                            )
+                            THEN (
+                                SELECT COUNT(*)
+                                FROM equipment_transaction_entries as ete
+                                WHERE ete.item_id = equipment_items.id
+                                AND ete.id > (
+                                    SELECT MAX(ete2.id)
+                                    FROM equipment_transaction_entries as ete2
+                                    WHERE ete2.item_id = equipment_items.id
+                                    AND ete2.is_maintenance = true
+                                )
+                            )
+                            ELSE (
+                                SELECT COUNT(*)
+                                FROM equipment_transaction_entries as ete
+                                WHERE ete.item_id = equipment_items.id
+                            )
+                        END
+                    ');
+                }
+            ]);
         }]);
+
+        
 
         // Build monthsByYear structure
         $monthsByYear = [];

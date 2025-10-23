@@ -87,6 +87,20 @@ const columns: ColumnDef<EquipmentItem>[] = [
     },
     header: 'Last Used',
   },
+  {
+    id: 'maintenance',
+    accessorFn: (item) => item.use_before_maintenance - item.transactions_since_maintenance,
+    cell: ({ row }) => (
+      <span>Uses Left: {row.getValue('maintenance')}</span>
+    )
+  },
+  {
+    id: 'overall',
+    accessorFn: (item) => item.use_before_disposal - (item.entries.filter(entry => !entry.is_maintenance).length),
+    cell: ({ row }) => (
+      <span>Uses Left: {row.getValue('overall')}</span>
+    )
+  }
 ]
 
 export default function ShowEquipmentItem({

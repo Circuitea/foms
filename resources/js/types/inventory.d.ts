@@ -16,6 +16,13 @@ export interface EquipmentItem {
   created_at?: string;
   updated_at?: string;
 
+  use_before_maintenance: number;
+  transactions_since_maintenance: number;
+
+  use_before_disposal: number;
+  
+  years_life_expectancy: number;
+
   entries: EquipmentTransactionEntry[];
 }
 
@@ -37,6 +44,7 @@ export interface ConsumableItem {
 export interface EquipmentTransactionEntry {
   id: number;
   transaction: Transaction;
+  is_maintenance: boolean;
 }
 
 export interface ConsumableTransactionEntry {
