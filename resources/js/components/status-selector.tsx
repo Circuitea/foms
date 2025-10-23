@@ -11,6 +11,7 @@ import { AlarmClockOff, CircleCheck, Coffee, LucideIcon, ShieldAlert } from "luc
 import { Checkbox } from "./ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { cn } from "@/lib/utils";
+import toast from "./toast";
 
 interface StatusOption {
   value: Status;
@@ -63,16 +64,22 @@ export function StatusSelector() {
   ];
 
   const handleStatusChange = async (newStatus: string) => {
-    const response: AxiosResponse<{ status: Status | null }> = await axios.post('/api/status', {
-      status: newStatus
-    });
 
-    if (response.status === 200 && response.data) {
-      dispatch({
-        type: 'set',
-        status: response.data.status ?? 'unavailable',
+    try {
+      const response: AxiosResponse<{ status: Status | null, message?: string }> = await axios.post('/api/status', {
+        status: newStatus
       });
+      
+      if (response.status === 200 && response.data) {
+        dispatch({
+          type: 'set',
+          status: response.data.status ?? 'unavailable',
+        });
+      }
+    } catch (e) {
+      toast('error', 'Status Change Error', e.response.data.message ?? '')
     }
+
   }
 
   return open ? (

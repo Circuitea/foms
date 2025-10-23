@@ -67,6 +67,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
         $oldStatus = $user->status;
         
         $newStatus = StatusEnum::from($validated['status']);
+
+        if (
+            $newStatus === StatusEnum::UNAVAILABLE &&
+            !is_null($user->shift_end_time)
+        ) {
+            $now = now()->format('H:i:s');
+            if ($now < $user->shift_end_time) {
+                return response([
+                    'message' => 'Cannot set status to UNAVAILABLE before shift end time.',
+                ], 409);
+            }
+        }
         
         $user->status = $newStatus;
         $user->save();
