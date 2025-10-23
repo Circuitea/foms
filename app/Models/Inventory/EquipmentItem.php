@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EquipmentItem extends Model
 {
-    public $fillable = ['name', 'description', 'location', 'image_path', 'group_id', 'created_at'];
+    public $fillable = ['name', 'description', 'location', 'image_path', 'group_id', 'created_at', 'use_before_maintenance', 'use_before_disposal', 'years_life_expectancy'];
 
     public function entries(): HasMany
     {
