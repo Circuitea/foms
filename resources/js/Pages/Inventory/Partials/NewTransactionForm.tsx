@@ -1,6 +1,7 @@
 import InputError from "@/components/InputError";
 import { ItemSelectionDialog } from "@/components/SimpleItemSelectionDialog";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ type NewTransactionEntry = {
   type: 'equipment' | 'consumable' | null;
   item_id?: number;
   quantity?: string;
+  is_maintenance?: boolean;
 };
 
 type EquipmentEntry = EquipmentGroup & { items: EquipmentItem[] };
@@ -144,7 +146,7 @@ export default function NewTransactionForm() {
                               <span className="text-gray-400 text-xs">{entry.type === 'equipment' ? 'Equipment Item' : 'Consumable Item'}</span>
                             </div>
 
-                            {entry.type === 'consumable' && (
+                            {entry.type === 'consumable' ? (
                               <Input
                                 id="title"
                                 value={data.entries[index].quantity}
@@ -157,7 +159,19 @@ export default function NewTransactionForm() {
                                   setData('entries', entries);  
                                 }}
                               />
+                            ) : entry.type === 'equipment' && (
+                              <div className="flex justify-center items-center gap-2">
+                                <Checkbox id="is_maintenance" checked={entry.is_maintenance ?? false} onCheckedChange={(checked) => {
+                                  if (checked !== 'indeterminate') {
+                                    const entries = data.entries;
+                                    entries[index].is_maintenance = checked;
+                                    setData('entries', entries);
+                                  }
+                                }} />
+                                <Label htmlFor="is_maintenance">Maintenance?</Label>
+                              </div>
                             )}
+
                           </>
                         )}
 

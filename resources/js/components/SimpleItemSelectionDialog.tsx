@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { ConsumableItem, EquipmentGroup, EquipmentItem } from "@/types/inventory"
+import { Checkbox } from "./ui/checkbox"
+import { Label } from "./ui/label"
 
 export type SingleItemSelection = EmptyItemSelection | ItemSelection;
 

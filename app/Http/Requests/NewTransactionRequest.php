@@ -35,6 +35,10 @@ class NewTransactionRequest extends FormRequest
                 'required_if:entries.*.type,consumable',
                 'integer',
             ],
+            'entries.*.is_maintenance' => [
+                'required_if:entries.*.type,equipment',
+                'boolean',
+            ],
         ];
     }
 }

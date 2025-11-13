@@ -129,6 +129,7 @@ class InventoryController extends Controller
                     $newEntry = new EquipmentTransactionEntry();
                     $newEntry->item()->associate($equipmentItem);
                     $newEntry->transaction()->associate($newTransaction);
+                    $newEntry->is_maintenance = $entry['is_maintenance'];
                     $newEntry->save();
                 } else if($entry['type'] === 'consumable') {
                     $consumableItem = ConsumableItem::find($entry['item_id']);
