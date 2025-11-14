@@ -16,6 +16,24 @@ import { Item } from '@radix-ui/react-select';
 import { Personnel } from '@/types';
 import { formatName } from '@/lib/utils';
 import { EquipmentItem } from '@/types/inventory';
+import { icon, Marker } from 'leaflet';
+
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIconBig from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const MarkerIcon = icon({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIconBig,
+  shadowUrl: markerIconShadow,
+  iconSize:    [25, 41],
+  iconAnchor:  [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowSize:  [41, 41],
+});
+
+Marker.prototype.options.icon = MarkerIcon;
 
 interface BreadcrumbEntry {
   value: string;

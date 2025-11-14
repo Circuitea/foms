@@ -5,7 +5,7 @@ import { PropsWithChildren, useRef, useState } from "react";
 import { TileLayer, GeoJSON, Marker, useMapEvent, Polyline, Polygon, Rectangle } from "react-leaflet";
 import { MapContainer, MapRef } from "react-leaflet/MapContainer";
 import SanJuanBoundary from '../Pages/Mapping/sanjuan-boundary.json';
-import { latLng, LatLng, latLngBounds } from "leaflet";
+import { Icon, icon, latLng, LatLng, latLngBounds } from "leaflet";
 import { geojsonToPoints } from "@/lib/utils";
 
 const bounds = latLngBounds(geojsonToPoints(SanJuanBoundary)).pad(0.05)
