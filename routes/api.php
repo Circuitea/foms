@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -308,6 +309,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/unread', [NotificationsController::class, 'listUnread']);
         Route::patch('/{id}/read', [NotificationsController::class, 'markAsRead']);
         Route::patch('/{id}/unread', [NotificationsController::class, 'markAsUnread']);
+    });
+
+    Route::post('first-time', function (Request $request) {
+        $validated = $request->validate([
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        $request->user()->update([
+            'first_time_login' => 0,
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return response(["status" =>  "ok"]);
     });
 });
 
