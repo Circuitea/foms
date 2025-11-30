@@ -20,30 +20,30 @@ use Inertia\Inertia;
 
 Route::middleware(['auth', 'verified', 'first_time'])->group(function () {
     Route::get('/dashboard', function () {
-        $incidentData = DB::table('incidents')
-            ->join('barangays', 'incidents.barangay_id', '=', 'barangays.id')
-            ->select('barangays.name as barangay', 'type_id', DB::raw('COUNT(*) as incidents_count'))
-            ->groupBy('barangays.name', 'type_id')
-            ->get();
+        // $incidentData = DB::table('incidents')
+        //     ->join('barangays', 'incidents.barangay_id', '=', 'barangays.id')
+        //     ->select('barangays.name as barangay', 'type_id', DB::raw('COUNT(*) as incidents_count'))
+        //     ->groupBy('barangays.name', 'type_id')
+        //     ->get();
 
-        // Transform to: [{ barangay: 'Addition Hills', 9: 2, 5: 1 }, ...]
-        $grouped = [];
+        // // Transform to: [{ barangay: 'Addition Hills', 9: 2, 5: 1 }, ...]
+        // $grouped = [];
 
-        foreach ($incidentData as $row) {
-            $barangayName = $row->barangay;
-            $typeId = $row->type_id;
-            $count = $row->incidents_count;
+        // foreach ($incidentData as $row) {
+        //     $barangayName = $row->barangay;
+        //     $typeId = $row->type_id;
+        //     $count = $row->incidents_count;
 
-            if (!isset($grouped[$barangayName])) {
-                $grouped[$barangayName] = ['barangay' => $barangayName];
-            }
-            $grouped[$barangayName][$typeId] = $count;
-        }
+        //     if (!isset($grouped[$barangayName])) {
+        //         $grouped[$barangayName] = ['barangay' => $barangayName];
+        //     }
+        //     $grouped[$barangayName][$typeId] = $count;
+        // }
 
-        $grouped = array_values($grouped);
+        // $grouped = array_values($grouped);
         return Inertia::render('Dashboard', [
-            'types' => TaskType::all()->pluck('name', 'id'),
-            'incidents' => $grouped,
+            // 'types' => TaskType::all()->pluck('name', 'id'),
+            // 'incidents' => $grouped,
             'availablePersonnel' => Personnel::where('status', StatusEnum::AVAILABLE)->count(),
             'ongoingTasks' => Task::whereNull('finished_at')->count(),
         ]);
