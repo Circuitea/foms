@@ -2,12 +2,12 @@ import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { formatName } from "@/lib/utils";
 import { PageProps, Personnel } from "@/types";
 import { ActivityDetail } from "@/types/activities";
-import { ReactElement, useState, useMemo } from "react";
+import { ReactElement, useState, useMemo, useEffect, useRef } from "react";
 import { Activity } from "./ActivityPartials/Activity";
 import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PDFDownloadLink, usePDF } from "@react-pdf/renderer";
+import { usePDF } from "@react-pdf/renderer";
 import { PersonnelActivityReport } from "@/Documents/PersonnelActivityReport";
 import { Download } from "lucide-react";
 import { usePage } from "@inertiajs/react";
@@ -22,6 +22,7 @@ type ListPersonnelActivityProps = PageProps<{
 export default function ListPersonnelActivity({ personnel }: ListPersonnelActivityProps) {
   const { user } = usePage().props.auth;
   const [selectedDate, setSelectedDate] = useState<string>("");
+  const [pendingDownload, setPendingDownload] = useState<string | null>(null);
 
   const activities = personnel.activities.reduce<{
     [key: string]: ActivityDetail[],
@@ -47,6 +48,7 @@ export default function ListPersonnelActivity({ personnel }: ListPersonnelActivi
   // Generate PDF when button is clicked
   const handleGenerateReport = () => {
     if (selectedDate) {
+      setPendingDownload(selectedDate);
       updateInstance(
         <PersonnelActivityReport
           personnel={personnel}
@@ -57,17 +59,18 @@ export default function ListPersonnelActivity({ personnel }: ListPersonnelActivi
     }
   };
 
-  // Download PDF when ready
-  useMemo(() => {
-    if (instance.url && !instance.loading && selectedDate) {
+  // Download PDF when ready and matches pending download
+  useEffect(() => {
+    if (instance.url && !instance.loading && pendingDownload) {
       const link = document.createElement('a');
       link.href = instance.url;
-      link.download = `personnel_${personnel.id}_activity_${selectedDate}.pdf`;
+      link.download = `personnel_${personnel.id}_activity_${pendingDownload}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      setPendingDownload(null); // Reset after download
     }
-  }, [instance.url, instance.loading, selectedDate, personnel.id]);
+  }, [instance.url, instance.loading, pendingDownload, personnel.id]);
 
   return (
     <div className="mx-auto">
