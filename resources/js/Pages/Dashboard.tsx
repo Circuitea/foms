@@ -23,7 +23,7 @@ interface IncidentData {
 export default function Dashboard({ incidents, availablePersonnel, ongoingTasks }: PageProps<{ incidents: IncidentData[], availablePersonnel: number, ongoingTasks: number }>) {
   return (
     <div>
-      <div className="min-h-screen bg-gray-50">
+      <div className="bg-gray-50">
         {/* Dashboard Content */}
         <div className="flex flex-col gap-6 px-6 py-6">
           {/* Summary Cards */}
@@ -71,7 +71,7 @@ export default function Dashboard({ incidents, availablePersonnel, ongoingTasks 
 
                 <div className="p-6">
                   <div
-                    className="relative bg-linear-to-br from-blue-50 to-green-50 rounded-lg h-64 cursor-pointer hover:shadow-md transition-all"
+                    className="relative bg-linear-to-br from-blue-50 to-green-50 rounded-lg h-full cursor-pointer hover:shadow-md transition-all"
                   >
                     <Link href="/map">
                       <MapContainer className='min-h-full h-64 z-0 border-2 border-dashed border-gray-300 rounded-lg' center={[14.6034363, 121.0389469]} zoom={14} scrollWheelZoom={false} dragging={false} zoomControl={false}>
@@ -91,7 +91,7 @@ export default function Dashboard({ incidents, availablePersonnel, ongoingTasks 
               </div>
 
               {/* Analytics Charts */}
-              <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
+              {/* <div className="bg-white rounded-lg shadow-xs border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Incidents (per Barangay)</h3>
                 <ChartContainer config={chartConfig}>
                   <BarChart
@@ -115,7 +115,7 @@ export default function Dashboard({ incidents, availablePersonnel, ongoingTasks 
                     <Bar dataKey={11} stackId="a" fill="var(--color-11)" />
                   </BarChart>
                 </ChartContainer>
-              </div>
+              </div> */}
             </div>
           </div>
 
