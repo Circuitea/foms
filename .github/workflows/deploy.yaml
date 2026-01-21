@@ -91,9 +91,9 @@ jobs:
           script: |
             cd $APP_DIR
 
-            sudo find storage -type d -exec chmod 775 {} \;
-            sudo find storage -type f -exec chmod 664 {} \;
-            sudo chmod -R 775 bootstrap/cache
+            find storage -type d -exec chmod 775 {} \;
+            find storage -type f -exec chmod 664 {} \;
+            chmod -R 775 bootstrap/cache
 
             if [ ! -f ".env" ]; then
               echo ".env not found at $APP_DIR.env"; exit 1
@@ -112,6 +112,4 @@ jobs:
 
             php artisan up
 
-            if command -v systemctl >/dev/null 2>&1; then
-              sudo systemctl reload ${PHP_FPM_SERVICE}
-            fi
+            caddy reload
