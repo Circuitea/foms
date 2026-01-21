@@ -111,5 +111,3 @@ jobs:
             php artisan reverb:restart || true
 
             php artisan up
-
-            caddy reload
